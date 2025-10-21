@@ -141,12 +141,12 @@ export default function UsersPage() {
     }
   };
 
-  const getProgressStats = (user: User) => {
+  const getProgressStats = (user: User): { courses: number; videos: number } => {
     if (!user.progress) return { courses: 0, videos: 0 };
 
     const courses = Object.keys(user.progress).length;
     const videos = Object.values(user.progress).reduce(
-      (acc, p: any) => acc + (p.watchedVideos?.length || 0),
+      (acc: number, p: any) => acc + (p.watchedVideos?.length || 0),
       0
     );
 
