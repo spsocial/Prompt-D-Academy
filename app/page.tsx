@@ -52,28 +52,108 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">เรียนรู้ AI Tools ชั้นนำ</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="card text-center">
-              <div className="text-4xl mb-4">🤖</div>
-              <h3 className="text-xl font-bold mb-2">ChatGPT & GPT Custom</h3>
-              <p className="text-gray-600">สร้าง AI Assistant ของคุณเอง</p>
+      {/* AI Tools Infinite Carousel */}
+      <section className="py-20 bg-gray-50 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+          <h2 className="text-3xl font-bold text-center mb-4">เรียนรู้ AI Tools ชั้นนำ</h2>
+          <p className="text-center text-gray-600 mb-12">ปลดล็อกพลังของ AI ชั้นนำระดับโลก</p>
+        </div>
+
+        {/* Infinite Scrolling Logos */}
+        <div className="relative">
+          <div className="flex animate-scroll">
+            {/* First set of logos */}
+            <div className="flex gap-8 px-4">
+              <div className="flex items-center gap-3 bg-white rounded-lg px-6 py-4 shadow-md whitespace-nowrap">
+                <span className="text-3xl">🎬</span>
+                <span className="font-bold text-gray-800">VEO 3.1</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white rounded-lg px-6 py-4 shadow-md whitespace-nowrap">
+                <span className="text-3xl">🍌</span>
+                <span className="font-bold text-gray-800">Nano Banana</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white rounded-lg px-6 py-4 shadow-md whitespace-nowrap">
+                <span className="text-3xl">🤖</span>
+                <span className="font-bold text-gray-800">ChatGPT</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white rounded-lg px-6 py-4 shadow-md whitespace-nowrap">
+                <span className="text-3xl">💬</span>
+                <span className="font-bold text-gray-800">Infinite Talk</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white rounded-lg px-6 py-4 shadow-md whitespace-nowrap">
+                <span className="text-3xl">🎨</span>
+                <span className="font-bold text-gray-800">Midjourney</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white rounded-lg px-6 py-4 shadow-md whitespace-nowrap">
+                <span className="text-3xl">🧠</span>
+                <span className="font-bold text-gray-800">Claude AI</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white rounded-lg px-6 py-4 shadow-md whitespace-nowrap">
+                <span className="text-3xl">✨</span>
+                <span className="font-bold text-gray-800">Gemini</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white rounded-lg px-6 py-4 shadow-md whitespace-nowrap">
+                <span className="text-3xl">🎵</span>
+                <span className="font-bold text-gray-800">Suno AI</span>
+              </div>
             </div>
-            <div className="card text-center">
-              <div className="text-4xl mb-4">🎨</div>
-              <h3 className="text-xl font-bold mb-2">Midjourney</h3>
-              <p className="text-gray-600">สร้างภาพสวยงามด้วย AI</p>
-            </div>
-            <div className="card text-center">
-              <div className="text-4xl mb-4">🎬</div>
-              <h3 className="text-xl font-bold mb-2">Heygen & Comfy UI</h3>
-              <p className="text-gray-600">สร้างวิดีโอและ AI Avatar</p>
+
+            {/* Duplicate set for seamless loop */}
+            <div className="flex gap-8 px-4">
+              <div className="flex items-center gap-3 bg-white rounded-lg px-6 py-4 shadow-md whitespace-nowrap">
+                <span className="text-3xl">🎬</span>
+                <span className="font-bold text-gray-800">VEO 3.1</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white rounded-lg px-6 py-4 shadow-md whitespace-nowrap">
+                <span className="text-3xl">🍌</span>
+                <span className="font-bold text-gray-800">Nano Banana</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white rounded-lg px-6 py-4 shadow-md whitespace-nowrap">
+                <span className="text-3xl">🤖</span>
+                <span className="font-bold text-gray-800">ChatGPT</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white rounded-lg px-6 py-4 shadow-md whitespace-nowrap">
+                <span className="text-3xl">💬</span>
+                <span className="font-bold text-gray-800">Infinite Talk</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white rounded-lg px-6 py-4 shadow-md whitespace-nowrap">
+                <span className="text-3xl">🎨</span>
+                <span className="font-bold text-gray-800">Midjourney</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white rounded-lg px-6 py-4 shadow-md whitespace-nowrap">
+                <span className="text-3xl">🧠</span>
+                <span className="font-bold text-gray-800">Claude AI</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white rounded-lg px-6 py-4 shadow-md whitespace-nowrap">
+                <span className="text-3xl">✨</span>
+                <span className="font-bold text-gray-800">Gemini</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white rounded-lg px-6 py-4 shadow-md whitespace-nowrap">
+                <span className="text-3xl">🎵</span>
+                <span className="font-bold text-gray-800">Suno AI</span>
+              </div>
             </div>
           </div>
         </div>
+
+        <style jsx>{`
+          @keyframes scroll {
+            0% {
+              transform: translateX(0);
+            }
+            100% {
+              transform: translateX(-50%);
+            }
+          }
+
+          .animate-scroll {
+            animation: scroll 30s linear infinite;
+          }
+
+          .animate-scroll:hover {
+            animation-play-state: paused;
+          }
+        `}</style>
       </section>
 
       {/* Pricing Section */}
@@ -94,10 +174,10 @@ export default function Home() {
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-green-500">✓</span>
-                  <span>ChatGPT, Midjourney, Heygen</span>
+                  <span>ChatGPT, Nano Banana, Veo3.1, Infinite talk</span>
                 </li>
               </ul>
-              <button className="btn-primary w-full">เลือกแพ็คเกจนี้</button>
+              <Link href="/register" className="btn-primary w-full block text-center">เลือกแพ็คเกจนี้</Link>
             </div>
 
             {/* All-in-One Package */}
@@ -120,14 +200,14 @@ export default function Home() {
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-green-500">✓</span>
-                  <span>สร้าง TikTok Viral</span>
+                  <span>สร้างเพลงและนิทานด้วย AI</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-green-500">✓</span>
-                  <span>สร้างเพลงและนิทานด้วย AI</span>
+                  <span>สอนใช้ AI ตัวอื่นๆอีกเพียบ</span>
                 </li>
               </ul>
-              <button className="btn-primary w-full">เลือกแพ็คเกจนี้</button>
+              <Link href="/register" className="btn-primary w-full block text-center">เลือกแพ็คเกจนี้</Link>
             </div>
 
             {/* Pro Package */}
