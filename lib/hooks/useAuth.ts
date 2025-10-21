@@ -14,7 +14,7 @@ export interface UserData {
   isActive: boolean;
   needsApproval: boolean;
   isAdmin?: boolean;
-  package: 'basic' | 'allinone' | 'pro' | null;
+  package: 'free' | 'basic' | 'allinone' | 'pro' | null;
   packageExpiry?: Date;
   createdAt: Date;
   lastLogin?: Date;

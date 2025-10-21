@@ -72,10 +72,10 @@ export default function RegisterPage() {
         displayName: formData.displayName,
         photoURL: null,
         provider: 'email',
-        isActive: true, // Email/Password users are auto-activated after email verification
+        isActive: true, // Auto-activated with free package (Freemium model)
         needsApproval: false,
         isAdmin: false,
-        package: null, // Admin will assign package later
+        package: 'free', // Start with free package, can upgrade later
         createdAt: new Date(),
         lastLogin: new Date(),
         progress: {},

@@ -24,37 +24,27 @@ export function GoogleSignInButton() {
       const userDoc = await getDoc(userRef);
 
       if (!userDoc.exists()) {
-        // New user - create document with pending approval
+        // New user - create document with free package (Freemium model)
         await setDoc(userRef, {
           uid: user.uid,
           email: user.email,
           displayName: user.displayName || 'ผู้ใช้ Google',
           photoURL: user.photoURL,
           provider: 'google',
-          isActive: false,
-          needsApproval: true,
+          isActive: true, // Auto-activated with free package
+          needsApproval: false,
           isAdmin: false,
-          package: null,
+          package: 'free', // Start with free package, can upgrade later
           createdAt: new Date(),
           lastLogin: new Date(),
           progress: {},
           activeSessions: 1,
           suspiciousActivity: false,
         });
-
-        // Redirect to pending approval page (don't sign out yet)
-        router.push('/pending-approval');
-      } else {
-        // Existing user - check if active
-        const userData = userDoc.data();
-
-        if (!userData.isActive) {
-          router.push('/pending-approval');
-        } else {
-          // User is active - redirect to dashboard
-          router.push('/dashboard');
-        }
       }
+
+      // All users (new and existing) go to dashboard
+      router.push('/dashboard');
     } catch (error: any) {
       console.error('Google Sign-In Error:', error);
 

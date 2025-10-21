@@ -7,6 +7,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { Clock, Mail, Zap } from 'lucide-react';
+import { MessengerFAB } from '@/components/MessengerFAB';
 
 export default function PendingApprovalPage() {
   const router = useRouter();
@@ -126,7 +127,9 @@ export default function PendingApprovalPage() {
           {/* Actions */}
           <div className="space-y-3">
             <a
-              href="mailto:support@promptdacademy.com"
+              href="https://m.me/719837687869400"
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-secondary w-full text-center inline-block"
             >
               <div className="flex items-center justify-center gap-2">
@@ -146,15 +149,23 @@ export default function PendingApprovalPage() {
           {/* Footer Note */}
           <div className="mt-6 pt-6 border-t border-gray-200">
             <p className="text-xs text-gray-500 text-center">
-              หากมีคำถามหรือต้องการความช่วยเหลือ กรุณาติดต่อเราผ่านอีเมล
+              หากมีคำถามหรือต้องการความช่วยเหลือ
               <br />
-              <a href="mailto:support@promptdacademy.com" className="text-purple-600 hover:underline">
-                support@promptdacademy.com
+              <a
+                href="https://m.me/719837687869400"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-purple-600 hover:underline font-medium"
+              >
+                ติดต่อเราผ่าน Facebook Messenger
               </a>
             </p>
           </div>
         </div>
       </div>
+
+      {/* Floating Messenger FAB */}
+      <MessengerFAB />
     </div>
   );
 }

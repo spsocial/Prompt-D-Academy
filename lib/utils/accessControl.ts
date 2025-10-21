@@ -10,6 +10,7 @@ export function canAccessContent(
   if (!userPackage) return false;
 
   const hierarchy: Record<string, number> = {
+    free: 0,
     basic: 1,
     allinone: 2,
     pro: 3,
@@ -51,6 +52,7 @@ export function isAdmin(userData: UserData | null): boolean {
  */
 export function getPackageName(packageId: string | null): string {
   const packageNames: Record<string, string> = {
+    free: 'Free',
     basic: 'โฆษณาโปร',
     allinone: 'All-in-One',
     pro: 'Pro Developer',

@@ -414,6 +414,7 @@ export default function UsersPage() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                   >
                     <option value="">ไม่มีแพ็คเกจ</option>
+                    <option value="free">Free (Freemium)</option>
                     <option value="basic">Basic</option>
                     <option value="allinone">All-in-One</option>
                     <option value="pro">Pro</option>
