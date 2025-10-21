@@ -30,7 +30,7 @@ export default function CreateAIToolPage() {
   const [folder, setFolder] = useState('');
   const [icon, setIcon] = useState('🤖');
   const [imageUrl, setImageUrl] = useState('');
-  const [requiredPackage, setRequiredPackage] = useState<'basic' | 'allinone' | 'pro'>('basic');
+  const [requiredPackage, setRequiredPackage] = useState<'free' | 'basic' | 'allinone' | 'pro'>('free');
   const [order, setOrder] = useState(0);
 
   // Videos
@@ -242,6 +242,7 @@ export default function CreateAIToolPage() {
                     onChange={(e) => setRequiredPackage(e.target.value as any)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                   >
+                    <option value="free">Free (ดูได้ฟรี)</option>
                     <option value="basic">Basic</option>
                     <option value="allinone">All-in-One</option>
                     <option value="pro">Pro</option>
