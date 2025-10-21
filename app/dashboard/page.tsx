@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Navbar } from '@/components/Navbar';
 import { LockOverlay } from '@/components/LockOverlay';
@@ -10,7 +11,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { useAITools } from '@/lib/hooks/useAITools';
 import { useLearningPaths } from '@/lib/hooks/useLearningPaths';
 import { canAccessContent } from '@/lib/utils/accessControl';
-import { Clock, Video, CheckCircle, TrendingUp, Search, SlidersHorizontal } from 'lucide-react';
+import { Clock, Video, TrendingUp } from 'lucide-react';
 
 export default function DashboardPage() {
   const { userData } = useAuth();
@@ -147,28 +148,23 @@ export default function DashboardPage() {
 function LearningPathsTab({ userPackage }: { userPackage: string | null }) {
   const { paths, loading } = useLearningPaths();
   const { userData } = useAuth();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterLevel, setFilterLevel] = useState<'all' | 'เริ่มต้น' | 'กลาง' | 'สูง'>('all');
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get('search') || '';
   const [filteredPaths, setFilteredPaths] = useState(paths);
 
   useEffect(() => {
     let filtered = [...paths];
 
-    // Search filter
-    if (searchTerm) {
+    // Search filter from Navbar
+    if (searchQuery) {
       filtered = filtered.filter(path =>
-        path.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        path.description.toLowerCase().includes(searchTerm.toLowerCase())
+        path.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        path.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    // Level filter
-    if (filterLevel !== 'all') {
-      filtered = filtered.filter(path => path.level === filterLevel);
-    }
-
     setFilteredPaths(filtered);
-  }, [paths, searchTerm, filterLevel]);
+  }, [paths, searchQuery]);
 
   if (loading) {
     return (
@@ -189,62 +185,21 @@ function LearningPathsTab({ userPackage }: { userPackage: string | null }) {
 
   return (
     <>
-      {/* Search & Filter Bar */}
-      <div className="card mb-6">
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* Search */}
-          <div className="flex-1">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="ค้นหาเส้นทางการเรียน..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
-              />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            </div>
-          </div>
-
-          {/* Filter by Level */}
-          <div className="flex items-center gap-2">
-            <SlidersHorizontal className="w-5 h-5 text-gray-500" />
-            <select
-              value={filterLevel}
-              onChange={(e) => setFilterLevel(e.target.value as any)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
-            >
-              <option value="all">ทุกระดับ</option>
-              <option value="เริ่มต้น">เริ่มต้น</option>
-              <option value="กลาง">กลาง</option>
-              <option value="สูง">สูง</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
       {/* Results count */}
-      {(searchTerm || filterLevel !== 'all') && (
+      {searchQuery && (
         <div className="mb-4 text-sm text-gray-600">
-          แสดง {filteredPaths.length} จาก {paths.length} เส้นทางการเรียน
+          {filteredPaths.length > 0 ? (
+            <>แสดง {filteredPaths.length} จาก {paths.length} เส้นทางการเรียน</>
+          ) : (
+            <div className="text-center py-12 card">
+              <p className="text-gray-600">ไม่พบเส้นทางการเรียนที่ค้นหา "{searchQuery}"</p>
+            </div>
+          )}
         </div>
       )}
 
       {/* Paths Grid */}
-      {filteredPaths.length === 0 ? (
-        <div className="text-center py-12 card">
-          <p className="text-gray-600 mb-2">ไม่พบเส้นทางการเรียนที่ค้นหา</p>
-          <button
-            onClick={() => {
-              setSearchTerm('');
-              setFilterLevel('all');
-            }}
-            className="text-purple-600 hover:underline text-sm"
-          >
-            ล้างตัวกรอง
-          </button>
-        </div>
-      ) : (
+      {filteredPaths.length > 0 && (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPaths.map((path) => {
             const hasAccess = canAccessContent(userPackage, path.requiredPackage);
@@ -354,22 +309,23 @@ function LearningPathsTab({ userPackage }: { userPackage: string | null }) {
 function AIToolsTab({ userPackage }: { userPackage: string | null }) {
   const { tools, loading } = useAITools();
   const { userData } = useAuth();
-  const [searchTerm, setSearchTerm] = useState('');
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get('search') || '';
   const [filteredTools, setFilteredTools] = useState(tools);
 
   useEffect(() => {
     let filtered = [...tools];
 
-    // Search filter
-    if (searchTerm) {
+    // Search filter from Navbar
+    if (searchQuery) {
       filtered = filtered.filter(tool =>
-        tool.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        tool.description.toLowerCase().includes(searchTerm.toLowerCase())
+        tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tool.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
     setFilteredTools(filtered);
-  }, [tools, searchTerm]);
+  }, [tools, searchQuery]);
 
   if (loading) {
     return (
@@ -390,39 +346,21 @@ function AIToolsTab({ userPackage }: { userPackage: string | null }) {
 
   return (
     <>
-      {/* Search Bar */}
-      <div className="card mb-6">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="ค้นหา AI Tool..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
-          />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-        </div>
-      </div>
-
       {/* Results count */}
-      {searchTerm && (
+      {searchQuery && (
         <div className="mb-4 text-sm text-gray-600">
-          แสดง {filteredTools.length} จาก {tools.length} AI Tools
+          {filteredTools.length > 0 ? (
+            <>แสดง {filteredTools.length} จาก {tools.length} AI Tools</>
+          ) : (
+            <div className="text-center py-12 card">
+              <p className="text-gray-600">ไม่พบ AI Tool ที่ค้นหา "{searchQuery}"</p>
+            </div>
+          )}
         </div>
       )}
 
       {/* Tools Grid */}
-      {filteredTools.length === 0 ? (
-        <div className="text-center py-12 card">
-          <p className="text-gray-600 mb-2">ไม่พบ AI Tool ที่ค้นหา</p>
-          <button
-            onClick={() => setSearchTerm('')}
-            className="text-purple-600 hover:underline text-sm"
-          >
-            ล้างคำค้นหา
-          </button>
-        </div>
-      ) : (
+      {filteredTools.length > 0 && (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTools.map((tool) => {
             const hasAccess = canAccessContent(userPackage, tool.requiredPackage);

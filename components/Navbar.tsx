@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Zap, Search, LogOut, User, Settings } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -11,9 +11,42 @@ import { getPackageName, getProviderIcon } from '@/lib/utils/accessControl';
 
 export function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { user, userData } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Sync search term with URL query
+  useEffect(() => {
+    const query = searchParams.get('search') || '';
+    setSearchTerm(query);
+  }, [searchParams]);
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+
+    // Only update URL if on dashboard page
+    if (pathname === '/dashboard') {
+      const params = new URLSearchParams(searchParams.toString());
+      if (value) {
+        params.set('search', value);
+      } else {
+        params.delete('search');
+      }
+      router.push(`/dashboard?${params.toString()}`);
+    }
+  };
+
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && searchTerm) {
+      // If not on dashboard, navigate to dashboard with search
+      if (pathname !== '/dashboard') {
+        router.push(`/dashboard?search=${encodeURIComponent(searchTerm)}`);
+      }
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -37,16 +70,21 @@ export function Navbar() {
           </Link>
 
           {/* Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <div className="relative w-full">
-              <input
-                type="text"
-                placeholder="ค้นหาคอร์ส..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
-              />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+          {user && (
+            <div className="hidden md:flex flex-1 max-w-md mx-8">
+              <div className="relative w-full">
+                <input
+                  type="text"
+                  placeholder="ค้นหาคอร์ส..."
+                  value={searchTerm}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  onKeyPress={handleSearchKeyPress}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Profile Dropdown */}
           {user && userData ? (
