@@ -137,7 +137,7 @@ export default function UsersPage() {
       loadUsers();
     } catch (error: any) {
       console.error('Error deleting user:', error);
-      alert('❌ เกิดข้อผิดพลาด: ' + error.message);
+      alert('❌ เกิดข้อผิดพลาด: ' + (error as Error).message);
     }
   };
 

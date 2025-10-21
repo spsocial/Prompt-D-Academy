@@ -268,15 +268,15 @@ export default function VideoPlayerPage() {
       console.error('❌ Error marking video as completed:', error);
       console.error('Error details:', {
         code: error.code,
-        message: error.message,
+        message: (error as Error).message,
         stack: error.stack
       });
 
       // แสดง error ที่ละเอียด
       if (error.code === 'permission-denied') {
-        alert('⛔ ไม่มีสิทธิ์บันทึกข้อมูล กรุณาเช็ค Firestore Rules\n\nError: ' + error.message);
+        alert('⛔ ไม่มีสิทธิ์บันทึกข้อมูล กรุณาเช็ค Firestore Rules\n\nError: ' + (error as Error).message);
       } else {
-        alert('❌ เกิดข้อผิดพลาด: ' + error.message);
+        alert('❌ เกิดข้อผิดพลาด: ' + (error as Error).message);
       }
 
       // Reset marked state กรณี error

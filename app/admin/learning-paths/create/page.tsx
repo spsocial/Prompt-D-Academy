@@ -188,7 +188,7 @@ export default function CreateLearningPathPage() {
       router.push('/admin/learning-paths');
     } catch (error) {
       console.error('❌ Error saving:', error);
-      alert('เกิดข้อผิดพลาด: ' + error.message);
+      alert('เกิดข้อผิดพลาด: ' + (error as Error).message);
     } finally {
       setSaving(false);
     }

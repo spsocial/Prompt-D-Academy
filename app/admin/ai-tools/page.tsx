@@ -65,7 +65,7 @@ export default function AdminAIToolsPage() {
       loadTools();
     } catch (error) {
       console.error('Error deleting tool:', error);
-      alert('❌ เกิดข้อผิดพลาด: ' + error.message);
+      alert('❌ เกิดข้อผิดพลาด: ' + (error as Error).message);
     }
   };
 

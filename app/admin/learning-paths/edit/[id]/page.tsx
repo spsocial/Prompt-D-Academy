@@ -95,7 +95,7 @@ export default function EditLearningPathPage() {
       }
     } catch (error) {
       console.error('❌ Error loading data:', error);
-      alert('เกิดข้อผิดพลาด: ' + error.message);
+      alert('เกิดข้อผิดพลาด: ' + (error as Error).message);
     } finally {
       setLoading(false);
     }
@@ -210,7 +210,7 @@ export default function EditLearningPathPage() {
       router.push('/admin/learning-paths');
     } catch (error) {
       console.error('❌ Error updating:', error);
-      alert('เกิดข้อผิดพลาด: ' + error.message);
+      alert('เกิดข้อผิดพลาด: ' + (error as Error).message);
     } finally {
       setSaving(false);
     }

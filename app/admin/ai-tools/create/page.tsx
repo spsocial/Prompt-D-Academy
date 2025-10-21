@@ -125,7 +125,7 @@ export default function CreateAIToolPage() {
       router.push('/admin/ai-tools');
     } catch (error) {
       console.error('❌ Error saving:', error);
-      alert('เกิดข้อผิดพลาด: ' + error.message);
+      alert('เกิดข้อผิดพลาด: ' + (error as Error).message);
     } finally {
       setSaving(false);
     }

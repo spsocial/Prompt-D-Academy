@@ -162,7 +162,7 @@ export default function EditAIToolPage({ params }: { params: { id: string } }) {
       router.push('/admin/ai-tools');
     } catch (error: any) {
       console.error('❌ Error updating:', error);
-      alert('เกิดข้อผิดพลาด: ' + error.message);
+      alert('เกิดข้อผิดพลาด: ' + (error as Error).message);
     } finally {
       setSaving(false);
     }

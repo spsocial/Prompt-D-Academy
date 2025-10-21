@@ -68,7 +68,7 @@ export default function AIToolDetailPage() {
     } catch (error) {
       console.error('❌ Error loading tool:', error);
       console.error('Error details:', {
-        message: error.message,
+        message: (error as Error).message,
         code: error.code
       });
       setTool(null);
