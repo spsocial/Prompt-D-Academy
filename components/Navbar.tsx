@@ -148,6 +148,15 @@ export function Navbar() {
 
                   {/* Menu Items */}
                   <Link
+                    href="/whats-new"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-purple-50 transition-colors md:hidden"
+                  >
+                    <Sparkles className="w-5 h-5 text-purple-600" />
+                    <span className="text-gray-700 font-medium">มีอะไรใหม่</span>
+                  </Link>
+
+                  <Link
                     href="/profile"
                     onClick={() => setDropdownOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
