@@ -8,6 +8,7 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Navbar } from '@/components/Navbar';
 import { ProviderBadge } from '@/components/ProviderBadge';
 import { PackageBadge } from '@/components/PackageBadge';
+import { FloatingContactButton } from '@/components/FloatingContactButton';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { getPackageName } from '@/lib/utils/accessControl';
 import {
@@ -21,6 +22,7 @@ import {
   Clock,
   TrendingUp,
   X,
+  MessageCircle,
 } from 'lucide-react';
 
 export default function ProfilePage() {
@@ -118,6 +120,7 @@ export default function ProfilePage() {
     <ProtectedRoute requireActive={true}>
       <div className="min-h-screen bg-gray-50">
         <Navbar />
+        <FloatingContactButton />
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">ข้อมูลส่วนตัว</h1>
@@ -216,10 +219,13 @@ export default function ProfilePage() {
                         คุณยังไม่มีแพ็คเกจ กรุณาติดต่อ Admin เพื่อเลือกแพ็คเกจที่เหมาะสมกับคุณ
                       </p>
                       <a
-                        href="mailto:support@promptdacademy.com"
-                        className="text-sm text-purple-600 hover:underline font-medium"
+                        href="https://m.me/719837687869400"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors font-medium"
                       >
-                        ติดต่อ Admin →
+                        <MessageCircle className="w-4 h-4" />
+                        ติดต่อ Admin เพื่อสมัครแพ็คเกจ
                       </a>
                     </div>
                   )}

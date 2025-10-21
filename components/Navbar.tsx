@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { Zap, Search, LogOut, User, Settings } from 'lucide-react';
+import { Zap, Search, LogOut, User, Settings, Sparkles } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -68,6 +68,19 @@ export function Navbar() {
               Prompt D Academy
             </span>
           </Link>
+
+          {/* What's New Link */}
+          {user && (
+            <Link
+              href="/whats-new"
+              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-purple-50 transition-colors group"
+            >
+              <Sparkles className="w-5 h-5 text-purple-600 group-hover:animate-pulse" />
+              <span className="font-medium text-gray-700 group-hover:text-purple-600">
+                มีอะไรใหม่
+              </span>
+            </Link>
+          )}
 
           {/* Search Bar */}
           {user && (

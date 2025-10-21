@@ -7,6 +7,7 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Navbar } from '@/components/Navbar';
 import { LockOverlay } from '@/components/LockOverlay';
 import { PackageBadge } from '@/components/PackageBadge';
+import { FloatingContactButton } from '@/components/FloatingContactButton';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useAITools } from '@/lib/hooks/useAITools';
 import { useLearningPaths } from '@/lib/hooks/useLearningPaths';
@@ -22,6 +23,7 @@ export default function DashboardPage() {
     <ProtectedRoute requireActive={true}>
       <div className="min-h-screen bg-gray-50">
         <Navbar />
+        <FloatingContactButton />
 
         {/* Hero Section */}
         <section className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-12">
