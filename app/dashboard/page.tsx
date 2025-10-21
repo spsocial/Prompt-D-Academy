@@ -86,7 +86,7 @@ export default function DashboardPage() {
                 <div className="text-center">
                   <p className="text-2xl font-bold text-green-600">
                     {userData?.progress
-                      ? Object.values(userData.progress).reduce((acc, p: any) => acc + (p.completed || 0), 0)
+                      ? Object.values(userData.progress).reduce((acc, p: any) => acc + (p.watchedVideos?.length || 0), 0)
                       : 0}
                   </p>
                   <p className="text-sm text-gray-600">วิดีโอที่ดูแล้ว</p>

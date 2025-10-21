@@ -105,7 +105,7 @@ export default function ProfilePage() {
   // Calculate statistics
   const totalCoursesEnrolled = userData?.progress ? Object.keys(userData.progress).length : 0;
   const totalVideosWatched = userData?.progress
-    ? Object.values(userData.progress).reduce((acc: number, p: any) => acc + (p.completed || 0), 0)
+    ? Object.values(userData.progress).reduce((acc: number, p: any) => acc + (p.watchedVideos?.length || 0), 0)
     : 0;
   const avgCompletionRate = userData?.progress
     ? Math.round(
