@@ -107,7 +107,7 @@ export default function ContentPage() {
                 แก้ไข Google Drive ID ในแต่ละ AI Tool
               </p>
               <div className="bg-gray-50 p-3 rounded-lg text-xs font-mono text-gray-700">
-                driveId: "YOUR_DRIVE_ID"
+                driveId: &quot;YOUR_DRIVE_ID&quot;
               </div>
             </div>
           </div>

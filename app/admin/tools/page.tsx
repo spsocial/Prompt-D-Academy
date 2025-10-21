@@ -418,7 +418,7 @@ export default function AdminToolsPage() {
                   ))}
 
                   {formData.videos.length === 0 && (
-                    <p className="text-center text-gray-500 py-4">ยังไม่มีวิดีโอ คลิก "เพิ่มวิดีโอ" ด้านบน</p>
+                    <p className="text-center text-gray-500 py-4">ยังไม่มีวิดีโอ คลิก &quot;เพิ่มวิดีโอ&quot; ด้านบน</p>
                   )}
                 </div>
               </div>

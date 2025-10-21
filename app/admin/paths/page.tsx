@@ -487,7 +487,7 @@ export default function AdminPathsPage() {
                   ))}
 
                   {formData.steps.length === 0 && (
-                    <p className="text-center text-gray-500 py-4">ยังไม่มีขั้นตอน คลิก "เพิ่มขั้นตอน" ด้านบน</p>
+                    <p className="text-center text-gray-500 py-4">ยังไม่มีขั้นตอน คลิก &quot;เพิ่มขั้นตอน&quot; ด้านบน</p>
                   )}
                 </div>
               </div>
