@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Navbar } from '@/components/Navbar';
@@ -10,7 +10,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { useAITools } from '@/lib/hooks/useAITools';
 import { useLearningPaths } from '@/lib/hooks/useLearningPaths';
 import { canAccessContent } from '@/lib/utils/accessControl';
-import { Clock, Video, CheckCircle, TrendingUp } from 'lucide-react';
+import { Clock, Video, CheckCircle, TrendingUp, Search, SlidersHorizontal } from 'lucide-react';
 
 export default function DashboardPage() {
   const { userData } = useAuth();
@@ -147,6 +147,28 @@ export default function DashboardPage() {
 function LearningPathsTab({ userPackage }: { userPackage: string | null }) {
   const { paths, loading } = useLearningPaths();
   const { userData } = useAuth();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterLevel, setFilterLevel] = useState<'all' | 'เริ่มต้น' | 'กลาง' | 'สูง'>('all');
+  const [filteredPaths, setFilteredPaths] = useState(paths);
+
+  useEffect(() => {
+    let filtered = [...paths];
+
+    // Search filter
+    if (searchTerm) {
+      filtered = filtered.filter(path =>
+        path.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        path.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Level filter
+    if (filterLevel !== 'all') {
+      filtered = filtered.filter(path => path.level === filterLevel);
+    }
+
+    setFilteredPaths(filtered);
+  }, [paths, searchTerm, filterLevel]);
 
   if (loading) {
     return (
@@ -166,108 +188,165 @@ function LearningPathsTab({ userPackage }: { userPackage: string | null }) {
   }
 
   return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {paths.map((path) => {
-        const hasAccess = canAccessContent(userPackage, path.requiredPackage);
-        // ✅ แปลง dot (.) เป็น underscore (_) เพื่อป้องกัน Firebase nested structure
-        const sanitizedPathId = path.id.replace(/\./g, '_');
-        const pathProgress = userData?.progress?.[sanitizedPathId];
-
-        // ✅ คำนวณ progress real-time จากจำนวนวิดีโอที่ดูแล้ว / จำนวนวิดีโอทั้งหมด
-        const watchedCount = pathProgress?.watchedVideos?.length || 0;
-        const totalVideos = path.totalVideos || 0;
-        const progress = totalVideos > 0 ? Math.round((watchedCount / totalVideos) * 100) : 0;
-
-        return (
-          <div key={path.id} className="relative group">
-            <Link
-              href={hasAccess ? `/learning-path/${path.id}` : '#'}
-              className={`card h-full block ${!hasAccess ? 'cursor-not-allowed' : ''}`}
-            >
-              {/* Icon/Image */}
-              {path.imageUrl ? (
-                <div className="w-full aspect-[4/3] mb-4 overflow-hidden rounded-lg bg-gray-100">
-                  <img
-                    src={path.imageUrl}
-                    alt={path.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ) : (
-                <div className="text-5xl mb-4">{path.icon}</div>
-              )}
-
-              {/* Title */}
-              <h3 className="text-xl font-bold text-gray-900 mb-2">{path.title}</h3>
-
-              {/* Description */}
-              <p className="text-gray-600 mb-4 line-clamp-2">{path.description}</p>
-
-              {/* Level Badge */}
-              <span
-                className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-3 ${
-                  path.level === 'เริ่มต้น'
-                    ? 'bg-green-100 text-green-700'
-                    : path.level === 'กลาง'
-                    ? 'bg-yellow-100 text-yellow-700'
-                    : 'bg-red-100 text-red-700'
-                }`}
-              >
-                {path.level}
-              </span>
-
-              {/* Info */}
-              <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                <div className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  <span>{path.totalDuration}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Video className="w-4 h-4" />
-                  <span>{path.totalVideos} คลิป</span>
-                </div>
-              </div>
-
-              {/* Tools Used */}
-              <div className="flex flex-wrap gap-2 mb-3">
-                {path.toolsUsed.slice(0, 3).map((tool, idx) => (
-                  <span
-                    key={idx}
-                    className="text-xs bg-purple-50 text-purple-600 px-2 py-1 rounded-full"
-                  >
-                    {tool}
-                  </span>
-                ))}
-                {path.toolsUsed.length > 3 && (
-                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                    +{path.toolsUsed.length - 3} เพิ่มเติม
-                  </span>
-                )}
-              </div>
-
-              {/* Progress Bar */}
-              {hasAccess && (
-                <div>
-                  <div className="flex justify-between text-xs text-gray-600 mb-1">
-                    <span>ความคืบหน้า</span>
-                    <span>{Math.round(progress)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-gradient-to-r from-purple-600 to-pink-600 h-2 rounded-full transition-all"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Lock Overlay */}
-              {!hasAccess && <LockOverlay requiredPackage={path.requiredPackage} />}
-            </Link>
+    <>
+      {/* Search & Filter Bar */}
+      <div className="card mb-6">
+        <div className="flex flex-col md:flex-row gap-4">
+          {/* Search */}
+          <div className="flex-1">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="ค้นหาเส้นทางการเรียน..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
+              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            </div>
           </div>
-        );
-      })}
-    </div>
+
+          {/* Filter by Level */}
+          <div className="flex items-center gap-2">
+            <SlidersHorizontal className="w-5 h-5 text-gray-500" />
+            <select
+              value={filterLevel}
+              onChange={(e) => setFilterLevel(e.target.value as any)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
+            >
+              <option value="all">ทุกระดับ</option>
+              <option value="เริ่มต้น">เริ่มต้น</option>
+              <option value="กลาง">กลาง</option>
+              <option value="สูง">สูง</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Results count */}
+      {(searchTerm || filterLevel !== 'all') && (
+        <div className="mb-4 text-sm text-gray-600">
+          แสดง {filteredPaths.length} จาก {paths.length} เส้นทางการเรียน
+        </div>
+      )}
+
+      {/* Paths Grid */}
+      {filteredPaths.length === 0 ? (
+        <div className="text-center py-12 card">
+          <p className="text-gray-600 mb-2">ไม่พบเส้นทางการเรียนที่ค้นหา</p>
+          <button
+            onClick={() => {
+              setSearchTerm('');
+              setFilterLevel('all');
+            }}
+            className="text-purple-600 hover:underline text-sm"
+          >
+            ล้างตัวกรอง
+          </button>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredPaths.map((path) => {
+            const hasAccess = canAccessContent(userPackage, path.requiredPackage);
+            const sanitizedPathId = path.id.replace(/\./g, '_');
+            const pathProgress = userData?.progress?.[sanitizedPathId];
+
+            const watchedCount = pathProgress?.watchedVideos?.length || 0;
+            const totalVideos = path.totalVideos || 0;
+            const progress = totalVideos > 0 ? Math.round((watchedCount / totalVideos) * 100) : 0;
+
+            return (
+              <div key={path.id} className="relative group">
+                <Link
+                  href={hasAccess ? `/learning-path/${path.id}` : '#'}
+                  className={`card h-full block ${!hasAccess ? 'cursor-not-allowed' : ''}`}
+                >
+                  {/* Icon/Image */}
+                  {path.imageUrl ? (
+                    <div className="w-full aspect-[4/3] mb-4 overflow-hidden rounded-lg bg-gray-100">
+                      <img
+                        src={path.imageUrl}
+                        alt={path.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-5xl mb-4">{path.icon}</div>
+                  )}
+
+                  {/* Title */}
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{path.title}</h3>
+
+                  {/* Description */}
+                  <p className="text-gray-600 mb-4 line-clamp-2">{path.description}</p>
+
+                  {/* Level Badge */}
+                  <span
+                    className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-3 ${
+                      path.level === 'เริ่มต้น'
+                        ? 'bg-green-100 text-green-700'
+                        : path.level === 'กลาง'
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : 'bg-red-100 text-red-700'
+                    }`}
+                  >
+                    {path.level}
+                  </span>
+
+                  {/* Info */}
+                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      <span>{path.totalDuration}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Video className="w-4 h-4" />
+                      <span>{path.totalVideos} คลิป</span>
+                    </div>
+                  </div>
+
+                  {/* Tools Used */}
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {path.toolsUsed.slice(0, 3).map((tool, idx) => (
+                      <span
+                        key={idx}
+                        className="text-xs bg-purple-50 text-purple-600 px-2 py-1 rounded-full"
+                      >
+                        {tool}
+                      </span>
+                    ))}
+                    {path.toolsUsed.length > 3 && (
+                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                        +{path.toolsUsed.length - 3} เพิ่มเติม
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Progress Bar */}
+                  {hasAccess && (
+                    <div>
+                      <div className="flex justify-between text-xs text-gray-600 mb-1">
+                        <span>ความคืบหน้า</span>
+                        <span>{Math.round(progress)}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-gradient-to-r from-purple-600 to-pink-600 h-2 rounded-full transition-all"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Lock Overlay */}
+                  {!hasAccess && <LockOverlay requiredPackage={path.requiredPackage} />}
+                </Link>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </>
   );
 }
 
@@ -275,6 +354,22 @@ function LearningPathsTab({ userPackage }: { userPackage: string | null }) {
 function AIToolsTab({ userPackage }: { userPackage: string | null }) {
   const { tools, loading } = useAITools();
   const { userData } = useAuth();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredTools, setFilteredTools] = useState(tools);
+
+  useEffect(() => {
+    let filtered = [...tools];
+
+    // Search filter
+    if (searchTerm) {
+      filtered = filtered.filter(tool =>
+        tool.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tool.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    setFilteredTools(filtered);
+  }, [tools, searchTerm]);
 
   if (loading) {
     return (
@@ -294,71 +389,105 @@ function AIToolsTab({ userPackage }: { userPackage: string | null }) {
   }
 
   return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {tools.map((tool) => {
-        const hasAccess = canAccessContent(userPackage, tool.requiredPackage);
-        // ✅ แปลง dot (.) เป็น underscore (_) เพื่อป้องกัน Firebase nested structure
-        const sanitizedToolId = tool.id.replace(/\./g, '_');
-        const toolProgress = userData?.progress?.[sanitizedToolId];
+    <>
+      {/* Search Bar */}
+      <div className="card mb-6">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="ค้นหา AI Tool..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
+          />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+        </div>
+      </div>
 
-        // ✅ คำนวณ progress real-time จากจำนวนวิดีโอที่ดูแล้ว / จำนวนวิดีโอทั้งหมด
-        const watchedCount = toolProgress?.watchedVideos?.length || 0;
-        const totalVideos = tool.videos?.length || 0;
-        const progress = totalVideos > 0 ? Math.round((watchedCount / totalVideos) * 100) : 0;
+      {/* Results count */}
+      {searchTerm && (
+        <div className="mb-4 text-sm text-gray-600">
+          แสดง {filteredTools.length} จาก {tools.length} AI Tools
+        </div>
+      )}
 
-        return (
-          <div key={tool.id} className="relative group">
-            <Link
-              href={hasAccess ? `/tool/${tool.id}` : '#'}
-              className={`card h-full block ${!hasAccess ? 'cursor-not-allowed' : ''}`}
-            >
-              {/* Icon/Image */}
-              {tool.imageUrl ? (
-                <div className="w-full aspect-[4/3] mb-4 overflow-hidden rounded-lg bg-gray-100">
-                  <img
-                    src={tool.imageUrl}
-                    alt={tool.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ) : (
-                <div className="text-5xl mb-4">{tool.icon}</div>
-              )}
+      {/* Tools Grid */}
+      {filteredTools.length === 0 ? (
+        <div className="text-center py-12 card">
+          <p className="text-gray-600 mb-2">ไม่พบ AI Tool ที่ค้นหา</p>
+          <button
+            onClick={() => setSearchTerm('')}
+            className="text-purple-600 hover:underline text-sm"
+          >
+            ล้างคำค้นหา
+          </button>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredTools.map((tool) => {
+            const hasAccess = canAccessContent(userPackage, tool.requiredPackage);
+            const sanitizedToolId = tool.id.replace(/\./g, '_');
+            const toolProgress = userData?.progress?.[sanitizedToolId];
 
-              {/* Title */}
-              <h3 className="text-xl font-bold text-gray-900 mb-2">{tool.name}</h3>
+            const watchedCount = toolProgress?.watchedVideos?.length || 0;
+            const totalVideos = tool.videos?.length || 0;
+            const progress = totalVideos > 0 ? Math.round((watchedCount / totalVideos) * 100) : 0;
 
-              {/* Description */}
-              <p className="text-gray-600 mb-4 line-clamp-2">{tool.description}</p>
+            return (
+              <div key={tool.id} className="relative group">
+                <Link
+                  href={hasAccess ? `/tool/${tool.id}` : '#'}
+                  className={`card h-full block ${!hasAccess ? 'cursor-not-allowed' : ''}`}
+                >
+                  {/* Icon/Image */}
+                  {tool.imageUrl ? (
+                    <div className="w-full aspect-[4/3] mb-4 overflow-hidden rounded-lg bg-gray-100">
+                      <img
+                        src={tool.imageUrl}
+                        alt={tool.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-5xl mb-4">{tool.icon}</div>
+                  )}
 
-              {/* Video Count */}
-              <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-                <Video className="w-4 h-4" />
-                <span>{tool.videos.length} วิดีโอ</span>
+                  {/* Title */}
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{tool.name}</h3>
+
+                  {/* Description */}
+                  <p className="text-gray-600 mb-4 line-clamp-2">{tool.description}</p>
+
+                  {/* Video Count */}
+                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+                    <Video className="w-4 h-4" />
+                    <span>{tool.videos.length} วิดีโอ</span>
+                  </div>
+
+                  {/* Progress Bar */}
+                  {hasAccess && (
+                    <div className="mb-3">
+                      <div className="flex justify-between text-xs text-gray-600 mb-1">
+                        <span>ความคืบหน้า</span>
+                        <span>{progress}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-gradient-to-r from-purple-600 to-pink-600 h-2 rounded-full transition-all"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Lock Overlay */}
+                  {!hasAccess && <LockOverlay requiredPackage={tool.requiredPackage} />}
+                </Link>
               </div>
-
-              {/* Progress Bar */}
-              {hasAccess && (
-                <div className="mb-3">
-                  <div className="flex justify-between text-xs text-gray-600 mb-1">
-                    <span>ความคืบหน้า</span>
-                    <span>{progress}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-gradient-to-r from-purple-600 to-pink-600 h-2 rounded-full transition-all"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Lock Overlay */}
-              {!hasAccess && <LockOverlay requiredPackage={tool.requiredPackage} />}
-            </Link>
-          </div>
-        );
-      })}
-    </div>
+            );
+          })}
+        </div>
+      )}
+    </>
   );
 }
