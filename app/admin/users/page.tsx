@@ -9,7 +9,7 @@ import { Navbar } from '@/components/Navbar';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { ProviderBadge } from '@/components/ProviderBadge';
 import { PackageBadge } from '@/components/PackageBadge';
-import { Search, Edit, Trash2, Users, CheckCircle, XCircle, Crown } from 'lucide-react';
+import { Search, Edit, Trash2, Users, CheckCircle, XCircle, Crown, Package } from 'lucide-react';
 import { getPackageName } from '@/lib/utils/accessControl';
 
 interface User {
@@ -33,6 +33,7 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
+  const [filterPackage, setFilterPackage] = useState<string>('all');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editPackage, setEditPackage] = useState<string>('basic');
@@ -46,7 +47,7 @@ export default function UsersPage() {
 
   useEffect(() => {
     filterUsers();
-  }, [users, searchTerm, filterStatus]);
+  }, [users, searchTerm, filterStatus, filterPackage]);
 
   const loadUsers = async () => {
     try {
@@ -83,6 +84,15 @@ export default function UsersPage() {
       filtered = filtered.filter((user) => user.isActive);
     } else if (filterStatus === 'inactive') {
       filtered = filtered.filter((user) => !user.isActive);
+    }
+
+    // Filter by package
+    if (filterPackage !== 'all') {
+      if (filterPackage === 'none') {
+        filtered = filtered.filter((user) => !user.package);
+      } else {
+        filtered = filtered.filter((user) => user.package === filterPackage);
+      }
     }
 
     setFilteredUsers(filtered);
@@ -152,6 +162,29 @@ export default function UsersPage() {
 
     return { courses, videos };
   };
+
+  // Package statistics
+  const getPackageStats = () => {
+    const stats = {
+      free: 0,
+      basic: 0,
+      allinone: 0,
+      pro: 0,
+      none: 0,
+    };
+
+    users.forEach((user) => {
+      if (!user.package) {
+        stats.none++;
+      } else if (user.package in stats) {
+        stats[user.package as keyof typeof stats]++;
+      }
+    });
+
+    return stats;
+  };
+
+  const packageStats = getPackageStats();
 
   if (!userData?.isAdmin) {
     return (
@@ -241,6 +274,36 @@ export default function UsersPage() {
             </div>
           </div>
 
+          {/* Package Statistics */}
+          <div className="card mb-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Package className="w-5 h-5 text-purple-600" />
+              <h2 className="text-lg font-bold text-gray-900">สถิติแพ็กเกจ</h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-xl font-bold text-gray-900">{packageStats.none}</p>
+                <p className="text-xs text-gray-600 mt-1">ไม่มีแพ็กเกจ</p>
+              </div>
+              <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-xl font-bold text-blue-600">{packageStats.free}</p>
+                <p className="text-xs text-gray-600 mt-1">Free</p>
+              </div>
+              <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
+                <p className="text-xl font-bold text-green-600">{packageStats.basic}</p>
+                <p className="text-xs text-gray-600 mt-1">Basic</p>
+              </div>
+              <div className="text-center p-3 bg-orange-50 rounded-lg border border-orange-200">
+                <p className="text-xl font-bold text-orange-600">{packageStats.allinone}</p>
+                <p className="text-xs text-gray-600 mt-1">All-in-One</p>
+              </div>
+              <div className="text-center p-3 bg-purple-50 rounded-lg border border-purple-200">
+                <p className="text-xl font-bold text-purple-600">{packageStats.pro}</p>
+                <p className="text-xs text-gray-600 mt-1">Pro</p>
+              </div>
+            </div>
+          </div>
+
           {/* Filters */}
           <div className="card mb-6">
             <div className="flex flex-wrap gap-4">
@@ -264,11 +327,28 @@ export default function UsersPage() {
                 onChange={(e) => setFilterStatus(e.target.value as any)}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
               >
-                <option value="all">ทั้งหมด</option>
+                <option value="all">สถานะ: ทั้งหมด</option>
                 <option value="active">Active เท่านั้น</option>
                 <option value="inactive">Inactive เท่านั้น</option>
               </select>
+
+              {/* Package Filter */}
+              <select
+                value={filterPackage}
+                onChange={(e) => setFilterPackage(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
+              >
+                <option value="all">แพ็กเกจ: ทั้งหมด</option>
+                <option value="none">ไม่มีแพ็กเกจ ({packageStats.none})</option>
+                <option value="free">Free ({packageStats.free})</option>
+                <option value="basic">Basic ({packageStats.basic})</option>
+                <option value="allinone">All-in-One ({packageStats.allinone})</option>
+                <option value="pro">Pro ({packageStats.pro})</option>
+              </select>
             </div>
+            <p className="text-sm text-gray-500 mt-3">
+              แสดง {filteredUsers.length} จาก {users.length} ผู้ใช้
+            </p>
           </div>
 
           {/* Users Table */}
@@ -387,6 +467,12 @@ export default function UsersPage() {
                   })}
                 </tbody>
               </table>
+
+              {filteredUsers.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-gray-500">ไม่พบผู้ใช้ที่ตรงกับเงื่อนไขการค้นหา</p>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -485,7 +571,7 @@ export default function UsersPage() {
         )}
 
         {/* Back to Admin */}
-        <div className="mt-8 text-center">
+        <div className="mt-8 text-center pb-8">
           <Link href="/admin" className="text-purple-600 hover:underline">
             ← กลับไปหน้า Admin
           </Link>
