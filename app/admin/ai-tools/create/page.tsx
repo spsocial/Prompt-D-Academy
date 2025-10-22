@@ -19,6 +19,10 @@ interface Video {
   order: number;
   description: string;
   createdAt?: any;
+  resources?: Array<{
+    title: string;
+    url: string;
+  }>;
 }
 
 export default function CreateAIToolPage() {
@@ -116,7 +120,8 @@ export default function CreateAIToolPage() {
           duration: v.duration,
           order: v.order,
           description: v.description || '',
-          createdAt: v.createdAt || Timestamp.now()
+          createdAt: v.createdAt || Timestamp.now(),
+          resources: v.resources || []
         }))
       };
 
@@ -400,6 +405,32 @@ export default function CreateAIToolPage() {
                             rows={2}
                             placeholder="อธิบายวิดีโอนี้..."
                           />
+                          <p className="text-xs text-gray-500 mt-1">
+                            💡 ลิงก์ใน description จะแสดงเป็นคลิกได้อัตโนมัติ
+                          </p>
+                        </div>
+
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            🔗 ลิงก์ที่เกี่ยวข้อง (JSON)
+                          </label>
+                          <textarea
+                            value={video.resources ? JSON.stringify(video.resources, null, 2) : ''}
+                            onChange={(e) => {
+                              try {
+                                const parsed = e.target.value.trim() ? JSON.parse(e.target.value) : [];
+                                updateVideo(index, 'resources', parsed);
+                              } catch (error) {
+                                console.warn('Invalid JSON');
+                              }
+                            }}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm"
+                            rows={4}
+                            placeholder='[&#10;  {"title": "สมัคร ChatGPT", "url": "https://chat.openai.com"},&#10;  {"title": "คู่มือใช้งาน", "url": "https://example.com/guide"}&#10;]'
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            📝 ใส่เป็น JSON array: [{"title": "ชื่อลิงก์", "url": "https://..."}]
+                          </p>
                         </div>
                       </div>
                     </div>

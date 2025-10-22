@@ -8,7 +8,7 @@ import { db } from '@/lib/firebase';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Navbar } from '@/components/Navbar';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { CheckCircle, ChevronRight, ChevronLeft, PlayCircle } from 'lucide-react';
+import { CheckCircle, ChevronRight, ChevronLeft, PlayCircle, ExternalLink, Link as LinkIcon } from 'lucide-react';
 
 interface Video {
   id: string;
@@ -17,6 +17,10 @@ interface Video {
   duration: string;
   order: number;
   description?: string;
+  resources?: Array<{
+    title: string;
+    url: string;
+  }>;
 }
 
 interface AITool {
@@ -39,6 +43,29 @@ interface LearningPath {
     title: string;
     description: string;
   }>;
+}
+
+// Helper function to detect and linkify URLs in text
+function linkify(text: string) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = text.split(urlRegex);
+
+  return parts.map((part, index) => {
+    if (part.match(urlRegex)) {
+      return (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-purple-600 hover:text-purple-700 underline break-all"
+        >
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
 }
 
 export default function VideoPlayerPage() {
@@ -349,7 +376,41 @@ export default function VideoPlayerPage() {
               {video.description && (
                 <div className="card">
                   <h3 className="text-lg font-bold text-gray-900 mb-2">รายละเอียด</h3>
-                  <p className="text-gray-600">{video.description}</p>
+                  <p className="text-gray-600 whitespace-pre-wrap">{linkify(video.description)}</p>
+                </div>
+              )}
+
+              {/* Resources / Links */}
+              {video.resources && video.resources.length > 0 && (
+                <div className="card">
+                  <div className="flex items-center gap-2 mb-4">
+                    <LinkIcon className="w-5 h-5 text-purple-600" />
+                    <h3 className="text-lg font-bold text-gray-900">ลิงก์ที่เกี่ยวข้อง</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {video.resources.map((resource, index) => (
+                      <a
+                        key={index}
+                        href={resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-between p-4 bg-purple-50 hover:bg-purple-100 border-2 border-purple-200 rounded-lg transition-all group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-purple-600 rounded-lg">
+                            <ExternalLink className="w-5 h-5 text-white" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900 group-hover:text-purple-600 transition-colors">
+                              {resource.title}
+                            </p>
+                            <p className="text-xs text-gray-500 break-all">{resource.url}</p>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-purple-600 group-hover:translate-x-1 transition-transform" />
+                      </a>
+                    ))}
+                  </div>
                 </div>
               )}
 
