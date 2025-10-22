@@ -411,26 +411,80 @@ export default function CreateAIToolPage() {
                         </div>
 
                         <div className="md:col-span-2">
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            🔗 ลิงก์ที่เกี่ยวข้อง (JSON)
-                          </label>
-                          <textarea
-                            value={video.resources ? JSON.stringify(video.resources, null, 2) : ''}
-                            onChange={(e) => {
-                              try {
-                                const parsed = e.target.value.trim() ? JSON.parse(e.target.value) : [];
-                                updateVideo(index, 'resources', parsed);
-                              } catch (error) {
-                                console.warn('Invalid JSON');
-                              }
-                            }}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm"
-                            rows={4}
-                            placeholder='[&#10;  {"title": "สมัคร ChatGPT", "url": "https://chat.openai.com"},&#10;  {"title": "คู่มือใช้งาน", "url": "https://example.com/guide"}&#10;]'
-                          />
-                          <p className="text-xs text-gray-500 mt-1">
-                            📝 ใส่เป็น JSON array: {'[{"title": "ชื่อลิงก์", "url": "https://..."}]'}
-                          </p>
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="block text-sm font-medium text-gray-700">
+                              🔗 ลิงก์ที่เกี่ยวข้อง
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const currentResources = video.resources || [];
+                                updateVideo(index, 'resources', [
+                                  ...currentResources,
+                                  { title: '', url: '' }
+                                ]);
+                              }}
+                              className="text-sm px-3 py-1 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+                            >
+                              + เพิ่มลิงก์
+                            </button>
+                          </div>
+
+                          {video.resources && video.resources.length > 0 ? (
+                            <div className="space-y-3">
+                              {video.resources.map((resource, resIndex) => (
+                                <div key={resIndex} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                  <div className="flex items-start gap-2">
+                                    <div className="flex-1 space-y-2">
+                                      <input
+                                        type="text"
+                                        value={resource.title}
+                                        onChange={(e) => {
+                                          const newResources = [...(video.resources || [])];
+                                          newResources[resIndex] = {
+                                            ...newResources[resIndex],
+                                            title: e.target.value
+                                          };
+                                          updateVideo(index, 'resources', newResources);
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                                        placeholder="ชื่อลิงก์ (เช่น สมัคร ChatGPT)"
+                                      />
+                                      <input
+                                        type="url"
+                                        value={resource.url}
+                                        onChange={(e) => {
+                                          const newResources = [...(video.resources || [])];
+                                          newResources[resIndex] = {
+                                            ...newResources[resIndex],
+                                            url: e.target.value
+                                          };
+                                          updateVideo(index, 'resources', newResources);
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                                        placeholder="URL (เช่น https://chat.openai.com)"
+                                      />
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const newResources = (video.resources || []).filter((_, i) => i !== resIndex);
+                                        updateVideo(index, 'resources', newResources);
+                                      }}
+                                      className="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                      title="ลบลิงก์"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-gray-500 py-3 text-center border-2 border-dashed border-gray-300 rounded-lg">
+                              ยังไม่มีลิงก์ กดปุ่ม "+ เพิ่มลิงก์" เพื่อเพิ่ม
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
