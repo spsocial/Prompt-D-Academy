@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { Zap, Search, LogOut, User, Settings, Sparkles } from 'lucide-react';
+import { GraduationCap, Search, LogOut, User, Settings, Sparkles } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -63,7 +63,7 @@ export function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <Zap className="w-8 h-8 text-purple-600" />
+            <GraduationCap className="w-8 h-8 text-purple-600" />
             <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               Prompt D Academy
             </span>
