@@ -72,42 +72,28 @@ export default function WhatsNewPage() {
         }
       });
 
-      // Load from Learning Paths
+      // Load from Learning Paths (check if updated within 30 days)
       const pathsCol = collection(db, 'learningPaths');
       const pathsSnapshot = await getDocs(pathsCol);
 
       pathsSnapshot.docs.forEach((doc) => {
         const path = doc.data();
-        const sections = path.sections || [];
 
-        const allPathVideos: any[] = [];
-        sections.forEach((section: any) => {
-          const sectionVideos = section.videos || [];
-          allPathVideos.push(...sectionVideos);
-        });
+        // Check if path was created or updated within 30 days
+        const pathDate = path.updatedAt || path.createdAt;
+        if (!pathDate) return;
 
-        // Count new videos
-        const newVideos = allPathVideos.filter((v: any) => {
-          if (!v.createdAt) return false;
-          const videoDate = v.createdAt.toDate();
-          const daysDiff = (new Date().getTime() - videoDate.getTime()) / (1000 * 60 * 60 * 24);
-          return daysDiff <= 30;
-        });
+        const updateDate = pathDate.toDate();
+        const daysDiff = (new Date().getTime() - updateDate.getTime()) / (1000 * 60 * 60 * 24);
 
-        if (newVideos.length > 0) {
-          const latestVideo = newVideos.reduce((latest: any, v: any) => {
-            if (!latest.createdAt) return v;
-            if (!v.createdAt) return latest;
-            return v.createdAt.seconds > latest.createdAt.seconds ? v : latest;
-          });
-
+        if (daysDiff <= 30) {
           sourceMap.set(`path-${doc.id}`, {
             sourceType: 'path',
             sourceName: path.title,
             sourceId: doc.id,
             requiredPackage: path.requiredPackage,
-            newVideosCount: newVideos.length,
-            latestDate: latestVideo.createdAt.toDate(),
+            newVideosCount: path.steps?.length || 0,
+            latestDate: updateDate,
             icon: path.icon,
             imageUrl: path.imageUrl,
           });
@@ -182,7 +168,10 @@ export default function WhatsNewPage() {
             <div className="text-center py-12 card">
               <Sparkles className="w-16 h-16 mx-auto text-gray-400 mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2">ยังไม่มีเนื้อหาใหม่</h3>
-              <p className="text-gray-600">กลับมาดูใหม่ใน 30 วันข้างหน้า!</p>
+              <p className="text-gray-600">
+                หน้านี้จะแสดงเนื้อหาใหม่เมื่อมีการอัพเดท<br />
+                ติดตามได้เสมอที่หน้านี้!
+              </p>
             </div>
           ) : (
             <>
@@ -240,7 +229,12 @@ export default function WhatsNewPage() {
                         {/* New videos count */}
                         <div className="flex items-center gap-2 text-purple-600 font-medium mb-2">
                           <Sparkles className="w-4 h-4" />
-                          <span>เพิ่มวิดีโอใหม่ {update.newVideosCount} คลิป</span>
+                          <span>
+                            {update.sourceType === 'tool'
+                              ? `เพิ่มวิดีโอใหม่ ${update.newVideosCount} คลิป`
+                              : `มี ${update.newVideosCount} ขั้นตอน - อัพเดทล่าสุด`
+                            }
+                          </span>
                         </div>
 
                         {/* Metadata */}

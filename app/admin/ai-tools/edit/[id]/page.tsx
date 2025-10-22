@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { collection, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Navbar } from '@/components/Navbar';
@@ -18,6 +18,7 @@ interface Video {
   duration: string;
   order: number;
   description: string;
+  createdAt?: any;
 }
 
 export default function EditAIToolPage({ params }: { params: { id: string } }) {
@@ -80,7 +81,8 @@ export default function EditAIToolPage({ params }: { params: { id: string } }) {
       driveId: '',
       duration: '',
       order: videos.length + 1,
-      description: ''
+      description: '',
+      createdAt: Timestamp.now()
     };
     setVideos([...videos, newVideo]);
   };
@@ -149,7 +151,8 @@ export default function EditAIToolPage({ params }: { params: { id: string } }) {
           driveId: v.driveId,
           duration: v.duration,
           order: v.order,
-          description: v.description || ''
+          description: v.description || '',
+          createdAt: v.createdAt || Timestamp.now()
         }))
       };
 

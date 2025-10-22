@@ -69,19 +69,6 @@ export function Navbar() {
             </span>
           </Link>
 
-          {/* What's New Link */}
-          {user && (
-            <Link
-              href="/whats-new"
-              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-purple-50 transition-colors group"
-            >
-              <Sparkles className="w-5 h-5 text-purple-600 group-hover:animate-pulse" />
-              <span className="font-medium text-gray-700 group-hover:text-purple-600">
-                มีอะไรใหม่
-              </span>
-            </Link>
-          )}
-
           {/* Search Bar */}
           {user && (
             <div className="hidden md:flex flex-1 max-w-md mx-8">
@@ -97,6 +84,19 @@ export function Navbar() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               </div>
             </div>
+          )}
+
+          {/* What's New Link */}
+          {user && (
+            <Link
+              href="/whats-new"
+              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-purple-50 transition-colors group"
+            >
+              <Sparkles className="w-5 h-5 text-purple-600 group-hover:animate-pulse" />
+              <span className="font-medium text-gray-700 group-hover:text-purple-600">
+                มีอะไรใหม่
+              </span>
+            </Link>
           )}
 
           {/* Profile Dropdown */}

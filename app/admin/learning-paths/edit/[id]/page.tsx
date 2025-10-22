@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { collection, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Navbar } from '@/components/Navbar';
@@ -192,6 +192,7 @@ export default function EditLearningPathPage() {
         totalDuration,
         toolsUsed,
         order: order || 0,
+        updatedAt: Timestamp.now(),
         steps: steps.map(s => ({
           order: s.order,
           toolId: s.toolId,
