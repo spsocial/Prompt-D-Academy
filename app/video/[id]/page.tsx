@@ -86,6 +86,7 @@ export default function VideoPlayerPage() {
   const [loading, setLoading] = useState(true);
   const [marking, setMarking] = useState(false);
   const [marked, setMarked] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -288,8 +289,13 @@ export default function VideoPlayerPage() {
       // ✅ อัพเดท local state ทันที (Optimistic Update)
       setMarked(true);
 
-      // แสดง success message
-      alert('✅ บันทึกความคืบหน้าเรียบร้อยแล้ว!');
+      // แสดง success modal
+      setShowSuccessModal(true);
+
+      // Auto close modal after 3 seconds
+      setTimeout(() => {
+        setShowSuccessModal(false);
+      }, 3000);
 
     } catch (error) {
       console.error('❌ Error marking video as completed:', error);
@@ -327,6 +333,54 @@ export default function VideoPlayerPage() {
     <ProtectedRoute requireActive={true}>
       <div className="min-h-screen bg-gray-50">
         <Navbar />
+
+        {/* Success Modal */}
+        {showSuccessModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
+            {/* Backdrop */}
+            <div
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              onClick={() => setShowSuccessModal(false)}
+            />
+
+            {/* Modal Content */}
+            <div className="relative bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full animate-scaleIn">
+              {/* Celebration Icon */}
+              <div className="flex justify-center mb-6">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-xl opacity-50 animate-pulse" />
+                  <div className="relative bg-gradient-to-r from-purple-600 to-pink-600 rounded-full p-4">
+                    <CheckCircle className="w-16 h-16 text-white" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Text Content */}
+              <div className="text-center space-y-3">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  🎉 ยินดีด้วย!
+                </h2>
+                <p className="text-xl font-semibold text-gray-900">
+                  คุณยกระดับความรู้ของคุณ
+                </p>
+                <p className="text-lg text-gray-600">
+                  ขึ้นไปอีกขั้นแล้ว! 🚀
+                </p>
+                <div className="pt-4 text-sm text-gray-500">
+                  บันทึกความคืบหน้าเรียบร้อยแล้ว ✓
+                </div>
+              </div>
+
+              {/* Close Button */}
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="mt-6 w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:opacity-90 transition-all"
+              >
+                เยี่ยมเลย! เรียนต่อกันเลย 💪
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid lg:grid-cols-3 gap-8">
