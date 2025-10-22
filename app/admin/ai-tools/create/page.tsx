@@ -429,7 +429,7 @@ export default function CreateAIToolPage() {
                             placeholder='[&#10;  {"title": "สมัคร ChatGPT", "url": "https://chat.openai.com"},&#10;  {"title": "คู่มือใช้งาน", "url": "https://example.com/guide"}&#10;]'
                           />
                           <p className="text-xs text-gray-500 mt-1">
-                            📝 ใส่เป็น JSON array: [{"title": "ชื่อลิงก์", "url": "https://..."}]
+                            📝 ใส่เป็น JSON array: {'[{"title": "ชื่อลิงก์", "url": "https://..."}]'}
                           </p>
                         </div>
                       </div>

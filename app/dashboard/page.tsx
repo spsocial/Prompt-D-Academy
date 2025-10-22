@@ -400,11 +400,29 @@ function AIToolsTab({ userPackage }: { userPackage: string | null }) {
                   {/* Description */}
                   <p className="text-gray-600 mb-4 line-clamp-2">{tool.description}</p>
 
-                  {/* Video Count */}
-                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-                    <Video className="w-4 h-4" />
-                    <span>{tool.videos.length} วิดีโอ</span>
-                  </div>
+                  {/* Video Count Badge */}
+                  {totalVideos === 0 ? (
+                    <div className="mb-3">
+                      <div className="inline-flex items-center gap-2 px-3 py-2 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
+                        <Video className="w-5 h-5 text-yellow-600" />
+                        <div>
+                          <p className="text-sm font-semibold text-yellow-700">รออัพเดตคลิปเรียน</p>
+                          <p className="text-xs text-yellow-600">กำลังเตรียมเนื้อหา</p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : totalVideos <= 3 ? (
+                    <div className="flex items-center gap-2 text-sm mb-3 px-3 py-2 bg-blue-50 border-2 border-blue-200 rounded-lg">
+                      <Video className="w-5 h-5 text-blue-600" />
+                      <span className="font-semibold text-blue-700">{totalVideos} คลิป</span>
+                      <span className="text-xs text-blue-600">(เนื้อหาย่อ)</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 text-sm mb-3 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
+                      <Video className="w-5 h-5 text-green-600" />
+                      <span className="font-semibold text-green-700">{totalVideos} คลิป</span>
+                    </div>
+                  )}
 
                   {/* Progress Bar */}
                   {hasAccess && (
