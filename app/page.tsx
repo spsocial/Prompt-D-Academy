@@ -17,15 +17,9 @@ export default function Home() {
             <div className="flex gap-4">
               <Link
                 href="/login"
-                className="text-gray-700 hover:text-purple-600 font-medium transition-colors"
-              >
-                เข้าสู่ระบบ
-              </Link>
-              <Link
-                href="/register"
                 className="btn-primary"
               >
-                สมัครสมาชิก
+                เข้าสู่ระบบ
               </Link>
             </div>
           </div>
@@ -42,11 +36,8 @@ export default function Home() {
             เลือกเส้นทางการเรียนที่เหมาะกับคุณ หรือเรียนรู้แต่ละ AI Tool แยกกัน
           </p>
           <div className="flex gap-4 justify-center">
-            <Link href="/register" className="bg-white text-purple-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors">
-              เริ่มต้นเรียนฟรี
-            </Link>
-            <Link href="/login" className="border-2 border-white text-white px-8 py-3 rounded-lg font-bold hover:bg-white hover:text-purple-600 transition-colors">
-              เข้าสู่ระบบ
+            <Link href="/login" className="bg-white text-purple-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors text-lg">
+              ทดลองเรียนฟรี - เข้าสู่ระบบด้วย Google
             </Link>
           </div>
         </div>
@@ -158,7 +149,7 @@ export default function Home() {
                   <span>ChatGPT, Nano Banana, Veo3.1, Infinite talk</span>
                 </li>
               </ul>
-              <Link href="/register" className="btn-primary w-full block text-center">เลือกแพ็คเกจนี้</Link>
+              <Link href="/login" className="btn-primary w-full block text-center">เลือกแพ็คเกจนี้</Link>
             </div>
 
             {/* All-in-One Package */}
@@ -188,7 +179,7 @@ export default function Home() {
                   <span>สอนใช้ AI ตัวอื่นๆอีกเพียบ</span>
                 </li>
               </ul>
-              <Link href="/register" className="btn-primary w-full block text-center">เลือกแพ็คเกจนี้</Link>
+              <Link href="/login" className="btn-primary w-full block text-center">เลือกแพ็คเกจนี้</Link>
             </div>
 
             {/* Pro Package */}
