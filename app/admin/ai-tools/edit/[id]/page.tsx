@@ -36,7 +36,7 @@ export default function EditAIToolPage({ params }: { params: { id: string } }) {
   const [folder, setFolder] = useState('');
   const [icon, setIcon] = useState('🤖');
   const [imageUrl, setImageUrl] = useState('');
-  const [requiredPackage, setRequiredPackage] = useState<'free' | 'basic' | 'allinone' | 'pro'>('free');
+  const [requiredPackage, setRequiredPackage] = useState<'free' | 'basic' | 'allinone' | 'pro' | 'pro_standalone'>('free');
   const [order, setOrder] = useState(0);
 
   // Videos
@@ -302,10 +302,13 @@ export default function EditAIToolPage({ params }: { params: { id: string } }) {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                   >
                     <option value="free">Free (ดูได้ฟรี)</option>
-                    <option value="basic">Basic</option>
+                    <option value="basic">Beginner</option>
                     <option value="allinone">All-in-One</option>
-                    <option value="pro">Pro</option>
+                    <option value="pro_standalone">Pro Developer (Standalone)</option>
                   </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    * Pro Developer Standalone เฉพาะเนื้อหา Developer เท่านั้น
+                  </p>
                 </div>
 
                 <div>

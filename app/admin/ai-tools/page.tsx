@@ -26,7 +26,7 @@ export default function AdminAIToolsPage() {
   const [filteredTools, setFilteredTools] = useState<AITool[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterPackage, setFilterPackage] = useState<'all' | 'free' | 'basic' | 'allinone' | 'pro'>('all');
+  const [filterPackage, setFilterPackage] = useState<'all' | 'free' | 'basic' | 'allinone' | 'pro' | 'pro_standalone'>('all');
   const [sortBy, setSortBy] = useState<'order' | 'name' | 'videos'>('order');
 
   useEffect(() => {
@@ -113,6 +113,8 @@ export default function AdminAIToolsPage() {
         return 'bg-purple-100 text-purple-700 border-purple-200';
       case 'pro':
         return 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-yellow-300';
+      case 'pro_standalone':
+        return 'bg-gradient-to-r from-indigo-400 to-purple-500 text-white border-indigo-300';
       default:
         return 'bg-gray-100 text-gray-700 border-gray-200';
     }
@@ -128,6 +130,8 @@ export default function AdminAIToolsPage() {
         return <Sparkles className="w-3 h-3" />;
       case 'pro':
         return <Crown className="w-3 h-3" />;
+      case 'pro_standalone':
+        return <Crown className="w-3 h-3" />;
       default:
         return null;
     }
@@ -136,9 +140,10 @@ export default function AdminAIToolsPage() {
   const getPackageName = (pkg: string) => {
     const names: Record<string, string> = {
       free: 'Free',
-      basic: 'Basic',
+      basic: 'Beginner',
       allinone: 'All-in-One',
-      pro: 'Pro'
+      pro: 'Pro Developer + All-in-One',
+      pro_standalone: 'Pro Developer'
     };
     return names[pkg] || pkg;
   };
@@ -150,6 +155,7 @@ export default function AdminAIToolsPage() {
     basic: tools.filter(t => t.requiredPackage === 'basic').length,
     allinone: tools.filter(t => t.requiredPackage === 'allinone').length,
     pro: tools.filter(t => t.requiredPackage === 'pro').length,
+    pro_standalone: tools.filter(t => t.requiredPackage === 'pro_standalone').length,
     totalVideos: tools.reduce((sum, t) => sum + (t.videos?.length || 0), 0)
   };
 
@@ -199,7 +205,7 @@ export default function AdminAIToolsPage() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-7 gap-4 mb-8">
             <div className="card bg-white">
               <div className="text-center">
                 <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
@@ -215,7 +221,7 @@ export default function AdminAIToolsPage() {
             <div className="card bg-blue-50 border-blue-200">
               <div className="text-center">
                 <p className="text-2xl font-bold text-blue-700">{stats.basic}</p>
-                <p className="text-xs text-blue-600">Basic</p>
+                <p className="text-xs text-blue-600">Beginner</p>
               </div>
             </div>
             <div className="card bg-purple-50 border-purple-200">
@@ -227,7 +233,13 @@ export default function AdminAIToolsPage() {
             <div className="card bg-gradient-to-br from-yellow-100 to-orange-100 border-yellow-200">
               <div className="text-center">
                 <p className="text-2xl font-bold text-orange-700">{stats.pro}</p>
-                <p className="text-xs text-orange-600">Pro</p>
+                <p className="text-xs text-orange-600">Pro Bundle</p>
+              </div>
+            </div>
+            <div className="card bg-gradient-to-br from-indigo-100 to-purple-100 border-indigo-200">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-indigo-700">{stats.pro_standalone}</p>
+                <p className="text-xs text-indigo-600">Pro Only</p>
               </div>
             </div>
             <div className="card bg-gray-50">
@@ -265,9 +277,10 @@ export default function AdminAIToolsPage() {
                 >
                   <option value="all">ทุก Package</option>
                   <option value="free">Free</option>
-                  <option value="basic">Basic</option>
+                  <option value="basic">Beginner</option>
                   <option value="allinone">All-in-One</option>
-                  <option value="pro">Pro</option>
+                  <option value="pro">Pro Bundle</option>
+                  <option value="pro_standalone">Pro Only</option>
                 </select>
               </div>
 

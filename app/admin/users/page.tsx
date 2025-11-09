@@ -170,6 +170,7 @@ export default function UsersPage() {
       basic: 0,
       allinone: 0,
       pro: 0,
+      pro_standalone: 0,
       none: 0,
     };
 
@@ -280,7 +281,7 @@ export default function UsersPage() {
               <Package className="w-5 h-5 text-purple-600" />
               <h2 className="text-lg font-bold text-gray-900">สถิติแพ็กเกจ</h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
               <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
                 <p className="text-xl font-bold text-gray-900">{packageStats.none}</p>
                 <p className="text-xs text-gray-600 mt-1">ไม่มีแพ็กเกจ</p>
@@ -291,7 +292,7 @@ export default function UsersPage() {
               </div>
               <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
                 <p className="text-xl font-bold text-green-600">{packageStats.basic}</p>
-                <p className="text-xs text-gray-600 mt-1">Basic</p>
+                <p className="text-xs text-gray-600 mt-1">Beginner</p>
               </div>
               <div className="text-center p-3 bg-orange-50 rounded-lg border border-orange-200">
                 <p className="text-xl font-bold text-orange-600">{packageStats.allinone}</p>
@@ -299,7 +300,11 @@ export default function UsersPage() {
               </div>
               <div className="text-center p-3 bg-purple-50 rounded-lg border border-purple-200">
                 <p className="text-xl font-bold text-purple-600">{packageStats.pro}</p>
-                <p className="text-xs text-gray-600 mt-1">Pro</p>
+                <p className="text-xs text-gray-600 mt-1">Pro Bundle</p>
+              </div>
+              <div className="text-center p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                <p className="text-xl font-bold text-indigo-600">{packageStats.pro_standalone}</p>
+                <p className="text-xs text-gray-600 mt-1">Pro Only</p>
               </div>
             </div>
           </div>
@@ -341,9 +346,10 @@ export default function UsersPage() {
                 <option value="all">แพ็กเกจ: ทั้งหมด</option>
                 <option value="none">ไม่มีแพ็กเกจ ({packageStats.none})</option>
                 <option value="free">Free ({packageStats.free})</option>
-                <option value="basic">Basic ({packageStats.basic})</option>
+                <option value="basic">Beginner ({packageStats.basic})</option>
                 <option value="allinone">All-in-One ({packageStats.allinone})</option>
-                <option value="pro">Pro ({packageStats.pro})</option>
+                <option value="pro">Pro Bundle ({packageStats.pro})</option>
+                <option value="pro_standalone">Pro Only ({packageStats.pro_standalone})</option>
               </select>
             </div>
             <p className="text-sm text-gray-500 mt-3">
@@ -501,9 +507,10 @@ export default function UsersPage() {
                   >
                     <option value="">ไม่มีแพ็คเกจ</option>
                     <option value="free">Free (Freemium)</option>
-                    <option value="basic">Basic</option>
+                    <option value="basic">Beginner</option>
                     <option value="allinone">All-in-One</option>
-                    <option value="pro">Pro</option>
+                    <option value="pro">Pro Developer + All-in-One (Bundle)</option>
+                    <option value="pro_standalone">Pro Developer (Standalone)</option>
                   </select>
                 </div>
 

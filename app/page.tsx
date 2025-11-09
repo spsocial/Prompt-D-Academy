@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Zap } from 'lucide-react'
+import { GraduationCap } from 'lucide-react'
 
 export default function Home() {
   return (
@@ -9,7 +9,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
-              <Zap className="w-8 h-8 text-purple-600" />
+              <GraduationCap className="w-8 h-8 text-purple-600" />
               <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 Prompt D Academy
               </span>
@@ -36,9 +36,9 @@ export default function Home() {
             เลือกเส้นทางการเรียนที่เหมาะกับคุณ หรือเรียนรู้แต่ละ AI Tool แยกกัน
           </p>
           <div className="flex gap-4 justify-center">
-            <Link href="/login" className="bg-white text-purple-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors text-lg">
-              ทดลองเรียนฟรี - เข้าสู่ระบบด้วย Google
-            </Link>
+            <a href="https://m.me/719837687869400" target="_blank" rel="noopener noreferrer" className="bg-white text-purple-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors text-lg">
+              สอบถามและสมัครคอร์ส
+            </a>
           </div>
         </div>
       </section>
@@ -135,9 +135,10 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             {/* Basic Package */}
             <div className="card hover:shadow-2xl">
-              <h3 className="text-2xl font-bold mb-2">โฆษณาโปร</h3>
-              <div className="text-3xl font-bold text-purple-600 mb-4">
-                ฿299
+              <h3 className="text-2xl font-bold mb-2">Beginner</h3>
+              <div className="mb-4">
+                <div className="text-3xl font-bold text-purple-600">฿299</div>
+                <div className="text-sm text-gray-400 line-through">฿499</div>
               </div>
               <ul className="space-y-2 mb-6">
                 <li className="flex items-center gap-2">
@@ -149,7 +150,7 @@ export default function Home() {
                   <span>ChatGPT, Nano Banana, Veo3.1, Infinite talk</span>
                 </li>
               </ul>
-              <Link href="/login" className="btn-primary w-full block text-center">เลือกแพ็คเกจนี้</Link>
+              <a href="https://m.me/719837687869400" target="_blank" rel="noopener noreferrer" className="btn-primary w-full block text-center">เลือกแพ็คเกจนี้</a>
             </div>
 
             {/* All-in-One Package */}
@@ -158,8 +159,9 @@ export default function Home() {
                 แนะนำ
               </div>
               <h3 className="text-2xl font-bold mb-2">All-in-One</h3>
-              <div className="text-3xl font-bold text-purple-600 mb-4">
-                ฿499
+              <div className="mb-4">
+                <div className="text-3xl font-bold text-purple-600">฿499</div>
+                <div className="text-sm text-gray-400 line-through">฿999</div>
               </div>
               <ul className="space-y-2 mb-6">
                 <li className="flex items-center gap-2">
@@ -179,19 +181,20 @@ export default function Home() {
                   <span>สอนใช้ AI ตัวอื่นๆอีกเพียบ</span>
                 </li>
               </ul>
-              <Link href="/login" className="btn-primary w-full block text-center">เลือกแพ็คเกจนี้</Link>
+              <a href="https://m.me/719837687869400" target="_blank" rel="noopener noreferrer" className="btn-primary w-full block text-center">เลือกแพ็คเกจนี้</a>
             </div>
 
             {/* Pro Package */}
             <div className="card hover:shadow-2xl">
               <h3 className="text-2xl font-bold mb-2">Pro Developer</h3>
-              <div className="text-3xl font-bold text-purple-600 mb-4">
-                ฿999
+              <div className="mb-4">
+                <div className="text-3xl font-bold text-purple-600">฿1,499</div>
+                <div className="text-sm text-gray-400 line-through">฿2,499</div>
               </div>
               <ul className="space-y-2 mb-6">
                 <li className="flex items-center gap-2">
                   <span className="text-green-500">✓</span>
-                  <span>ทุกอย่างใน All-in-One</span>
+                  <span>เรียนรู้การพัฒนาด้วย AI</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-green-500">✓</span>
@@ -201,8 +204,12 @@ export default function Home() {
                   <span className="text-green-500">✓</span>
                   <span>สร้าง Automation ระบบ</span>
                 </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span>
+                  <span>เหมาะสำหรับนักพัฒนา</span>
+                </li>
               </ul>
-              <button className="btn-secondary w-full">เร็วๆ นี้</button>
+              <a href="https://m.me/719837687869400" target="_blank" rel="noopener noreferrer" className="btn-primary w-full block text-center">เลือกแพ็คเกจนี้</a>
             </div>
           </div>
         </div>
@@ -212,7 +219,7 @@ export default function Home() {
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Zap className="w-6 h-6" />
+            <GraduationCap className="w-6 h-6" />
             <span className="text-xl font-bold">Prompt D Academy</span>
           </div>
           <p className="text-gray-400">

@@ -1,7 +1,8 @@
 import { UserData } from '@/lib/hooks/useAuth';
 
 /**
- * Check if user can access content based on package hierarchy
+ * Check if user can access content based on package rules
+ * Supports both hierarchy (backward compatible) and specific package access
  */
 export function canAccessContent(
   userPackage: string | null,
@@ -9,14 +10,17 @@ export function canAccessContent(
 ): boolean {
   if (!userPackage) return false;
 
-  const hierarchy: Record<string, number> = {
-    free: 0,
-    basic: 1,
-    allinone: 2,
-    pro: 3,
+  // Define what each package can access
+  const accessRules: Record<string, string[]> = {
+    free: ['free'],
+    basic: ['free', 'basic'],
+    allinone: ['free', 'basic', 'allinone'],
+    pro: ['free', 'basic', 'allinone', 'pro'], // Original pro includes everything (backward compatible)
+    pro_standalone: ['free', 'pro'], // New standalone pro - only pro content + free
   };
 
-  return hierarchy[userPackage] >= hierarchy[requiredPackage];
+  const userAccess = accessRules[userPackage] || [];
+  return userAccess.includes(requiredPackage);
 }
 
 /**
@@ -53,9 +57,10 @@ export function isAdmin(userData: UserData | null): boolean {
 export function getPackageName(packageId: string | null): string {
   const packageNames: Record<string, string> = {
     free: 'Free',
-    basic: 'โฆษณาโปร',
+    basic: 'Beginner',
     allinone: 'All-in-One',
-    pro: 'Pro Developer',
+    pro: 'Pro Developer + All-in-One',
+    pro_standalone: 'Pro Developer',
   };
 
   return packageId ? packageNames[packageId] || 'ไม่มีแพ็คเกจ' : 'ไม่มีแพ็คเกจ';
