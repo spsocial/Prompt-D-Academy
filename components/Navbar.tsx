@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { Search, LogOut, User, Settings, Sparkles } from 'lucide-react';
+import { Search, LogOut, User, Settings } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -92,7 +92,14 @@ export function Navbar() {
               href="/whats-new"
               className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-purple-50 transition-colors group"
             >
-              <Sparkles className="w-5 h-5 text-purple-600 group-hover:animate-pulse" />
+              <lottie-player
+                src="/images/whats-new.json"
+                background="transparent"
+                speed="1"
+                style={{ width: '24px', height: '24px' }}
+                loop
+                autoplay
+              />
               <span className="font-medium text-gray-700 group-hover:text-purple-600">
                 มีอะไรใหม่
               </span>
