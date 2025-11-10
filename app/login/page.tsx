@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { GraduationCap } from 'lucide-react';
 import { GoogleSignInButton } from '@/components/GoogleSignInButton';
 
 export default function LoginPage() {
@@ -9,8 +8,8 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Logo */}
-        <Link href="/" className="flex items-center justify-center gap-2 mb-6">
-          <GraduationCap className="w-12 h-12 text-purple-600" />
+        <Link href="/" className="flex items-center justify-center gap-3 mb-6">
+          <img src="/images/logo_1.png" alt="Prompt D Academy Logo" className="w-12 h-12 object-contain" />
           <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             Prompt D Academy
           </span>

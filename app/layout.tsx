@@ -7,6 +7,10 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Prompt D Academy - เรียนรู้ AI แบบมืออาชีพ',
   description: 'แพลตฟอร์มเรียนรู้ AI ออนไลน์สำหรับผู้ที่ต้องการพัฒนาทักษะด้วย AI Tools ชั้นนำ',
+  icons: {
+    icon: '/images/logo_1.png',
+    apple: '/images/logo_1.png',
+  },
 }
 
 export default function RootLayout({
