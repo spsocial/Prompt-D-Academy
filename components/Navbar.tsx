@@ -92,16 +92,18 @@ export function Navbar() {
               href="/whats-new"
               className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-purple-50 transition-colors group"
             >
-              <lottie-player
-                src="/images/whats-new.json"
-                background="transparent"
-                speed="1"
-                style={{ width: '24px', height: '24px' }}
-                loop
-                autoplay
-              />
+              <div className="w-6 h-6 flex items-center justify-center">
+                <lottie-player
+                  src="/images/whats-new.json"
+                  background="transparent"
+                  speed="1"
+                  style={{ width: '24px', height: '24px' }}
+                  loop
+                  autoplay
+                />
+              </div>
               <span className="font-medium text-gray-700 group-hover:text-purple-600">
-                มีอะไรใหม่
+                ✨ มีอะไรใหม่
               </span>
             </Link>
           )}
@@ -159,8 +161,17 @@ export function Navbar() {
                     onClick={() => setDropdownOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 hover:bg-purple-50 transition-colors md:hidden"
                   >
-                    <Sparkles className="w-5 h-5 text-purple-600" />
-                    <span className="text-gray-700 font-medium">มีอะไรใหม่</span>
+                    <div className="w-5 h-5 flex items-center justify-center">
+                      <lottie-player
+                        src="/images/whats-new.json"
+                        background="transparent"
+                        speed="1"
+                        style={{ width: '20px', height: '20px' }}
+                        loop
+                        autoplay
+                      />
+                    </div>
+                    <span className="text-gray-700 font-medium">✨ มีอะไรใหม่</span>
                   </Link>
 
                   <Link
