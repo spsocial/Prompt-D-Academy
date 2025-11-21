@@ -429,7 +429,7 @@ export default function Home() {
               <div className="group relative bg-white rounded-3xl p-8 border-2 border-gray-200 hover:border-purple-400 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-purple-200/50 shadow-lg">
                 <h3 className="text-2xl font-bold mb-2 text-gray-900">Pro Developer</h3>
                 <div className="mb-6">
-                  <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">฿1,499</div>
+                  <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">฿1,999</div>
                   <div className="text-sm text-gray-500 line-through">฿2,499</div>
                 </div>
                 <ul className="space-y-3 mb-8">

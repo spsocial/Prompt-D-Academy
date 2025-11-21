@@ -110,26 +110,28 @@ export default function DashboardPage() {
         {/* Navigation Tabs */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
           <div className="card p-2">
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3">
               <button
                 onClick={() => setActiveTab('paths')}
-                className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-all duration-200 ${
+                className={`flex-1 py-2 sm:py-3 px-3 sm:px-6 rounded-lg font-semibold text-xs sm:text-base transition-all duration-200 ${
                   activeTab === 'paths'
                     ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-300 transform scale-105'
                     : 'bg-white text-gray-600 hover:bg-purple-50 hover:text-purple-600 hover:shadow-md border-2 border-gray-200'
                 }`}
               >
-                📚 เส้นทางการเรียน (Learning Path)
+                <span className="hidden sm:inline">📚 เส้นทางการเรียน (Learning Path)</span>
+                <span className="sm:hidden">📚 เส้นทางเรียน</span>
               </button>
               <button
                 onClick={() => setActiveTab('tools')}
-                className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-all duration-200 ${
+                className={`flex-1 py-2 sm:py-3 px-3 sm:px-6 rounded-lg font-semibold text-xs sm:text-base transition-all duration-200 ${
                   activeTab === 'tools'
                     ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-300 transform scale-105'
                     : 'bg-white text-gray-600 hover:bg-purple-50 hover:text-purple-600 hover:shadow-md border-2 border-gray-200'
                 }`}
               >
-                🛠️ เรียนแยกตาม AI Tool
+                <span className="hidden sm:inline">🛠️ เรียนแยกตาม AI Tool</span>
+                <span className="sm:hidden">🛠️ AI Tools</span>
               </button>
             </div>
           </div>
