@@ -1,9 +1,9 @@
 'use client';
 import { useEffect } from 'react';
 
-import { useEffect, ProtectedRoute } from '@/components/ProtectedRoute';
-import { useEffect, Navbar } from '@/components/Navbar';
-import { useEffect, BookOpen, Wrench, Video, Plus } from 'lucide-react';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { Navbar } from '@/components/Navbar';
+import { BookOpen, Wrench, Video, Plus } from 'lucide-react';
 
 export default function ContentPage() {
 

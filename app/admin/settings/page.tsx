@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useEffect, ProtectedRoute } from '@/components/ProtectedRoute';
-import { useEffect, Navbar } from '@/components/Navbar';
-import { useEffect, useAuth } from '@/lib/hooks/useAuth';
-import { useEffect, Settings, Shield, Mail, Globe, Database, Save } from 'lucide-react';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { Navbar } from '@/components/Navbar';
+import { useAuth } from '@/lib/hooks/useAuth';
+import { Settings, Shield, Mail, Globe, Database, Save } from 'lucide-react';
 
 export default function AdminSettingsPage() {
 

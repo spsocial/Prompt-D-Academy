@@ -322,7 +322,7 @@ function LearningPathsTab({ userPackage, viewMode }: { userPackage: string | nul
                   )}
 
                   {/* Title */}
-                  <h3 className={`font-bold text-gray-900 mb-2 ${
+                  <h3 className={`font-bold text-gray-900 dark:text-white mb-2 ${
                     viewMode === 'list' ? 'text-xl' : 'text-sm line-clamp-2'
                   }`}>{path.title}</h3>
 
@@ -503,7 +503,7 @@ function AIToolsTab({ userPackage, viewMode }: { userPackage: string | null; vie
                   )}
 
                   {/* Title */}
-                  <h3 className={`font-bold text-gray-900 mb-2 ${
+                  <h3 className={`font-bold text-gray-900 dark:text-white mb-2 ${
                     viewMode === 'list' ? 'text-xl' : 'text-sm line-clamp-2'
                   }`}>{tool.name}</h3>
 
