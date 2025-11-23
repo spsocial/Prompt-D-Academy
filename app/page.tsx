@@ -1,9 +1,40 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Script from 'next/script'
+import { collection, getDocs } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
 
 export default function Home() {
+  const [totalTools, setTotalTools] = useState(0)
+  const [totalVideos, setTotalVideos] = useState(0)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadStats()
+  }, [])
+
+  const loadStats = async () => {
+    try {
+      const toolsCol = collection(db, 'aiTools')
+      const toolsSnapshot = await getDocs(toolsCol)
+
+      let videoCount = 0
+      toolsSnapshot.docs.forEach(doc => {
+        const videos = doc.data().videos || []
+        videoCount += videos.length
+      })
+
+      setTotalTools(toolsSnapshot.docs.length)
+      setTotalVideos(videoCount)
+    } catch (error) {
+      console.error('Error loading stats:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <>
       <Script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js" />
@@ -269,7 +300,7 @@ export default function Home() {
                     <span className="text-6xl opacity-20">📱</span>
                   </div>
                   <img
-                    src="/images/show1.png"
+                    src="/images/show1.jpeg"
                     alt="ตัวอย่างหน้าเว็บภายใน 1"
                     className="w-full h-full object-cover relative z-10"
                     onError={(e) => { e.currentTarget.style.display = 'none' }}
@@ -323,7 +354,7 @@ export default function Home() {
                     <span className="text-6xl opacity-20">🎓</span>
                   </div>
                   <img
-                    src="/images/show2.png"
+                    src="/images/show2.jpeg"
                     alt="ตัวอย่างหน้าเว็บภายใน 2"
                     className="w-full h-full object-cover relative z-10"
                     onError={(e) => { e.currentTarget.style.display = 'none' }}
@@ -486,6 +517,48 @@ export default function Home() {
             </div>
         </div>
       </section>
+
+        {/* Stats Section */}
+        <section className="py-16 bg-white border-t border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                เนื้อหาที่พร้อมให้คุณเรียนรู้
+              </h2>
+              <p className="text-gray-600">อัพเดทอยู่เสมอ ไม่มีหยุด!</p>
+            </div>
+
+            {loading ? (
+              <div className="flex justify-center py-8">
+                <div className="spinner h-8 w-8" />
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+                {/* Total Courses */}
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 border-2 border-purple-200 hover:shadow-xl transition-all">
+                  <div className="text-center">
+                    <div className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+                      {totalTools}
+                    </div>
+                    <div className="text-lg font-semibold text-gray-700">คอร์ส AI Tools</div>
+                    <div className="text-sm text-gray-600 mt-1">พร้อมสอนทุกทักษะ</div>
+                  </div>
+                </div>
+
+                {/* Total Videos */}
+                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-8 border-2 border-blue-200 hover:shadow-xl transition-all">
+                  <div className="text-center">
+                    <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">
+                      {totalVideos}
+                    </div>
+                    <div className="text-lg font-semibold text-gray-700">วิดีโอทั้งหมด</div>
+                    <div className="text-sm text-gray-600 mt-1">เนื้อหาคุณภาพสูง</div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
 
         {/* Footer */}
         <footer className="bg-gradient-to-b from-white to-gray-100 border-t-2 border-gray-300 py-12 shadow-inner">
