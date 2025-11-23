@@ -159,25 +159,25 @@ export default function DashboardPage() {
               <div className="flex gap-1.5 sm:gap-2 flex-1">
                 <button
                   onClick={() => setActiveTab('paths')}
-                  className={`flex-1 sm:flex-initial sm:px-5 px-2.5 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 ${
+                  className={`flex-1 sm:flex-initial sm:px-5 px-2.5 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-2 ${
                     activeTab === 'paths'
                       ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md sm:shadow-lg sm:shadow-purple-300/50 sm:scale-105'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-gray-900 border border-gray-300'
                   }`}
                 >
-                  <span className="hidden sm:inline">📚 เส้นทางเรียน</span>
-                  <span className="sm:hidden">📚</span>
+                  <img src="/images/school_16007916.png" alt="เส้นทางเรียน" className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="hidden sm:inline">เส้นทางเรียน</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('tools')}
-                  className={`flex-1 sm:flex-initial sm:px-5 px-2.5 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 ${
+                  className={`flex-1 sm:flex-initial sm:px-5 px-2.5 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-2 ${
                     activeTab === 'tools'
                       ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md sm:shadow-lg sm:shadow-purple-300/50 sm:scale-105'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-gray-900 border border-gray-300'
                   }`}
                 >
-                  <span className="hidden sm:inline">🛠️ AI Tools</span>
-                  <span className="sm:hidden">🛠️</span>
+                  <img src="/images/ai_tool.png" alt="AI Tools" className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="hidden sm:inline">AI Tools</span>
                 </button>
               </div>
 
