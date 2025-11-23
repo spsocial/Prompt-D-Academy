@@ -497,35 +497,45 @@ export default function Home() {
               <p className="text-gray-600">อัพเดทอยู่เสมอ ไม่มีหยุด!</p>
             </div>
 
-            {loading ? (
-              <div className="flex justify-center py-8">
-                <div className="spinner h-8 w-8" />
-              </div>
-            ) : (
-              <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-                {/* Total Courses */}
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 border-2 border-purple-200 hover:shadow-xl transition-all">
-                  <div className="text-center">
-                    <div className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-                      {totalTools}
+            <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+              {/* Total Courses */}
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 border-2 border-purple-200 hover:shadow-xl transition-all">
+                <div className="text-center">
+                  {loading ? (
+                    <div className="flex justify-center py-4">
+                      <div className="spinner h-8 w-8" />
                     </div>
-                    <div className="text-lg font-semibold text-gray-700">คอร์ส AI Tools</div>
-                    <div className="text-sm text-gray-600 mt-1">พร้อมสอนทุกทักษะ</div>
-                  </div>
+                  ) : (
+                    <>
+                      <div className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+                        {totalTools}
+                      </div>
+                      <div className="text-lg font-semibold text-gray-700">คอร์ส AI Tools</div>
+                      <div className="text-sm text-gray-600 mt-1">พร้อมสอนทุกทักษะ</div>
+                    </>
+                  )}
                 </div>
+              </div>
 
-                {/* Total Videos */}
-                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-8 border-2 border-blue-200 hover:shadow-xl transition-all">
-                  <div className="text-center">
-                    <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">
-                      {totalVideos}
+              {/* Total Videos */}
+              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-8 border-2 border-blue-200 hover:shadow-xl transition-all">
+                <div className="text-center">
+                  {loading ? (
+                    <div className="flex justify-center py-4">
+                      <div className="spinner h-8 w-8" />
                     </div>
-                    <div className="text-lg font-semibold text-gray-700">วิดีโอทั้งหมด</div>
-                    <div className="text-sm text-gray-600 mt-1">เนื้อหาคุณภาพสูง</div>
-                  </div>
+                  ) : (
+                    <>
+                      <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">
+                        {totalVideos}
+                      </div>
+                      <div className="text-lg font-semibold text-gray-700">วิดีโอทั้งหมด</div>
+                      <div className="text-sm text-gray-600 mt-1">เนื้อหาคุณภาพสูง</div>
+                    </>
+                  )}
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </section>
 

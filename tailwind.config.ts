@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
+  darkMode: 'class',
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -34,6 +35,14 @@ const config: Config = {
           700: '#be185d',
           800: '#9f1239',
           900: '#831843',
+        },
+        // TikTok-inspired dark mode colors
+        tiktok: {
+          cyan: '#00f2ea',
+          pink: '#fe2c55',
+          dark: '#121212',
+          darkGray: '#1a1a1a',
+          lightGray: '#2a2a2a',
         },
       },
       backgroundImage: {

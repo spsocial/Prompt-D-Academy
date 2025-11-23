@@ -2,18 +2,20 @@
 
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { Search, LogOut, User, Settings } from 'lucide-react';
+import { Search, LogOut, User, Settings, Moon, Sun } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { getPackageName, getProviderIcon } from '@/lib/utils/accessControl';
+import { useTheme } from '@/lib/context/ThemeContext';
 
 export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { user, userData } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -58,13 +60,13 @@ export function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <nav className="bg-white dark:bg-tiktok-dark shadow-md sticky top-0 z-50 border-b border-gray-200 dark:border-tiktok-lightGray">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <img src="/images/logo_1.png" alt="Prompt D Academy Logo" className="w-10 h-10 object-contain" />
-            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-tiktok-cyan dark:to-tiktok-pink bg-clip-text text-transparent">
               Prompt D Academy
             </span>
           </Link>
@@ -79,33 +81,49 @@ export function Navbar() {
                   value={searchTerm}
                   onChange={(e) => handleSearch(e.target.value)}
                   onKeyPress={handleSearchKeyPress}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-tiktok-lightGray rounded-lg focus:ring-2 focus:ring-purple-600 dark:focus:ring-tiktok-cyan focus:border-transparent outline-none bg-white dark:bg-tiktok-darkGray dark:text-white"
                 />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-300" />
               </div>
             </div>
           )}
 
-          {/* What's New Link */}
+          {/* Right Side Actions */}
           {user && (
-            <Link
-              href="/whats-new"
-              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-purple-50 transition-colors group"
-            >
-              <div className="w-6 h-6 flex items-center justify-center">
-                <lottie-player
-                  src="/images/whats-new.json"
-                  background="transparent"
-                  speed="1"
-                  style={{ width: '24px', height: '24px' }}
-                  loop
-                  autoplay
-                />
-              </div>
-              <span className="font-medium text-gray-700 group-hover:text-purple-600">
-                มีอะไรใหม่
-              </span>
-            </Link>
+            <div className="hidden md:flex items-center gap-2">
+              {/* What's New Link */}
+              <Link
+                href="/whats-new"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-purple-50 dark:hover:bg-tiktok-lightGray transition-colors group"
+              >
+                <div className="w-6 h-6 flex items-center justify-center">
+                  <lottie-player
+                    src="/images/whats-new.json"
+                    background="transparent"
+                    speed="1"
+                    style={{ width: '24px', height: '24px' }}
+                    loop
+                    autoplay
+                  />
+                </div>
+                <span className="font-medium text-gray-700 dark:text-gray-200 group-hover:text-purple-600 dark:group-hover:text-tiktok-cyan">
+                  มีอะไรใหม่
+                </span>
+              </Link>
+
+              {/* Dark Mode Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-purple-50 dark:hover:bg-tiktok-lightGray transition-colors group"
+                title={theme === 'dark' ? 'เปลี่ยนเป็นโหมดสว่าง' : 'เปลี่ยนเป็นโหมดมืด'}
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-5 h-5 text-tiktok-cyan" />
+                ) : (
+                  <Moon className="w-5 h-5 text-gray-700" />
+                )}
+              </button>
+            </div>
           )}
 
           {/* Profile Dropdown */}
@@ -113,7 +131,7 @@ export function Navbar() {
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-2 hover:bg-gray-50 rounded-lg p-2 transition-colors"
+                className="flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-tiktok-lightGray rounded-lg p-2 transition-colors"
               >
                 {userData.photoURL && !imageError ? (
                   <img
@@ -135,21 +153,21 @@ export function Navbar() {
 
               {/* Dropdown Menu */}
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-tiktok-darkGray rounded-lg shadow-xl border border-gray-200 dark:border-tiktok-lightGray py-2 z-50">
                   {/* User Info */}
-                  <div className="px-4 py-3 border-b border-gray-200">
-                    <p className="font-bold text-gray-900">{userData.displayName}</p>
-                    <p className="text-sm text-gray-600">{userData.email}</p>
+                  <div className="px-4 py-3 border-b border-gray-200 dark:border-tiktok-lightGray">
+                    <p className="font-bold text-gray-900 dark:text-white">{userData.displayName}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">{userData.email}</p>
 
                     {/* Provider Badge */}
-                    <div className="mt-2 inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full text-xs">
+                    <div className="mt-2 inline-flex items-center gap-1 bg-gray-100 dark:bg-tiktok-lightGray px-2 py-1 rounded-full text-xs dark:text-gray-200">
                       <span>{getProviderIcon(userData.provider)}</span>
                       <span>{userData.provider === 'google' ? 'Google' : 'Email'}</span>
                     </div>
 
                     {/* Package Badge */}
                     <div className="mt-2">
-                      <span className="badge text-xs">
+                      <span className="badge dark:bg-tiktok-lightGray dark:text-tiktok-cyan text-xs">
                         {getPackageName(userData.package)}
                       </span>
                     </div>
@@ -159,7 +177,7 @@ export function Navbar() {
                   <Link
                     href="/whats-new"
                     onClick={() => setDropdownOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-purple-50 transition-colors md:hidden"
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-purple-50 dark:hover:bg-tiktok-lightGray transition-colors md:hidden"
                   >
                     <div className="w-5 h-5 flex items-center justify-center">
                       <lottie-player
@@ -171,28 +189,46 @@ export function Navbar() {
                         autoplay
                       />
                     </div>
-                    <span className="text-gray-700 font-medium">มีอะไรใหม่</span>
+                    <span className="text-gray-700 dark:text-gray-200 font-medium">มีอะไรใหม่</span>
                   </Link>
+
+                  {/* Dark Mode Toggle - Mobile */}
+                  <button
+                    onClick={toggleTheme}
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-purple-50 dark:hover:bg-tiktok-lightGray transition-colors md:hidden"
+                  >
+                    {theme === 'dark' ? (
+                      <>
+                        <Sun className="w-5 h-5 text-tiktok-cyan" />
+                        <span className="text-gray-700 dark:text-gray-200 font-medium">เปลี่ยนเป็นโหมดสว่าง</span>
+                      </>
+                    ) : (
+                      <>
+                        <Moon className="w-5 h-5 text-gray-600" />
+                        <span className="text-gray-700 dark:text-gray-200 font-medium">เปลี่ยนเป็นโหมดมืด</span>
+                      </>
+                    )}
+                  </button>
 
                   <Link
                     href="/profile"
                     onClick={() => setDropdownOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-tiktok-lightGray transition-colors"
                   >
-                    <User className="w-5 h-5 text-gray-600" />
-                    <span className="text-gray-700">ข้อมูลส่วนตัว</span>
+                    <User className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                    <span className="text-gray-700 dark:text-gray-200">ข้อมูลส่วนตัว</span>
                   </Link>
 
                   {userData.isAdmin && (
                     <Link
                       href="/admin"
                       onClick={() => setDropdownOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-purple-50 transition-colors border-t border-gray-100"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-purple-50 dark:hover:bg-tiktok-lightGray transition-colors border-t border-gray-100 dark:border-tiktok-lightGray"
                     >
-                      <Settings className="w-5 h-5 text-purple-600" />
+                      <Settings className="w-5 h-5 text-purple-600 dark:text-tiktok-cyan" />
                       <div>
-                        <p className="text-gray-900 font-medium">⚙️ Admin Panel</p>
-                        <p className="text-xs text-gray-500">จัดการระบบ</p>
+                        <p className="text-gray-900 dark:text-white font-medium">⚙️ Admin Panel</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">จัดการระบบ</p>
                       </div>
                     </Link>
                   )}
@@ -202,7 +238,7 @@ export function Navbar() {
                       setDropdownOpen(false);
                       handleLogout();
                     }}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 transition-colors text-red-600"
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-red-600 dark:text-red-400"
                   >
                     <LogOut className="w-5 h-5" />
                     <span>ออกจากระบบ</span>

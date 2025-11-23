@@ -9,6 +9,12 @@
     --background-end-rgb: 255, 255, 255;
   }
 
+  .dark {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 18, 18, 18;
+    --background-end-rgb: 26, 26, 26;
+  }
+
   body {
     color: rgb(var(--foreground-rgb));
     background: linear-gradient(
