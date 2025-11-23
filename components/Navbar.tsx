@@ -103,7 +103,7 @@ export function Navbar() {
                 />
               </div>
               <span className="font-medium text-gray-700 group-hover:text-purple-600">
-                ✨ มีอะไรใหม่
+                มีอะไรใหม่
               </span>
             </Link>
           )}
@@ -171,7 +171,7 @@ export function Navbar() {
                         autoplay
                       />
                     </div>
-                    <span className="text-gray-700 font-medium">✨ มีอะไรใหม่</span>
+                    <span className="text-gray-700 font-medium">มีอะไรใหม่</span>
                   </Link>
 
                   <Link
