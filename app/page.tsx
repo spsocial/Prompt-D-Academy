@@ -1,44 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import Script from 'next/script'
-import { collection, getDocs } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
+import { useAITools } from '@/lib/hooks/useAITools'
 
 export default function Home() {
-  const [totalTools, setTotalTools] = useState(0)
-  const [totalVideos, setTotalVideos] = useState(0)
-  const [loading, setLoading] = useState(true)
+  const { tools, loading } = useAITools()
 
-  useEffect(() => {
-    loadStats()
-  }, [])
-
-  const loadStats = async () => {
-    try {
-      const toolsCol = collection(db, 'aiTools')
-      const toolsSnapshot = await getDocs(toolsCol)
-
-      let videoCount = 0
-      toolsSnapshot.docs.forEach(doc => {
-        const videos = doc.data().videos || []
-        videoCount += videos.length
-      })
-
-      console.log('📊 Stats loaded:', {
-        totalTools: toolsSnapshot.docs.length,
-        totalVideos: videoCount
-      })
-
-      setTotalTools(toolsSnapshot.docs.length)
-      setTotalVideos(videoCount)
-    } catch (error) {
-      console.error('❌ Error loading stats:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // Calculate statistics from tools
+  const totalTools = tools.length
+  const totalVideos = tools.reduce((sum, tool) => sum + (tool.videos?.length || 0), 0)
 
   return (
     <>
