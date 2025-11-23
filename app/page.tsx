@@ -306,10 +306,6 @@ export default function Home() {
                     onError={(e) => { e.currentTarget.style.display = 'none' }}
                   />
                 </div>
-                <div className="p-4 text-center bg-gradient-to-r from-purple-50 to-pink-50">
-                  <p className="text-sm font-semibold text-gray-700">เนื้อหาเรียงระบบ</p>
-                  <p className="text-xs text-gray-600">แยกหมวดหมู่ชัดเจน</p>
-                </div>
               </div>
 
               {/* Center - Coach FILM */}
@@ -359,10 +355,6 @@ export default function Home() {
                     className="w-full h-full object-cover relative z-10"
                     onError={(e) => { e.currentTarget.style.display = 'none' }}
                   />
-                </div>
-                <div className="p-4 text-center bg-gradient-to-r from-purple-50 to-pink-50">
-                  <p className="text-sm font-semibold text-gray-700">เรียนง่าย ทำตาม</p>
-                  <p className="text-xs text-gray-600">มีวิดีโอสอนทุกขั้นตอน</p>
                 </div>
               </div>
             </div>
