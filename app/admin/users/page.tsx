@@ -9,7 +9,7 @@ import { Navbar } from '@/components/Navbar';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { ProviderBadge } from '@/components/ProviderBadge';
 import { PackageBadge } from '@/components/PackageBadge';
-import { Search, Edit, Trash2, Users, CheckCircle, XCircle, Crown, Package } from 'lucide-react';
+import { Search, Edit, Trash2, Users, CheckCircle, XCircle, Crown, Package, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { getPackageName } from '@/lib/utils/accessControl';
 
 interface User {
@@ -40,6 +40,8 @@ export default function UsersPage() {
   const [editActive, setEditActive] = useState(true);
   const [editAdmin, setEditAdmin] = useState(false);
   const [editExpiry, setEditExpiry] = useState<string>('');
+  const [sortBy, setSortBy] = useState<'createdAt' | 'name' | 'progress'>('createdAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   useEffect(() => {
     loadUsers();
@@ -47,7 +49,7 @@ export default function UsersPage() {
 
   useEffect(() => {
     filterUsers();
-  }, [users, searchTerm, filterStatus, filterPackage]);
+  }, [users, searchTerm, filterStatus, filterPackage, sortBy, sortOrder]);
 
   const loadUsers = async () => {
     try {
@@ -95,7 +97,43 @@ export default function UsersPage() {
       }
     }
 
+    // Sort users
+    filtered.sort((a, b) => {
+      if (sortBy === 'createdAt') {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+      } else if (sortBy === 'progress') {
+        // Sort by total videos watched
+        const videosA = a.progress
+          ? Object.values(a.progress).reduce((acc: number, p: any) => acc + (p.watchedVideos?.length || 0), 0)
+          : 0;
+        const videosB = b.progress
+          ? Object.values(b.progress).reduce((acc: number, p: any) => acc + (p.watchedVideos?.length || 0), 0)
+          : 0;
+        return sortOrder === 'asc' ? videosA - videosB : videosB - videosA;
+      } else {
+        // Sort by name
+        const nameA = a.displayName.toLowerCase();
+        const nameB = b.displayName.toLowerCase();
+        if (sortOrder === 'asc') {
+          return nameA.localeCompare(nameB);
+        } else {
+          return nameB.localeCompare(nameA);
+        }
+      }
+    });
+
     setFilteredUsers(filtered);
+  };
+
+  const toggleSort = (column: 'createdAt' | 'name' | 'progress') => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortOrder('desc');
+    }
   };
 
   const handleEdit = (user: User) => {
@@ -368,11 +406,60 @@ export default function UsersPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">ผู้ใช้</th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700">
+                      <button
+                        onClick={() => toggleSort('name')}
+                        className="flex items-center gap-2 hover:text-purple-600 transition-colors"
+                      >
+                        ผู้ใช้
+                        {sortBy === 'name' ? (
+                          sortOrder === 'asc' ? (
+                            <ArrowUp className="w-4 h-4" />
+                          ) : (
+                            <ArrowDown className="w-4 h-4" />
+                          )
+                        ) : (
+                          <ArrowUpDown className="w-4 h-4 text-gray-400" />
+                        )}
+                      </button>
+                    </th>
                     <th className="text-left py-3 px-4 font-semibold text-gray-700">Provider</th>
                     <th className="text-left py-3 px-4 font-semibold text-gray-700">Package</th>
                     <th className="text-left py-3 px-4 font-semibold text-gray-700">สถานะ</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">ความคืบหน้า</th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700">
+                      <button
+                        onClick={() => toggleSort('createdAt')}
+                        className="flex items-center gap-2 hover:text-purple-600 transition-colors"
+                      >
+                        วันที่สมัคร
+                        {sortBy === 'createdAt' ? (
+                          sortOrder === 'asc' ? (
+                            <ArrowUp className="w-4 h-4" />
+                          ) : (
+                            <ArrowDown className="w-4 h-4" />
+                          )
+                        ) : (
+                          <ArrowUpDown className="w-4 h-4 text-gray-400" />
+                        )}
+                      </button>
+                    </th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700">
+                      <button
+                        onClick={() => toggleSort('progress')}
+                        className="flex items-center gap-2 hover:text-purple-600 transition-colors"
+                      >
+                        ความคืบหน้า
+                        {sortBy === 'progress' ? (
+                          sortOrder === 'asc' ? (
+                            <ArrowUp className="w-4 h-4" />
+                          ) : (
+                            <ArrowDown className="w-4 h-4" />
+                          )
+                        ) : (
+                          <ArrowUpDown className="w-4 h-4 text-gray-400" />
+                        )}
+                      </button>
+                    </th>
                     <th className="text-left py-3 px-4 font-semibold text-gray-700">จัดการ</th>
                   </tr>
                 </thead>
@@ -445,6 +532,27 @@ export default function UsersPage() {
                               </>
                             )}
                           </span>
+                        </td>
+                        <td className="py-3 px-4 text-sm">
+                          {user.createdAt ? (
+                            <>
+                              <p className="text-gray-900 font-medium">
+                                {new Date(user.createdAt).toLocaleDateString('th-TH', {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric',
+                                })}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {new Date(user.createdAt).toLocaleTimeString('th-TH', {
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
+                              </p>
+                            </>
+                          ) : (
+                            <p className="text-gray-400 text-xs">ไม่มีข้อมูล</p>
+                          )}
                         </td>
                         <td className="py-3 px-4 text-sm">
                           <p className="text-gray-900 font-medium">{stats.courses} คอร์ส</p>
