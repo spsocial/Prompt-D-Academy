@@ -26,10 +26,15 @@ export default function Home() {
         videoCount += videos.length
       })
 
+      console.log('📊 Stats loaded:', {
+        totalTools: toolsSnapshot.docs.length,
+        totalVideos: videoCount
+      })
+
       setTotalTools(toolsSnapshot.docs.length)
       setTotalVideos(videoCount)
     } catch (error) {
-      console.error('Error loading stats:', error)
+      console.error('❌ Error loading stats:', error)
     } finally {
       setLoading(false)
     }

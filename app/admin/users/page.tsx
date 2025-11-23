@@ -537,17 +537,31 @@ export default function UsersPage() {
                           {user.createdAt ? (
                             <>
                               <p className="text-gray-900 font-medium">
-                                {new Date(user.createdAt).toLocaleDateString('th-TH', {
-                                  year: 'numeric',
-                                  month: 'short',
-                                  day: 'numeric',
-                                })}
+                                {(() => {
+                                  try {
+                                    const date = user.createdAt.toDate ? user.createdAt.toDate() : new Date(user.createdAt);
+                                    return date.toLocaleDateString('th-TH', {
+                                      year: 'numeric',
+                                      month: 'short',
+                                      day: 'numeric',
+                                    });
+                                  } catch (e) {
+                                    return 'ไม่มีข้อมูล';
+                                  }
+                                })()}
                               </p>
                               <p className="text-xs text-gray-500">
-                                {new Date(user.createdAt).toLocaleTimeString('th-TH', {
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                })}
+                                {(() => {
+                                  try {
+                                    const date = user.createdAt.toDate ? user.createdAt.toDate() : new Date(user.createdAt);
+                                    return date.toLocaleTimeString('th-TH', {
+                                      hour: '2-digit',
+                                      minute: '2-digit',
+                                    });
+                                  } catch (e) {
+                                    return '';
+                                  }
+                                })()}
                               </p>
                             </>
                           ) : (
