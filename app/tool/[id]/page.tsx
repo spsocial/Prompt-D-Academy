@@ -80,12 +80,12 @@ export default function AIToolDetailPage() {
   if (loading) {
     return (
       <ProtectedRoute requireActive={true}>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-tiktok-dark">
           <Navbar />
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="text-center">
               <div className="spinner h-12 w-12 mx-auto mb-4" />
-              <p className="text-gray-600">กำลังโหลด...</p>
+              <p className="text-gray-600 dark:text-white">กำลังโหลด...</p>
             </div>
           </div>
         </div>
@@ -96,12 +96,12 @@ export default function AIToolDetailPage() {
   if (!tool) {
     return (
       <ProtectedRoute requireActive={true}>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-tiktok-dark">
           <Navbar />
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">ไม่พบเครื่องมือนี้</h1>
-              <p className="text-gray-600 mb-4">กรุณาติดต่อ Admin เพื่อเพิ่มเครื่องมือนี้</p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-4 dark:text-white">ไม่พบเครื่องมือนี้</h1>
+              <p className="text-gray-600 mb-4 dark:text-white">กรุณาติดต่อ Admin เพื่อเพิ่มเครื่องมือนี้</p>
               <Link href="/dashboard" className="text-purple-600 hover:underline">
                 กลับไปหน้าหลัก
               </Link>
@@ -124,12 +124,12 @@ export default function AIToolDetailPage() {
 
   return (
     <ProtectedRoute requireActive={true}>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-tiktok-dark">
         <Navbar />
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-6">
+          <div className="flex items-center gap-2 text-sm text-gray-600 mb-6 dark:text-white">
             <Link href="/dashboard" className="hover:text-purple-600">
               หน้าหลัก
             </Link>
@@ -138,7 +138,7 @@ export default function AIToolDetailPage() {
               AI Tools
             </Link>
             <ChevronRight className="w-4 h-4" />
-            <span className="text-gray-900">{tool.name}</span>
+            <span className="text-gray-900 dark:text-white">{tool.name}</span>
           </div>
 
           {/* Header */}
@@ -157,26 +157,26 @@ export default function AIToolDetailPage() {
               )}
 
               <div className="flex-1">
-                <h1 className="text-3xl font-bold text-gray-900 mb-3">{tool.name}</h1>
-                <p className="text-gray-600 text-lg mb-6">{tool.description}</p>
+                <h1 className="text-3xl font-bold text-gray-900 mb-3 dark:text-white">{tool.name}</h1>
+                <p className="text-gray-600 text-lg mb-6 dark:text-white">{tool.description}</p>
 
-                <div className="flex items-center gap-2 text-gray-600 mb-6">
+                <div className="flex items-center gap-2 text-gray-600 mb-6 dark:text-white">
                   <Video className="w-5 h-5" />
                   <span>{tool.videos.length} วิดีโอทั้งหมด</span>
                 </div>
 
                 {/* Progress */}
                 {hasAccess && (
-                  <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
-                    <div className="flex justify-between text-sm text-gray-700 mb-2">
+                  <div className="bg-purple-50 dark:bg-tiktok-lightGray border-2 border-purple-200 dark:border-tiktok-cyan rounded-lg p-4">
+                    <div className="flex justify-between text-sm text-gray-700 dark:text-white dark:text-white mb-2">
                       <span className="font-medium">ความคืบหน้าของคุณ</span>
                       <span className="font-bold">
                         {watchedVideos.length}/{tool.videos.length} วิดีโอ ({Math.round(completionPercent)}%)
                       </span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div className="w-full bg-gray-200 dark:bg-tiktok-dark rounded-full h-3">
                       <div
-                        className="bg-gradient-to-r from-purple-600 to-pink-600 h-3 rounded-full transition-all"
+                        className="bg-gradient-to-r from-purple-600 to-pink-600 dark:from-tiktok-cyan dark:to-tiktok-pink h-3 rounded-full transition-all"
                         style={{ width: `${completionPercent}%` }}
                       />
                     </div>
@@ -191,7 +191,7 @@ export default function AIToolDetailPage() {
 
           {/* Videos List */}
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">วิดีโอทั้งหมด</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 dark:text-white">วิดีโอทั้งหมด</h2>
 
             {tool.videos.map((video, index) => {
               const isWatched = watchedVideos.includes(video.id);
@@ -208,8 +208,8 @@ export default function AIToolDetailPage() {
                   <div
                     className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${
                       isWatched
-                        ? 'bg-green-500 text-white'
-                        : 'bg-purple-100 text-purple-600'
+                        ? 'bg-green-500 dark:bg-tiktok-cyan text-white'
+                        : 'bg-purple-100 dark:bg-tiktok-lightGray text-purple-600 dark:text-tiktok-cyan'
                     }`}
                   >
                     {isWatched ? <CheckCircle className="w-6 h-6" /> : video.order}
@@ -218,19 +218,19 @@ export default function AIToolDetailPage() {
                   {/* Content */}
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-1">
-                      <h3 className="text-lg font-bold text-gray-900">{video.title}</h3>
-                      <span className="flex items-center gap-1 text-sm text-gray-500 ml-4">
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white">{video.title}</h3>
+                      <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-200 ml-4">
                         <Clock className="w-4 h-4" />
                         {video.duration}
                       </span>
                     </div>
                     {video.description && (
-                      <p className="text-gray-600 text-sm mb-2">{video.description}</p>
+                      <p className="text-gray-600 text-sm mb-2 dark:text-white">{video.description}</p>
                     )}
                     {hasAccess && (
                       <div className="flex items-center gap-2">
-                        <PlayCircle className="w-5 h-5 text-purple-600" />
-                        <span className="text-purple-600 font-medium text-sm">
+                        <PlayCircle className="w-5 h-5 text-purple-600 dark:text-tiktok-cyan" />
+                        <span className="text-purple-600 dark:text-tiktok-cyan font-medium text-sm">
                           {isWatched ? 'ดูอีกครั้ง' : 'เริ่มดู'}
                         </span>
                       </div>
@@ -240,8 +240,8 @@ export default function AIToolDetailPage() {
                   {/* Lock indicator for individual video */}
                   {!hasAccess && (
                     <div className="absolute inset-0 bg-gray-900 bg-opacity-40 rounded-xl flex items-center justify-center">
-                      <div className="bg-white px-4 py-2 rounded-lg shadow-lg">
-                        <p className="text-sm text-gray-700">🔒 ล็อค</p>
+                      <div className="bg-white px-4 py-2 rounded-lg shadow-lg dark:bg-tiktok-darkGray">
+                        <p className="text-sm text-gray-700 dark:text-white">🔒 ล็อค</p>
                       </div>
                     </div>
                   )}

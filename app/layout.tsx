@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
 import { ThemeProvider } from '@/lib/context/ThemeContext'
 
@@ -21,6 +22,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="th">
+      <head>
+        <Script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js" />
+      </head>
       <body className={inter.className}>
         <ThemeProvider>
           {children}

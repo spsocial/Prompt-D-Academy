@@ -58,7 +58,7 @@ function linkify(text: string) {
           href={part}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-purple-600 hover:text-purple-700 underline break-all"
+          className="text-purple-600 dark:text-tiktok-cyan dark:text-tiktok-cyan hover:text-purple-700 dark:hover:text-tiktok-pink underline break-all"
         >
           {part}
         </a>
@@ -173,12 +173,12 @@ export default function VideoPlayerPage() {
   if (loading) {
     return (
       <ProtectedRoute requireActive={true}>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-tiktok-dark">
           <Navbar />
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="text-center">
               <div className="spinner h-12 w-12 mx-auto mb-4" />
-              <p className="text-gray-600">กำลังโหลดวิดีโอ...</p>
+              <p className="text-gray-600 dark:text-white">กำลังโหลดวิดีโอ...</p>
             </div>
           </div>
         </div>
@@ -189,12 +189,12 @@ export default function VideoPlayerPage() {
   if (!video || !tool) {
     return (
       <ProtectedRoute requireActive={true}>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-tiktok-dark">
           <Navbar />
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">ไม่พบวิดีโอนี้</h1>
-              <p className="text-gray-600 mb-4">กรุณาติดต่อ Admin</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">ไม่พบวิดีโอนี้</h1>
+              <p className="text-gray-600 dark:text-white mb-4">กรุณาติดต่อ Admin</p>
               <Link href="/dashboard" className="text-purple-600 hover:underline">
                 กลับไปหน้าหลัก
               </Link>
@@ -326,7 +326,7 @@ export default function VideoPlayerPage() {
 
   return (
     <ProtectedRoute requireActive={true}>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-tiktok-dark">
         <Navbar />
 
         {/* Success Modal */}
@@ -339,14 +339,14 @@ export default function VideoPlayerPage() {
             />
 
             {/* Modal Content */}
-            <div className="relative bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full animate-scaleIn">
+            <div className="relative bg-white dark:bg-tiktok-darkGray rounded-2xl shadow-2xl p-8 max-w-md w-full animate-scaleIn">
               {/* Close Button - Top Right */}
               <button
                 onClick={() => setShowSuccessModal(false)}
                 className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors group"
                 aria-label="ปิด"
               >
-                <X className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+                <X className="w-5 h-5 text-gray-400 dark:text-gray-300 group-hover:text-gray-600 dark:text-white" />
               </button>
 
               {/* Celebration Icon */}
@@ -364,13 +364,13 @@ export default function VideoPlayerPage() {
                 <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                   🎉 ยินดีด้วย!
                 </h2>
-                <p className="text-xl font-semibold text-gray-900">
+                <p className="text-xl font-semibold text-gray-900 dark:text-white">
                   คุณยกระดับความรู้ของคุณ
                 </p>
-                <p className="text-lg text-gray-600">
+                <p className="text-lg text-gray-600 dark:text-white">
                   ขึ้นไปอีกขั้นแล้ว! 🚀
                 </p>
-                <div className="pt-4 text-sm text-gray-500">
+                <div className="pt-4 text-sm text-gray-500 dark:text-gray-200">
                   บันทึกความคืบหน้าเรียบร้อยแล้ว ✓
                 </div>
               </div>
@@ -391,14 +391,14 @@ export default function VideoPlayerPage() {
             {/* Main Content - 70% */}
             <div className="lg:col-span-2 space-y-6">
               {/* Breadcrumb */}
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Link href="/dashboard" className="hover:text-purple-600">
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-white">
+                <Link href="/dashboard" className="hover:text-purple-600 dark:text-tiktok-cyan dark:hover:text-tiktok-cyan">
                   หน้าหลัก
                 </Link>
                 <ChevronRight className="w-4 h-4" />
                 {path && (
                   <>
-                    <Link href={`/learning-path/${pathId}`} className="hover:text-purple-600">
+                    <Link href={`/learning-path/${pathId}`} className="hover:text-purple-600 dark:text-tiktok-cyan dark:hover:text-tiktok-cyan">
                       {path.title}
                     </Link>
                     <ChevronRight className="w-4 h-4" />
@@ -406,17 +406,17 @@ export default function VideoPlayerPage() {
                 )}
                 {tool && !path && (
                   <>
-                    <Link href={`/tool/${toolId}`} className="hover:text-purple-600">
+                    <Link href={`/tool/${toolId}`} className="hover:text-purple-600 dark:text-tiktok-cyan dark:hover:text-tiktok-cyan">
                       {tool.name}
                     </Link>
                     <ChevronRight className="w-4 h-4" />
                   </>
                 )}
-                <span className="text-gray-900">{video.title}</span>
+                <span className="text-gray-900 dark:text-white">{video.title}</span>
               </div>
 
               {/* Video Title */}
-              <h1 className="text-3xl font-bold text-gray-900">{video.title}</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{video.title}</h1>
 
               {/* Video Player */}
               <div className="bg-black rounded-xl overflow-hidden shadow-2xl aspect-video">
@@ -433,8 +433,8 @@ export default function VideoPlayerPage() {
               {/* Video Description */}
               {video.description && (
                 <div className="card">
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">รายละเอียด</h3>
-                  <p className="text-gray-600 whitespace-pre-wrap">{linkify(video.description)}</p>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">รายละเอียด</h3>
+                  <p className="text-gray-600 dark:text-white whitespace-pre-wrap">{linkify(video.description)}</p>
                 </div>
               )}
 
@@ -443,7 +443,7 @@ export default function VideoPlayerPage() {
                 <div className="card">
                   <div className="flex items-center gap-2 mb-4">
                     <LinkIcon className="w-5 h-5 text-purple-600" />
-                    <h3 className="text-lg font-bold text-gray-900">ลิงก์ที่เกี่ยวข้อง</h3>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">ลิงก์ที่เกี่ยวข้อง</h3>
                   </div>
                   <div className="space-y-3">
                     {video.resources.map((resource, index) => (
@@ -459,10 +459,10 @@ export default function VideoPlayerPage() {
                             <ExternalLink className="w-5 h-5 text-white" />
                           </div>
                           <div>
-                            <p className="font-medium text-gray-900 group-hover:text-purple-600 transition-colors">
+                            <p className="font-medium text-gray-900 dark:text-white group-hover:text-purple-600 dark:text-tiktok-cyan dark:hover:text-tiktok-cyan transition-colors">
                               {resource.title}
                             </p>
-                            <p className="text-xs text-gray-500 break-all">{resource.url}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-200 break-all">{resource.url}</p>
                           </div>
                         </div>
                         <ChevronRight className="w-5 h-5 text-purple-600 group-hover:translate-x-1 transition-transform" />
@@ -518,7 +518,7 @@ export default function VideoPlayerPage() {
             {/* Sidebar - 30% */}
             <div className="lg:col-span-1">
               <div className="card sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
                   {path ? 'ขั้นตอนการเรียน' : 'รายการวิดีโอ'}
                 </h3>
 
@@ -547,7 +547,7 @@ export default function VideoPlayerPage() {
                         className={`w-full text-left p-3 rounded-lg transition-all ${
                           isCurrentVideo
                             ? 'bg-purple-600 text-white'
-                            : 'bg-gray-50 hover:bg-gray-100'
+                            : 'bg-gray-50 dark:bg-tiktok-dark hover:bg-gray-100'
                         }`}
                       >
                         <div className="flex items-start gap-3">

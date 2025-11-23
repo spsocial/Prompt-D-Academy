@@ -1,13 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { Navbar } from '@/components/Navbar';
-import { useAuth } from '@/lib/hooks/useAuth';
-import { Settings, Shield, Mail, Globe, Database, Save } from 'lucide-react';
+import { useEffect, ProtectedRoute } from '@/components/ProtectedRoute';
+import { useEffect, Navbar } from '@/components/Navbar';
+import { useEffect, useAuth } from '@/lib/hooks/useAuth';
+import { useEffect, Settings, Shield, Mail, Globe, Database, Save } from 'lucide-react';
 
 export default function AdminSettingsPage() {
+
+  // Force light mode for admin pages
+  useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    return () => {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+    };
+  }, []);
   const { userData } = useAuth();
   const [saving, setSaving] = useState(false);
 

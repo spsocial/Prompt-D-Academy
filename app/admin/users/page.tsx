@@ -27,6 +27,17 @@ interface User {
 }
 
 export default function UsersPage() {
+
+  // Force light mode for admin pages
+  useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    return () => {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+    };
+  }, []);
   const { userData } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);

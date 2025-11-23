@@ -28,33 +28,33 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium py-2 px-6 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply bg-gradient-to-r from-purple-600 to-pink-600 dark:from-tiktok-cyan dark:to-tiktok-pink text-white font-medium py-2 px-6 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply bg-gray-200 text-gray-800 font-medium py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors;
+    @apply bg-gray-200 dark:bg-tiktok-lightGray text-gray-800 dark:text-white font-medium py-2 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-tiktok-darkGray transition-colors;
   }
 
   .card {
-    @apply bg-white shadow-lg rounded-xl border-2 border-transparent hover:border-purple-500 transition-all p-6;
+    @apply bg-white dark:bg-tiktok-darkGray shadow-lg rounded-xl border-2 border-transparent dark:border-tiktok-lightGray hover:border-purple-500 dark:hover:border-tiktok-cyan transition-all p-6 dark:text-white;
   }
 
   .input-field {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none transition-all;
+    @apply w-full px-4 py-3 border border-gray-300 dark:border-tiktok-lightGray bg-white dark:bg-tiktok-dark dark:text-white rounded-lg focus:ring-2 focus:ring-purple-600 dark:focus:ring-tiktok-cyan focus:border-transparent outline-none transition-all;
   }
 
   .badge {
-    @apply bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-sm font-medium;
+    @apply bg-purple-100 dark:bg-tiktok-lightGray text-purple-600 dark:text-tiktok-cyan px-3 py-1 rounded-full text-sm font-medium;
   }
 
   .lock-overlay {
-    @apply absolute inset-0 bg-gray-900 bg-opacity-75 backdrop-blur-sm flex flex-col items-center justify-center rounded-xl;
+    @apply absolute inset-0 bg-gray-900 dark:bg-black bg-opacity-75 dark:bg-opacity-85 backdrop-blur-sm flex flex-col items-center justify-center rounded-xl;
   }
 }
 
 /* Loading spinner */
 .spinner {
-  @apply animate-spin rounded-full border-b-2 border-purple-600;
+  @apply animate-spin rounded-full border-b-2 border-purple-600 dark:border-tiktok-cyan;
 }
 
 /* Scrollbar styling */
@@ -68,13 +68,25 @@
   border-radius: 10px;
 }
 
+.dark ::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
 ::-webkit-scrollbar-thumb {
   background: #9333ea;
   border-radius: 10px;
 }
 
+.dark ::-webkit-scrollbar-thumb {
+  background: #00f2ea;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background: #7e22ce;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #fe2c55;
 }
 
 /* Infinite Scroll Animation for AI Tools Carousel */

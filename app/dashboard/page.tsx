@@ -43,12 +43,12 @@ export default function DashboardPage() {
 
   return (
     <ProtectedRoute requireActive={true}>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-tiktok-dark">
         <Navbar />
         <FloatingContactButton />
 
         {/* Hero Section */}
-        <section className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-12">
+        <section className="bg-gradient-to-r from-purple-600 to-pink-600 dark:from-tiktok-cyan dark:to-tiktok-pink text-white py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
               <div>
@@ -81,19 +81,19 @@ export default function DashboardPage() {
 
         {/* Package Info Card with Integrated Stats */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 mb-8">
-          <div className="bg-white rounded-xl shadow-lg p-6 border-2 border-purple-200">
+          <div className="bg-white dark:bg-tiktok-darkGray rounded-xl shadow-lg p-6 border-2 border-purple-200 dark:border-tiktok-lightGray dark:bg-tiktok-darkGray">
             <div className="flex flex-wrap items-center justify-between gap-4">
               {/* Package Info */}
               <div className="flex items-center gap-4">
-                <div className="bg-purple-100 p-3 rounded-lg">
-                  <TrendingUp className="w-8 h-8 text-purple-600" />
+                <div className="bg-purple-100 dark:bg-tiktok-lightGray p-3 rounded-lg">
+                  <TrendingUp className="w-8 h-8 text-purple-600 dark:text-tiktok-cyan" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">แพ็คเกจปัจจุบัน</p>
+                  <p className="text-sm text-gray-600 dark:text-white dark:text-white">แพ็คเกจปัจจุบัน</p>
                   <div className="flex items-center gap-2">
                     <PackageBadge packageId={userData?.package || null} size="lg" />
                     {userData?.packageExpiry && (
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-gray-500 dark:text-gray-200">
                         (หมดอายุ: {new Date(userData.packageExpiry).toLocaleDateString('th-TH')})
                       </span>
                     )}
@@ -105,36 +105,36 @@ export default function DashboardPage() {
               <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
                 {/* Courses Progress */}
                 <div
-                  className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border border-purple-200 cursor-help transition-all hover:shadow-md"
+                  className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-tiktok-lightGray dark:to-tiktok-lightGray rounded-lg border border-purple-200 dark:border-tiktok-cyan cursor-help transition-all hover:shadow-md"
                   title="จำนวนคอร์สที่คุณได้เริ่มเรียนแล้ว จากคอร์สทั้งหมดในระบบ"
                 >
                   <img src="/images/lesson_11687399.png" alt="คอร์สที่เรียน" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <div className="flex items-baseline gap-0.5 sm:gap-1">
-                    <span className="text-base sm:text-lg font-bold text-purple-600">{toolsStudied}</span>
-                    <span className="text-[10px] sm:text-xs text-gray-600">/ {totalTools}</span>
+                    <span className="text-base sm:text-lg font-bold text-purple-600 dark:text-tiktok-cyan">{toolsStudied}</span>
+                    <span className="text-[10px] sm:text-xs text-gray-600 dark:text-white dark:text-white">/ {totalTools}</span>
                   </div>
                 </div>
 
                 {/* Videos Progress */}
                 <div
-                  className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg border border-blue-200 cursor-help transition-all hover:shadow-md"
+                  className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-tiktok-lightGray dark:to-tiktok-lightGray rounded-lg border border-blue-200 dark:border-tiktok-cyan cursor-help transition-all hover:shadow-md"
                   title="จำนวนวิดีโอที่คุณดูจบแล้ว จากวิดีโอทั้งหมดในระบบ"
                 >
                   <img src="/images/video_17236469.png" alt="วิดีโอที่ดู" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <div className="flex items-baseline gap-0.5 sm:gap-1">
-                    <span className="text-base sm:text-lg font-bold text-blue-600">{watchedVideos}</span>
-                    <span className="text-[10px] sm:text-xs text-gray-600">/ {totalVideos}</span>
+                    <span className="text-base sm:text-lg font-bold text-blue-600 dark:text-tiktok-cyan">{watchedVideos}</span>
+                    <span className="text-[10px] sm:text-xs text-gray-600 dark:text-white dark:text-white">/ {totalVideos}</span>
                   </div>
                 </div>
 
                 {/* Success Rate */}
                 <div
-                  className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-green-200 cursor-help transition-all hover:shadow-md"
+                  className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-tiktok-lightGray dark:to-tiktok-lightGray rounded-lg border border-green-200 dark:border-tiktok-pink cursor-help transition-all hover:shadow-md"
                   title="เปอร์เซ็นต์ความสำเร็จในการเรียนของคุณ คำนวณจากวิดีโอที่ดู / วิดีโอที่เข้าถึงได้ทั้งหมด"
                 >
                   <img src="/images/achieving-goal_12056818.png" alt="อัตราความสำเร็จ" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <div className="flex items-center gap-0.5 sm:gap-1">
-                    <span className="text-base sm:text-lg font-bold text-green-600">{successRate}%</span>
+                    <span className="text-base sm:text-lg font-bold text-green-600 dark:text-tiktok-pink">{successRate}%</span>
                   </div>
                 </div>
               </div>
@@ -153,7 +153,7 @@ export default function DashboardPage() {
 
         {/* Navigation Tabs & View Toggle - Combined */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-          <div className="bg-white rounded-xl sm:rounded-2xl shadow-md sm:shadow-lg border border-gray-200 sm:border-2 sm:border-gray-100 p-2 sm:p-3">
+          <div className="bg-white dark:bg-tiktok-darkGray rounded-xl sm:rounded-2xl shadow-md sm:shadow-lg border border-gray-200 dark:border-tiktok-lightGray sm:border-2 sm:border-gray-100 dark:sm:border-tiktok-lightGray p-2 sm:p-3 dark:bg-tiktok-darkGray dark:border-tiktok-lightGray">
             <div className="flex items-center gap-2 sm:gap-3">
               {/* Tab Buttons - Left Side */}
               <div className="flex gap-1.5 sm:gap-2 flex-1">
@@ -161,8 +161,8 @@ export default function DashboardPage() {
                   onClick={() => setActiveTab('paths')}
                   className={`flex-1 sm:flex-initial sm:px-5 px-2.5 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-2 ${
                     activeTab === 'paths'
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md sm:shadow-lg sm:shadow-purple-300/50 sm:scale-105'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-gray-900 border border-gray-300'
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 dark:from-tiktok-cyan dark:to-tiktok-pink text-white shadow-md sm:shadow-lg sm:shadow-purple-300/50 dark:sm:shadow-tiktok-cyan/30 sm:scale-105'
+                      : 'bg-gray-200 dark:bg-tiktok-lightGray text-gray-700 dark:text-white dark:text-white hover:bg-gray-300 dark:hover:bg-tiktok-dark hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-tiktok-dark'
                   }`}
                 >
                   <img src="/images/school_16007916.png" alt="เส้นทางเรียน" className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -172,8 +172,8 @@ export default function DashboardPage() {
                   onClick={() => setActiveTab('tools')}
                   className={`flex-1 sm:flex-initial sm:px-5 px-2.5 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-2 ${
                     activeTab === 'tools'
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md sm:shadow-lg sm:shadow-purple-300/50 sm:scale-105'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-gray-900 border border-gray-300'
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 dark:from-tiktok-cyan dark:to-tiktok-pink text-white shadow-md sm:shadow-lg sm:shadow-purple-300/50 dark:sm:shadow-tiktok-cyan/30 sm:scale-105'
+                      : 'bg-gray-200 dark:bg-tiktok-lightGray text-gray-700 dark:text-white dark:text-white hover:bg-gray-300 dark:hover:bg-tiktok-dark hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-tiktok-dark'
                   }`}
                 >
                   <img src="/images/ai_tool.png" alt="AI Tools" className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -182,16 +182,16 @@ export default function DashboardPage() {
               </div>
 
               {/* Divider - Hidden on mobile */}
-              <div className="hidden sm:block w-px h-10 bg-gray-200"></div>
+              <div className="hidden sm:block w-px h-10 bg-gray-200 dark:bg-tiktok-lightGray"></div>
 
               {/* View Toggle Buttons - Right Side */}
-              <div className="flex gap-1 sm:gap-1.5 bg-gray-50 rounded-lg sm:rounded-xl p-1 sm:p-1.5">
+              <div className="flex gap-1 sm:gap-1.5 bg-gray-50 dark:bg-tiktok-dark rounded-lg sm:rounded-xl p-1 sm:p-1.5">
                 <button
                   onClick={() => setViewMode('list')}
                   className={`flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-md sm:rounded-lg font-semibold text-xs sm:text-sm transition-all duration-300 ${
                     viewMode === 'list'
-                      ? 'bg-white text-purple-600 shadow-sm sm:shadow-md'
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                      ? 'bg-white dark:bg-tiktok-lightGray text-purple-600 dark:text-tiktok-cyan shadow-sm sm:shadow-md'
+                      : 'text-gray-500 dark:text-gray-200 hover:text-gray-700 dark:text-white dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-tiktok-lightGray/50'
                   }`}
                   title="ตาราง"
                 >
@@ -202,8 +202,8 @@ export default function DashboardPage() {
                   onClick={() => setViewMode('grid')}
                   className={`flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-md sm:rounded-lg font-semibold text-xs sm:text-sm transition-all duration-300 ${
                     viewMode === 'grid'
-                      ? 'bg-white text-purple-600 shadow-sm sm:shadow-md'
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                      ? 'bg-white dark:bg-tiktok-lightGray text-purple-600 dark:text-tiktok-cyan shadow-sm sm:shadow-md'
+                      : 'text-gray-500 dark:text-gray-200 hover:text-gray-700 dark:hover:text-white hover:bg-white/50 dark:hover:bg-tiktok-lightGray/50'
                   }`}
                   title="รายการ"
                 >
@@ -254,7 +254,7 @@ function LearningPathsTab({ userPackage, viewMode }: { userPackage: string | nul
     return (
       <div className="text-center py-12">
         <div className="spinner h-12 w-12 mx-auto mb-4" />
-        <p className="text-gray-600">กำลังโหลด...</p>
+        <p className="text-gray-600 dark:text-white">กำลังโหลด...</p>
       </div>
     );
   }
@@ -262,7 +262,7 @@ function LearningPathsTab({ userPackage, viewMode }: { userPackage: string | nul
   if (paths.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-600">ยังไม่มีเส้นทางการเรียน</p>
+        <p className="text-gray-600 dark:text-white">ยังไม่มีเส้นทางการเรียน</p>
       </div>
     );
   }
@@ -273,12 +273,12 @@ function LearningPathsTab({ userPackage, viewMode }: { userPackage: string | nul
       {searchQuery && (
         <div className="mb-4">
           {filteredPaths.length > 0 ? (
-            <div className="text-sm text-gray-600 bg-white rounded-lg px-4 py-2 border border-gray-200 inline-block">
+            <div className="text-sm text-gray-600 bg-white rounded-lg px-4 py-2 border border-gray-200 inline-block dark:text-white dark:bg-tiktok-darkGray dark:border-tiktok-lightGray">
               แสดง <span className="font-bold text-purple-600">{filteredPaths.length}</span> จาก {paths.length} เส้นทางการเรียน
             </div>
           ) : (
             <div className="text-center py-12 card">
-              <p className="text-gray-600">ไม่พบเส้นทางการเรียนที่ค้นหา "{searchQuery}"</p>
+              <p className="text-gray-600 dark:text-white">ไม่พบเส้นทางการเรียนที่ค้นหา "{searchQuery}"</p>
             </div>
           )}
         </div>
@@ -328,7 +328,7 @@ function LearningPathsTab({ userPackage, viewMode }: { userPackage: string | nul
 
                   {/* Description - Only show in list mode */}
                   {viewMode === 'list' && (
-                    <p className="text-gray-600 mb-4 line-clamp-2">{path.description}</p>
+                    <p className="text-gray-600 mb-4 line-clamp-2 dark:text-white">{path.description}</p>
                   )}
 
                   {/* Level Badge */}
@@ -337,17 +337,17 @@ function LearningPathsTab({ userPackage, viewMode }: { userPackage: string | nul
                       viewMode === 'list' ? 'text-xs' : 'text-[10px]'
                     } ${
                       path.level === 'เริ่มต้น'
-                        ? 'bg-green-100 text-green-700'
+                        ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 dark:border dark:border-green-500'
                         : path.level === 'กลาง'
-                        ? 'bg-yellow-100 text-yellow-700'
-                        : 'bg-red-100 text-red-700'
+                        ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 dark:border dark:border-yellow-500'
+                        : 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 dark:border dark:border-red-500'
                     }`}
                   >
                     {path.level}
                   </span>
 
                   {/* Info */}
-                  <div className={`flex items-center text-gray-600 mb-3 ${
+                  <div className={`flex items-center text-gray-600 dark:text-white mb-3 ${
                     viewMode === 'list' ? 'gap-4 text-sm' : 'gap-2 text-[10px] flex-col items-start'
                   }`}>
                     <div className="flex items-center gap-1">
@@ -366,13 +366,13 @@ function LearningPathsTab({ userPackage, viewMode }: { userPackage: string | nul
                       {path.toolsUsed.slice(0, 3).map((tool, idx) => (
                         <span
                           key={idx}
-                          className="text-xs bg-purple-50 text-purple-600 px-2 py-1 rounded-full"
+                          className="text-xs bg-purple-50 dark:bg-tiktok-lightGray text-purple-600 dark:text-tiktok-cyan px-2 py-1 rounded-full dark:border dark:border-tiktok-cyan"
                         >
                           {tool}
                         </span>
                       ))}
                       {path.toolsUsed.length > 3 && (
-                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                        <span className="text-xs bg-gray-100 dark:bg-tiktok-lightGray text-gray-600 dark:text-white px-2 py-1 rounded-full dark:border dark:border-gray-500">
                           +{path.toolsUsed.length - 3} เพิ่มเติม
                         </span>
                       )}
@@ -382,15 +382,15 @@ function LearningPathsTab({ userPackage, viewMode }: { userPackage: string | nul
                   {/* Progress Bar */}
                   {hasAccess && (
                     <div>
-                      <div className={`flex justify-between text-gray-600 mb-1 ${
+                      <div className={`flex justify-between text-gray-600 dark:text-white mb-1 ${
                         viewMode === 'list' ? 'text-xs' : 'text-[10px]'
                       }`}>
                         <span>ความคืบหน้า</span>
                         <span>{Math.round(progress)}%</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-gray-200 dark:bg-tiktok-dark rounded-full h-2">
                         <div
-                          className="bg-gradient-to-r from-purple-600 to-pink-600 h-2 rounded-full transition-all"
+                          className="bg-gradient-to-r from-purple-600 to-pink-600 dark:from-tiktok-cyan dark:to-tiktok-pink h-2 rounded-full transition-all"
                           style={{ width: `${progress}%` }}
                         />
                       </div>
@@ -435,7 +435,7 @@ function AIToolsTab({ userPackage, viewMode }: { userPackage: string | null; vie
     return (
       <div className="text-center py-12">
         <div className="spinner h-12 w-12 mx-auto mb-4" />
-        <p className="text-gray-600">กำลังโหลด...</p>
+        <p className="text-gray-600 dark:text-white">กำลังโหลด...</p>
       </div>
     );
   }
@@ -443,7 +443,7 @@ function AIToolsTab({ userPackage, viewMode }: { userPackage: string | null; vie
   if (tools.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-600">ยังไม่มี AI Tools</p>
+        <p className="text-gray-600 dark:text-white">ยังไม่มี AI Tools</p>
       </div>
     );
   }
@@ -454,12 +454,12 @@ function AIToolsTab({ userPackage, viewMode }: { userPackage: string | null; vie
       {searchQuery && (
         <div className="mb-4">
           {filteredTools.length > 0 ? (
-            <div className="text-sm text-gray-600 bg-white rounded-lg px-4 py-2 border border-gray-200 inline-block">
+            <div className="text-sm text-gray-600 bg-white rounded-lg px-4 py-2 border border-gray-200 inline-block dark:text-white dark:bg-tiktok-darkGray dark:border-tiktok-lightGray">
               แสดง <span className="font-bold text-purple-600">{filteredTools.length}</span> จาก {tools.length} AI Tools
             </div>
           ) : (
             <div className="text-center py-12 card">
-              <p className="text-gray-600">ไม่พบ AI Tool ที่ค้นหา "{searchQuery}"</p>
+              <p className="text-gray-600 dark:text-white">ไม่พบ AI Tool ที่ค้นหา "{searchQuery}"</p>
             </div>
           )}
         </div>
@@ -509,7 +509,7 @@ function AIToolsTab({ userPackage, viewMode }: { userPackage: string | null; vie
 
                   {/* Description - Only show in list mode */}
                   {viewMode === 'list' && (
-                    <p className="text-gray-600 mb-4 line-clamp-2">{tool.description}</p>
+                    <p className="text-gray-600 mb-4 line-clamp-2 dark:text-white">{tool.description}</p>
                   )}
 
                   {/* Video Count Badge */}
@@ -547,15 +547,15 @@ function AIToolsTab({ userPackage, viewMode }: { userPackage: string | null; vie
                   {/* Progress Bar */}
                   {hasAccess && (
                     <div className="mb-3">
-                      <div className={`flex justify-between text-gray-600 mb-1 ${
+                      <div className={`flex justify-between text-gray-600 dark:text-white mb-1 ${
                         viewMode === 'list' ? 'text-xs' : 'text-[10px]'
                       }`}>
                         <span>ความคืบหน้า</span>
                         <span>{progress}%</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-gray-200 dark:bg-tiktok-dark rounded-full h-2">
                         <div
-                          className="bg-gradient-to-r from-purple-600 to-pink-600 h-2 rounded-full transition-all"
+                          className="bg-gradient-to-r from-purple-600 to-pink-600 dark:from-tiktok-cyan dark:to-tiktok-pink h-2 rounded-full transition-all"
                           style={{ width: `${progress}%` }}
                         />
                       </div>

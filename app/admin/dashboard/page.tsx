@@ -10,6 +10,17 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { Users, CheckCircle, Clock, TrendingUp, AlertTriangle } from 'lucide-react';
 
 export default function AdminDashboardPage() {
+
+  // Force light mode for admin pages
+  useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    return () => {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+    };
+  }, []);
   const { userData } = useAuth();
   const [stats, setStats] = useState({
     totalUsers: 0,

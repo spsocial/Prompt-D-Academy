@@ -1,16 +1,38 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Script from 'next/script'
-import { useAITools } from '@/lib/hooks/useAITools'
+import { collection, getDocs } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
 
 export default function Home() {
-  const { tools, loading } = useAITools()
+  const [stats, setStats] = useState({ totalTools: 0, totalVideos: 0 })
+  const [loading, setLoading] = useState(true)
 
-  // Calculate statistics from tools
-  const totalTools = tools.length
-  const totalVideos = tools.reduce((sum, tool) => sum + (tool.videos?.length || 0), 0)
+  // Load stats on mount - without authentication required
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const toolsCol = collection(db, 'aiTools')
+        const toolsSnapshot = await getDocs(toolsCol)
+
+        const tools = toolsSnapshot.docs.map(doc => doc.data())
+        const totalTools = tools.length
+        const totalVideos = tools.reduce((sum: number, tool: any) => sum + (tool.videos?.length || 0), 0)
+
+        setStats({ totalTools, totalVideos })
+        console.log('✅ Loaded stats:', { totalTools, totalVideos })
+      } catch (error) {
+        console.error('❌ Error loading stats:', error)
+        // If error (permission denied), keep showing 0 or use fallback
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadStats()
+  }, [])
 
   return (
     <>
@@ -508,7 +530,7 @@ export default function Home() {
                   ) : (
                     <>
                       <div className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-                        {totalTools}
+                        {stats.totalTools}
                       </div>
                       <div className="text-lg font-semibold text-gray-700">คอร์ส AI Tools</div>
                       <div className="text-sm text-gray-600 mt-1">พร้อมสอนทุกทักษะ</div>
@@ -527,7 +549,7 @@ export default function Home() {
                   ) : (
                     <>
                       <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">
-                        {totalVideos}
+                        {stats.totalVideos}
                       </div>
                       <div className="text-lg font-semibold text-gray-700">วิดีโอทั้งหมด</div>
                       <div className="text-sm text-gray-600 mt-1">เนื้อหาคุณภาพสูง</div>

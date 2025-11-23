@@ -1,10 +1,22 @@
 'use client';
+import { useEffect } from 'react';
 
-import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { Navbar } from '@/components/Navbar';
-import { BookOpen, Wrench, Video, Plus } from 'lucide-react';
+import { useEffect, ProtectedRoute } from '@/components/ProtectedRoute';
+import { useEffect, Navbar } from '@/components/Navbar';
+import { useEffect, BookOpen, Wrench, Video, Plus } from 'lucide-react';
 
 export default function ContentPage() {
+
+  // Force light mode for admin pages
+  useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    return () => {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+    };
+  }, []);
   return (
     <ProtectedRoute requireActive={true} requireAdmin={true}>
       <div className="min-h-screen bg-gray-50">

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Navbar } from '@/components/Navbar';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -8,6 +9,18 @@ import { Users, BookOpen, Wrench, Settings, BarChart } from 'lucide-react';
 
 export default function AdminDashboardPage() {
   const { userData } = useAuth();
+
+  // Force light mode for admin pages
+  useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    return () => {
+      // Restore dark mode setting when leaving admin
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+    };
+  }, []);
 
   // Check if user is admin
   if (!userData?.isAdmin) {

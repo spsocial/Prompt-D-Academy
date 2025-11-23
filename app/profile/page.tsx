@@ -136,12 +136,12 @@ export default function ProfilePage() {
 
   return (
     <ProtectedRoute requireActive={true}>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-tiktok-dark">
         <Navbar />
         <FloatingContactButton />
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">ข้อมูลส่วนตัว</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-8 dark:text-white">ข้อมูลส่วนตัว</h1>
 
           <div className="grid md:grid-cols-3 gap-6">
             {/* Left Column - User Info */}
@@ -161,8 +161,8 @@ export default function ProfilePage() {
                     </div>
                   )}
 
-                  <h2 className="text-xl font-bold text-gray-900 mb-1">{userData?.displayName}</h2>
-                  <p className="text-gray-600 text-sm mb-3">{userData?.email}</p>
+                  <h2 className="text-xl font-bold text-gray-900 mb-1 dark:text-white">{userData?.displayName}</h2>
+                  <p className="text-gray-600 text-sm mb-3 dark:text-white">{userData?.email}</p>
 
                   {/* Provider Badge */}
                   {userData?.provider && <ProviderBadge provider={userData.provider} />}
@@ -174,10 +174,10 @@ export default function ProfilePage() {
                 {userData?.provider === 'email' && (
                   <button
                     onClick={() => setShowChangePassword(true)}
-                    className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors dark:bg-tiktok-dark"
                   >
-                    <Key className="w-5 h-5 text-gray-600" />
-                    <span className="text-gray-700 font-medium">เปลี่ยนรหัสผ่าน</span>
+                    <Key className="w-5 h-5 text-gray-600 dark:text-white" />
+                    <span className="text-gray-700 dark:text-white font-medium">เปลี่ยนรหัสผ่าน</span>
                   </button>
                 )}
 
@@ -195,21 +195,21 @@ export default function ProfilePage() {
             <div className="md:col-span-2 space-y-6">
               {/* Package Info */}
               <div className="card">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 dark:text-white">
                   <Award className="w-5 h-5 text-purple-600" />
                   แพ็คเกจของคุณ
                 </h3>
 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600">แพ็คเกจปัจจุบัน:</span>
+                    <span className="text-gray-600 dark:text-white">แพ็คเกจปัจจุบัน:</span>
                     <PackageBadge packageId={userData?.package || null} size="md" />
                   </div>
 
                   {userData?.packageExpiry && (
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-600">วันหมดอายุ:</span>
-                      <span className="font-medium text-gray-900">
+                      <span className="text-gray-600 dark:text-white">วันหมดอายุ:</span>
+                      <span className="font-medium text-gray-900 dark:text-white">
                         {new Date(userData.packageExpiry).toLocaleDateString('th-TH', {
                           year: 'numeric',
                           month: 'long',
@@ -220,8 +220,8 @@ export default function ProfilePage() {
                   )}
 
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600">สมัครสมาชิกเมื่อ:</span>
-                    <span className="font-medium text-gray-900">
+                    <span className="text-gray-600 dark:text-white">สมัครสมาชิกเมื่อ:</span>
+                    <span className="font-medium text-gray-900 dark:text-white">
                       {userData?.createdAt &&
                         new Date(userData.createdAt).toLocaleDateString('th-TH', {
                           year: 'numeric',
@@ -282,7 +282,7 @@ export default function ProfilePage() {
 
               {/* Statistics */}
               <div className="card">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 dark:text-white">
                   <TrendingUp className="w-5 h-5 text-purple-600" />
                   สถิติการเรียน
                 </h3>
@@ -296,9 +296,9 @@ export default function ProfilePage() {
                     </div>
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-bold text-purple-600">{toolsStudied}</span>
-                      <span className="text-gray-600">/ {totalTools}</span>
+                      <span className="text-gray-600 dark:text-white">/ {totalTools}</span>
                     </div>
-                    <p className="text-xs text-gray-600 mt-1">คอร์สทั้งหมดในระบบ</p>
+                    <p className="text-xs text-gray-600 mt-1 dark:text-white">คอร์สทั้งหมดในระบบ</p>
                   </div>
 
                   {/* Videos Progress */}
@@ -309,9 +309,9 @@ export default function ProfilePage() {
                     </div>
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-bold text-blue-600">{totalVideosWatched}</span>
-                      <span className="text-gray-600">/ {totalVideos}</span>
+                      <span className="text-gray-600 dark:text-white">/ {totalVideos}</span>
                     </div>
-                    <p className="text-xs text-gray-600 mt-1">วิดีโอทั้งหมดในระบบ</p>
+                    <p className="text-xs text-gray-600 mt-1 dark:text-white">วิดีโอทั้งหมดในระบบ</p>
                   </div>
 
                   {/* Success Rate */}
@@ -339,15 +339,15 @@ export default function ProfilePage() {
         {/* Change Password Modal */}
         {showChangePassword && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl max-w-md w-full p-6 relative">
+            <div className="bg-white rounded-xl max-w-md w-full p-6 relative dark:bg-tiktok-darkGray">
               <button
                 onClick={() => setShowChangePassword(false)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-white"
               >
                 <X className="w-5 h-5" />
               </button>
 
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">เปลี่ยนรหัสผ่าน</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4 dark:text-white">เปลี่ยนรหัสผ่าน</h2>
 
               <form onSubmit={handleChangePassword} className="space-y-4">
                 {passwordError && (
@@ -363,7 +363,7 @@ export default function ProfilePage() {
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
                     รหัสผ่านปัจจุบัน
                   </label>
                   <input
@@ -378,7 +378,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
                     รหัสผ่านใหม่
                   </label>
                   <input
@@ -396,7 +396,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
                     ยืนยันรหัสผ่านใหม่
                   </label>
                   <input

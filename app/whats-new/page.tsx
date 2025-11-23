@@ -149,7 +149,7 @@ export default function WhatsNewPage() {
 
   return (
     <ProtectedRoute requireActive={true}>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-tiktok-dark">
         <Navbar />
         <FloatingContactButton />
 
@@ -171,13 +171,13 @@ export default function WhatsNewPage() {
           {loading ? (
             <div className="text-center py-12">
               <div className="spinner h-12 w-12 mx-auto mb-4" />
-              <p className="text-gray-600">กำลังโหลดข้อมูล...</p>
+              <p className="text-gray-600 dark:text-white">กำลังโหลดข้อมูล...</p>
             </div>
           ) : updates.length === 0 ? (
             <div className="text-center py-12 card">
               <Sparkles className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2">ยังไม่มีเนื้อหาใหม่</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-bold text-gray-900 mb-2 dark:text-white">ยังไม่มีเนื้อหาใหม่</h3>
+              <p className="text-gray-600 dark:text-white">
                 หน้านี้จะแสดงเนื้อหาใหม่เมื่อมีการอัพเดท<br />
                 ติดตามได้เสมอที่หน้านี้!
               </p>
@@ -186,9 +186,9 @@ export default function WhatsNewPage() {
             <>
               {/* Stats */}
               <div className="mb-8">
-                <div className="card inline-flex items-center gap-2 bg-purple-50 border-purple-200">
-                  <Sparkles className="w-5 h-5 text-purple-600" />
-                  <span className="font-medium text-purple-700">
+                <div className="card inline-flex items-center gap-2 bg-purple-50 dark:bg-tiktok-lightGray border-purple-200 dark:border-tiktok-cyan">
+                  <Sparkles className="w-5 h-5 text-purple-600 dark:text-tiktok-cyan" />
+                  <span className="font-medium text-purple-700 dark:text-white">
                     {updates.length} แหล่งเรียนมีเนื้อหาใหม่ใน 30 วันล่าสุด
                   </span>
                 </div>
@@ -229,7 +229,7 @@ export default function WhatsNewPage() {
                       <div className="flex-1 min-w-0">
                         {/* Title */}
                         <div className="flex items-start justify-between gap-2 mb-1">
-                          <h3 className="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2">
+                          <h3 className="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2 dark:text-white">
                             <span className="line-clamp-1">{update.sourceName}</span>
                             {!hasAccess && <Lock className="w-4 h-4 text-gray-400 flex-shrink-0" />}
                           </h3>
@@ -247,7 +247,7 @@ export default function WhatsNewPage() {
                         </div>
 
                         {/* Metadata */}
-                        <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 flex-wrap">
+                        <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 flex-wrap dark:text-white">
                           <div className="flex items-center gap-1">
                             <span className="hidden sm:inline">
                               {update.sourceType === 'tool' ? 'AI Tool' : 'Learning Path'}

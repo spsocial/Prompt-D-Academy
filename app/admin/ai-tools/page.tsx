@@ -21,6 +21,17 @@ interface AITool {
 }
 
 export default function AdminAIToolsPage() {
+
+  // Force light mode for admin pages
+  useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    return () => {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+    };
+  }, []);
   const { userData } = useAuth();
   const [tools, setTools] = useState<AITool[]>([]);
   const [filteredTools, setFilteredTools] = useState<AITool[]>([]);

@@ -65,12 +65,12 @@ export default function LearningPathDetailPage() {
   if (loading) {
     return (
       <ProtectedRoute requireActive={true}>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-tiktok-dark">
           <Navbar />
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="text-center">
               <div className="spinner h-12 w-12 mx-auto mb-4" />
-              <p className="text-gray-600">กำลังโหลด...</p>
+              <p className="text-gray-600 dark:text-white">กำลังโหลด...</p>
             </div>
           </div>
         </div>
@@ -81,12 +81,12 @@ export default function LearningPathDetailPage() {
   if (!path) {
     return (
       <ProtectedRoute requireActive={true}>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-tiktok-dark">
           <Navbar />
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">ไม่พบเส้นทางการเรียนนี้</h1>
-              <p className="text-gray-600 mb-4">กรุณาติดต่อ Admin เพื่อเพิ่มเส้นทางการเรียนนี้</p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-4 dark:text-white">ไม่พบเส้นทางการเรียนนี้</h1>
+              <p className="text-gray-600 mb-4 dark:text-white">กรุณาติดต่อ Admin เพื่อเพิ่มเส้นทางการเรียนนี้</p>
               <Link href="/dashboard" className="text-purple-600 hover:underline">
                 กลับไปหน้าหลัก
               </Link>
@@ -109,12 +109,12 @@ export default function LearningPathDetailPage() {
 
   return (
     <ProtectedRoute requireActive={true}>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-tiktok-dark">
         <Navbar />
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-6">
+          <div className="flex items-center gap-2 text-sm text-gray-600 mb-6 dark:text-white">
             <Link href="/dashboard" className="hover:text-purple-600">
               หน้าหลัก
             </Link>
@@ -123,7 +123,7 @@ export default function LearningPathDetailPage() {
               เส้นทางการเรียน
             </Link>
             <ChevronRight className="w-4 h-4" />
-            <span className="text-gray-900">{path.title}</span>
+            <span className="text-gray-900 dark:text-white">{path.title}</span>
           </div>
 
           {/* Header */}
@@ -142,28 +142,28 @@ export default function LearningPathDetailPage() {
               )}
 
               <div className="flex-1">
-                <h1 className="text-3xl font-bold text-gray-900 mb-3">{path.title}</h1>
-                <p className="text-gray-600 text-lg mb-4">{path.description}</p>
+                <h1 className="text-3xl font-bold text-gray-900 mb-3 dark:text-white">{path.title}</h1>
+                <p className="text-gray-600 text-lg mb-4 dark:text-white">{path.description}</p>
 
                 <div className="flex flex-wrap gap-4 mb-4">
                   <span
                     className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                       path.level === 'เริ่มต้น'
-                        ? 'bg-green-100 text-green-700'
+                        ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 dark:border dark:border-green-500'
                         : path.level === 'กลาง'
-                        ? 'bg-yellow-100 text-yellow-700'
-                        : 'bg-red-100 text-red-700'
+                        ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 dark:border dark:border-yellow-500'
+                        : 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 dark:border dark:border-red-500'
                     }`}
                   >
                     ระดับ: {path.level}
                   </span>
 
-                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-700">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-purple-100 dark:bg-tiktok-lightGray text-purple-700 dark:text-tiktok-cyan dark:border dark:border-tiktok-cyan">
                     <Clock className="w-4 h-4" />
                     {path.totalDuration}
                   </span>
 
-                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-blue-100 dark:bg-tiktok-lightGray text-blue-700 dark:text-tiktok-pink dark:border dark:border-tiktok-pink">
                     <Video className="w-4 h-4" />
                     {path.totalVideos} คลิป
                   </span>
@@ -171,12 +171,12 @@ export default function LearningPathDetailPage() {
 
                 {/* AI Tools Used */}
                 <div className="mb-4">
-                  <p className="text-sm text-gray-600 mb-2">เครื่องมือที่จะได้เรียน:</p>
+                  <p className="text-sm text-gray-600 mb-2 dark:text-white">เครื่องมือที่จะได้เรียน:</p>
                   <div className="flex flex-wrap gap-2">
                     {path.toolsUsed.map((tool, idx) => (
                       <span
                         key={idx}
-                        className="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-sm font-medium"
+                        className="px-3 py-1 bg-purple-50 dark:bg-tiktok-lightGray text-purple-600 dark:text-tiktok-cyan rounded-full text-sm font-medium"
                       >
                         {tool}
                       </span>
@@ -187,7 +187,7 @@ export default function LearningPathDetailPage() {
                 {/* Progress */}
                 {hasAccess && progress && (
                   <div>
-                    <div className="flex justify-between text-sm text-gray-600 mb-2">
+                    <div className="flex justify-between text-sm text-gray-600 mb-2 dark:text-white">
                       <span>ความคืบหน้า</span>
                       <span>
                         {completedSteps}/{path.totalVideos} คลิป ({completionPercent}%)
@@ -210,7 +210,7 @@ export default function LearningPathDetailPage() {
 
           {/* Steps */}
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">ขั้นตอนการเรียน</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 dark:text-white">ขั้นตอนการเรียน</h2>
 
             {path.steps.map((step, index) => {
               const isCompleted = progress?.watchedVideos?.includes(step.videoId);
@@ -232,7 +232,7 @@ export default function LearningPathDetailPage() {
                   <div
                     className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${
                       isCompleted
-                        ? 'bg-green-500 text-white'
+                        ? 'bg-green-500 dark:bg-tiktok-cyan text-white'
                         : isCurrent
                         ? 'bg-purple-600 text-white'
                         : 'bg-gray-200 text-gray-600'
@@ -244,14 +244,14 @@ export default function LearningPathDetailPage() {
                   {/* Content */}
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className="text-lg font-bold text-gray-900">{step.title}</h3>
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white">{step.title}</h3>
                       {isCurrent && (
                         <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full ml-2">
                           กำลังเรียน
                         </span>
                       )}
                     </div>
-                    <p className="text-gray-600 mb-3">{step.description}</p>
+                    <p className="text-gray-600 mb-3 dark:text-white">{step.description}</p>
 
                     {hasAccess && (
                       <div className="flex items-center gap-2">
@@ -266,8 +266,8 @@ export default function LearningPathDetailPage() {
                   {/* Lock Overlay for individual step */}
                   {!hasAccess && (
                     <div className="absolute inset-0 bg-gray-900 bg-opacity-40 rounded-xl flex items-center justify-center">
-                      <div className="bg-white px-4 py-2 rounded-lg shadow-lg">
-                        <p className="text-sm text-gray-700">🔒 ล็อค</p>
+                      <div className="bg-white px-4 py-2 rounded-lg shadow-lg dark:bg-tiktok-darkGray">
+                        <p className="text-sm text-gray-700 dark:text-white">🔒 ล็อค</p>
                       </div>
                     </div>
                   )}
