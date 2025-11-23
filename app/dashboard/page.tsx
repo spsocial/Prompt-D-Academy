@@ -12,13 +12,34 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { useAITools } from '@/lib/hooks/useAITools';
 import { useLearningPaths } from '@/lib/hooks/useLearningPaths';
 import { canAccessContent } from '@/lib/utils/accessControl';
-import { Clock, Video, TrendingUp, LayoutGrid, List } from 'lucide-react';
+import { Clock, Video, TrendingUp, LayoutGrid, List, Target, Award } from 'lucide-react';
 
 export default function DashboardPage() {
   const { userData } = useAuth();
   const [activeTab, setActiveTab] = useState<'paths' | 'tools'>('paths');
   const [photoError, setPhotoError] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  const { tools } = useAITools();
+
+  // Calculate statistics
+  const totalTools = tools.length;
+  const totalVideos = tools.reduce((sum, tool) => sum + (tool.videos?.length || 0), 0);
+
+  // Count tools with access
+  const accessibleTools = tools.filter(tool => canAccessContent(userData?.package || null, tool.requiredPackage));
+  const toolsStudied = accessibleTools.filter(tool => {
+    const sanitizedToolId = tool.id.replace(/\./g, '_');
+    return userData?.progress?.[sanitizedToolId]?.watchedVideos?.length > 0;
+  }).length;
+
+  // Count total watched videos
+  const watchedVideos = userData?.progress
+    ? Object.values(userData.progress).reduce((acc: number, p: any) => acc + (p.watchedVideos?.length || 0), 0)
+    : 0;
+
+  // Calculate success rate based on accessible videos
+  const accessibleVideos = accessibleTools.reduce((sum, tool) => sum + (tool.videos?.length || 0), 0);
+  const successRate = accessibleVideos > 0 ? Math.round((watchedVideos / accessibleVideos) * 100) : 0;
 
   return (
     <ProtectedRoute requireActive={true}>
@@ -58,10 +79,11 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        {/* Package Info Card */}
+        {/* Package Info Card with Integrated Stats */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 mb-8">
           <div className="bg-white rounded-xl shadow-lg p-6 border-2 border-purple-200">
             <div className="flex flex-wrap items-center justify-between gap-4">
+              {/* Package Info */}
               <div className="flex items-center gap-4">
                 <div className="bg-purple-100 p-3 rounded-lg">
                   <TrendingUp className="w-8 h-8 text-purple-600" />
@@ -79,20 +101,41 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="flex gap-6">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-purple-600">
-                    {userData?.progress ? Object.keys(userData.progress).length : 0}
-                  </p>
-                  <p className="text-sm text-gray-600">คอร์สที่เรียน</p>
+              {/* Statistics - Compact */}
+              <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+                {/* Courses Progress */}
+                <div
+                  className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border border-purple-200 cursor-help transition-all hover:shadow-md"
+                  title="จำนวนคอร์สที่คุณได้เริ่มเรียนแล้ว จากคอร์สทั้งหมดในระบบ"
+                >
+                  <img src="/images/lesson_11687399.png" alt="คอร์สที่เรียน" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <div className="flex items-baseline gap-0.5 sm:gap-1">
+                    <span className="text-base sm:text-lg font-bold text-purple-600">{toolsStudied}</span>
+                    <span className="text-[10px] sm:text-xs text-gray-600">/ {totalTools}</span>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">
-                    {userData?.progress
-                      ? Object.values(userData.progress).reduce((acc, p: any) => acc + (p.watchedVideos?.length || 0), 0)
-                      : 0}
-                  </p>
-                  <p className="text-sm text-gray-600">วิดีโอที่ดูแล้ว</p>
+
+                {/* Videos Progress */}
+                <div
+                  className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg border border-blue-200 cursor-help transition-all hover:shadow-md"
+                  title="จำนวนวิดีโอที่คุณดูจบแล้ว จากวิดีโอทั้งหมดในระบบ"
+                >
+                  <img src="/images/video_17236469.png" alt="วิดีโอที่ดู" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <div className="flex items-baseline gap-0.5 sm:gap-1">
+                    <span className="text-base sm:text-lg font-bold text-blue-600">{watchedVideos}</span>
+                    <span className="text-[10px] sm:text-xs text-gray-600">/ {totalVideos}</span>
+                  </div>
+                </div>
+
+                {/* Success Rate */}
+                <div
+                  className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-green-200 cursor-help transition-all hover:shadow-md"
+                  title="เปอร์เซ็นต์ความสำเร็จในการเรียนของคุณ คำนวณจากวิดีโอที่ดู / วิดีโอที่เข้าถึงได้ทั้งหมด"
+                >
+                  <img src="/images/achieving-goal_12056818.png" alt="อัตราความสำเร็จ" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <div className="flex items-center gap-0.5 sm:gap-1">
+                    <span className="text-base sm:text-lg font-bold text-green-600">{successRate}%</span>
+                  </div>
                 </div>
               </div>
 

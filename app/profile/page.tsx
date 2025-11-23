@@ -10,7 +10,8 @@ import { ProviderBadge } from '@/components/ProviderBadge';
 import { PackageBadge } from '@/components/PackageBadge';
 import { FloatingContactButton } from '@/components/FloatingContactButton';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { getPackageName } from '@/lib/utils/accessControl';
+import { useAITools } from '@/lib/hooks/useAITools';
+import { getPackageName, canAccessContent } from '@/lib/utils/accessControl';
 import {
   User,
   Mail,
@@ -23,11 +24,13 @@ import {
   TrendingUp,
   X,
   MessageCircle,
+  Target,
 } from 'lucide-react';
 
 export default function ProfilePage() {
   const router = useRouter();
   const { user, userData } = useAuth();
+  const { tools } = useAITools();
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -115,6 +118,21 @@ export default function ProfilePage() {
           Object.keys(userData.progress).length
       )
     : 0;
+
+  // Calculate total stats
+  const totalTools = tools.length;
+  const totalVideos = tools.reduce((sum, tool) => sum + (tool.videos?.length || 0), 0);
+
+  // Count accessible tools and courses studied
+  const accessibleTools = tools.filter(tool => canAccessContent(userData?.package || null, tool.requiredPackage));
+  const toolsStudied = accessibleTools.filter(tool => {
+    const sanitizedToolId = tool.id.replace(/\./g, '_');
+    return userData?.progress?.[sanitizedToolId]?.watchedVideos?.length > 0;
+  }).length;
+
+  // Calculate success rate
+  const accessibleVideos = accessibleTools.reduce((sum, tool) => sum + (tool.videos?.length || 0), 0);
+  const successRate = accessibleVideos > 0 ? Math.round((totalVideosWatched / accessibleVideos) * 100) : 0;
 
   return (
     <ProtectedRoute requireActive={true}>
@@ -269,29 +287,48 @@ export default function ProfilePage() {
                   สถิติการเรียน
                 </h3>
 
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <div className="flex justify-center mb-2">
-                      <Award className="w-6 h-6 text-purple-600" />
+                <div className="space-y-4">
+                  {/* Courses Progress */}
+                  <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border-2 border-purple-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <img src="/images/lesson_11687399.png" alt="คอร์สที่เรียน" className="w-5 h-5" />
+                      <h4 className="font-semibold text-gray-800">คอร์สที่เรียน</h4>
                     </div>
-                    <p className="text-2xl font-bold text-purple-600">{totalCoursesEnrolled}</p>
-                    <p className="text-xs text-gray-600">คอร์สที่เรียน</p>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-bold text-purple-600">{toolsStudied}</span>
+                      <span className="text-gray-600">/ {totalTools}</span>
+                    </div>
+                    <p className="text-xs text-gray-600 mt-1">คอร์สทั้งหมดในระบบ</p>
                   </div>
 
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <div className="flex justify-center mb-2">
-                      <Video className="w-6 h-6 text-green-600" />
+                  {/* Videos Progress */}
+                  <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <img src="/images/video_17236469.png" alt="วิดีโอที่ดู" className="w-5 h-5" />
+                      <h4 className="font-semibold text-gray-800">วิดีโอที่ดู</h4>
                     </div>
-                    <p className="text-2xl font-bold text-green-600">{totalVideosWatched}</p>
-                    <p className="text-xs text-gray-600">วิดีโอที่ดู</p>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-bold text-blue-600">{totalVideosWatched}</span>
+                      <span className="text-gray-600">/ {totalVideos}</span>
+                    </div>
+                    <p className="text-xs text-gray-600 mt-1">วิดีโอทั้งหมดในระบบ</p>
                   </div>
 
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <div className="flex justify-center mb-2">
-                      <TrendingUp className="w-6 h-6 text-blue-600" />
+                  {/* Success Rate */}
+                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <img src="/images/achieving-goal_12056818.png" alt="อัตราความสำเร็จ" className="w-5 h-5" />
+                      <h4 className="font-semibold text-gray-800">อัตราความสำเร็จ</h4>
                     </div>
-                    <p className="text-2xl font-bold text-blue-600">{avgCompletionRate}%</p>
-                    <p className="text-xs text-gray-600">อัตราความสำเร็จ</p>
+                    <div className="flex items-baseline gap-2 mb-2">
+                      <span className="text-3xl font-bold text-green-600">{successRate}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full transition-all"
+                        style={{ width: `${successRate}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

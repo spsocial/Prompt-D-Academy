@@ -216,10 +216,10 @@ export default function WhatsNewPage() {
                           <img
                             src={update.imageUrl}
                             alt={update.sourceName}
-                            className="w-16 h-16 rounded-lg object-cover"
+                            className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover"
                           />
                         ) : (
-                          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center text-3xl">
+                          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center text-2xl sm:text-3xl">
                             {update.icon || (update.sourceType === 'tool' ? '🛠️' : '📚')}
                           </div>
                         )}
@@ -229,14 +229,14 @@ export default function WhatsNewPage() {
                       <div className="flex-1 min-w-0">
                         {/* Title */}
                         <div className="flex items-start justify-between gap-2 mb-1">
-                          <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                          <h3 className="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2">
                             <span className="line-clamp-1">{update.sourceName}</span>
                             {!hasAccess && <Lock className="w-4 h-4 text-gray-400 flex-shrink-0" />}
                           </h3>
                         </div>
 
                         {/* New videos count */}
-                        <div className="flex items-center gap-2 text-purple-600 font-medium mb-2">
+                        <div className="flex items-center gap-2 text-purple-600 font-medium mb-2 text-sm sm:text-base">
                           <Sparkles className="w-4 h-4" />
                           <span>
                             {update.sourceType === 'tool'
@@ -247,18 +247,18 @@ export default function WhatsNewPage() {
                         </div>
 
                         {/* Metadata */}
-                        <div className="flex items-center gap-3 text-sm text-gray-600">
+                        <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 flex-wrap">
                           <div className="flex items-center gap-1">
-                            {update.sourceType === 'tool' ? (
-                              <Wrench className="w-4 h-4" />
-                            ) : (
-                              <BookOpen className="w-4 h-4" />
-                            )}
-                            <span>{update.sourceType === 'tool' ? 'AI Tool' : 'Learning Path'}</span>
+                            <span className="hidden sm:inline">
+                              {update.sourceType === 'tool' ? 'AI Tool' : 'Learning Path'}
+                            </span>
+                            <span className="sm:hidden">
+                              {update.sourceType === 'tool' ? '🛠️' : '📚'}
+                            </span>
                           </div>
-                          <span>•</span>
+                          <span className="hidden sm:inline">•</span>
                           <div className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
+                            <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                             <span>{formatDate(update.latestDate)}</span>
                           </div>
                         </div>
