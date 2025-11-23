@@ -160,6 +160,8 @@ export default function CreateLearningPathPage() {
         return tool?.name || s.toolId;
       }))];
 
+      const now = Timestamp.now();
+
       const learningPathData = {
         title,
         description,
@@ -171,14 +173,15 @@ export default function CreateLearningPathPage() {
         totalDuration,
         toolsUsed,
         order: order || 0,
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now(),
+        createdAt: now,
+        updatedAt: now,
         steps: steps.map(s => ({
           order: s.order,
           toolId: s.toolId,
           videoId: s.videoId,
           title: s.title,
-          description: s.description
+          description: s.description,
+          createdAt: now // All new steps get creation timestamp
         }))
       };
 

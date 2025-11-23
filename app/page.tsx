@@ -377,14 +377,22 @@ export default function Home() {
                     <span>ChatGPT, Nano Banana, Veo3.1, Infinite talk</span>
                   </li>
                 </ul>
-                <a
-                  href="https://m.me/719837687869400"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-full font-bold text-center hover:shadow-lg hover:shadow-purple-500/50 transition-all"
-                >
-                  เลือกแพ็คเกจนี้
-                </a>
+                <div className="flex flex-col gap-3">
+                  <Link
+                    href="/login"
+                    className="block w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-full font-bold text-center hover:shadow-lg hover:shadow-green-500/50 transition-all"
+                  >
+                    ทดลองเรียนฟรี
+                  </Link>
+                  <a
+                    href="https://m.me/719837687869400"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-full font-bold text-center hover:shadow-lg hover:shadow-purple-500/50 transition-all"
+                  >
+                    เลือกแพ็คเกจนี้
+                  </a>
+                </div>
               </div>
 
               {/* All-in-One Package */}
@@ -415,14 +423,22 @@ export default function Home() {
                     <span>สอนใช้ AI ตัวอื่นๆอีกเพียบ</span>
                   </li>
                 </ul>
-                <a
-                  href="https://m.me/719837687869400"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-full font-bold text-center hover:shadow-lg hover:shadow-purple-500/50 transition-all"
-                >
-                  เลือกแพ็คเกจนี้
-                </a>
+                <div className="flex flex-col gap-3">
+                  <Link
+                    href="/login"
+                    className="block w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-full font-bold text-center hover:shadow-lg hover:shadow-green-500/50 transition-all"
+                  >
+                    ทดลองเรียนฟรี
+                  </Link>
+                  <a
+                    href="https://m.me/719837687869400"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-full font-bold text-center hover:shadow-lg hover:shadow-purple-500/50 transition-all"
+                  >
+                    เลือกแพ็คเกจนี้
+                  </a>
+                </div>
               </div>
 
               {/* Pro Package */}
@@ -450,14 +466,22 @@ export default function Home() {
                     <span>เหมาะสำหรับนักพัฒนา</span>
                   </li>
                 </ul>
-                <a
-                  href="https://m.me/719837687869400"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-full font-bold text-center hover:shadow-lg hover:shadow-purple-500/50 transition-all"
-                >
-                  เลือกแพ็คเกจนี้
-                </a>
+                <div className="flex flex-col gap-3">
+                  <Link
+                    href="/login"
+                    className="block w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-full font-bold text-center hover:shadow-lg hover:shadow-green-500/50 transition-all"
+                  >
+                    ทดลองเรียนฟรี
+                  </Link>
+                  <a
+                    href="https://m.me/719837687869400"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-full font-bold text-center hover:shadow-lg hover:shadow-purple-500/50 transition-all"
+                  >
+                    เลือกแพ็คเกจนี้
+                  </a>
+                </div>
               </div>
             </div>
         </div>

@@ -12,12 +12,13 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { useAITools } from '@/lib/hooks/useAITools';
 import { useLearningPaths } from '@/lib/hooks/useLearningPaths';
 import { canAccessContent } from '@/lib/utils/accessControl';
-import { Clock, Video, TrendingUp } from 'lucide-react';
+import { Clock, Video, TrendingUp, LayoutGrid, List } from 'lucide-react';
 
 export default function DashboardPage() {
   const { userData } = useAuth();
   const [activeTab, setActiveTab] = useState<'paths' | 'tools'>('paths');
   const [photoError, setPhotoError] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
 
   return (
     <ProtectedRoute requireActive={true}>
@@ -107,32 +108,66 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Navigation Tabs */}
+        {/* Navigation Tabs & View Toggle - Combined */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-          <div className="card p-2">
-            <div className="flex gap-2 sm:gap-3">
-              <button
-                onClick={() => setActiveTab('paths')}
-                className={`flex-1 py-2 sm:py-3 px-3 sm:px-6 rounded-lg font-semibold text-xs sm:text-base transition-all duration-200 ${
-                  activeTab === 'paths'
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-300 transform scale-105'
-                    : 'bg-white text-gray-600 hover:bg-purple-50 hover:text-purple-600 hover:shadow-md border-2 border-gray-200'
-                }`}
-              >
-                <span className="hidden sm:inline">📚 เส้นทางการเรียน (Learning Path)</span>
-                <span className="sm:hidden">📚 เส้นทางเรียน</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('tools')}
-                className={`flex-1 py-2 sm:py-3 px-3 sm:px-6 rounded-lg font-semibold text-xs sm:text-base transition-all duration-200 ${
-                  activeTab === 'tools'
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-300 transform scale-105'
-                    : 'bg-white text-gray-600 hover:bg-purple-50 hover:text-purple-600 hover:shadow-md border-2 border-gray-200'
-                }`}
-              >
-                <span className="hidden sm:inline">🛠️ เรียนแยกตาม AI Tool</span>
-                <span className="sm:hidden">🛠️ AI Tools</span>
-              </button>
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-md sm:shadow-lg border border-gray-200 sm:border-2 sm:border-gray-100 p-2 sm:p-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Tab Buttons - Left Side */}
+              <div className="flex gap-1.5 sm:gap-2 flex-1">
+                <button
+                  onClick={() => setActiveTab('paths')}
+                  className={`flex-1 sm:flex-initial sm:px-5 px-2.5 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 ${
+                    activeTab === 'paths'
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md sm:shadow-lg sm:shadow-purple-300/50 sm:scale-105'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-gray-900 border border-gray-300'
+                  }`}
+                >
+                  <span className="hidden sm:inline">📚 เส้นทางเรียน</span>
+                  <span className="sm:hidden">📚</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('tools')}
+                  className={`flex-1 sm:flex-initial sm:px-5 px-2.5 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 ${
+                    activeTab === 'tools'
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md sm:shadow-lg sm:shadow-purple-300/50 sm:scale-105'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-gray-900 border border-gray-300'
+                  }`}
+                >
+                  <span className="hidden sm:inline">🛠️ AI Tools</span>
+                  <span className="sm:hidden">🛠️</span>
+                </button>
+              </div>
+
+              {/* Divider - Hidden on mobile */}
+              <div className="hidden sm:block w-px h-10 bg-gray-200"></div>
+
+              {/* View Toggle Buttons - Right Side */}
+              <div className="flex gap-1 sm:gap-1.5 bg-gray-50 rounded-lg sm:rounded-xl p-1 sm:p-1.5">
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-md sm:rounded-lg font-semibold text-xs sm:text-sm transition-all duration-300 ${
+                    viewMode === 'list'
+                      ? 'bg-white text-purple-600 shadow-sm sm:shadow-md'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                  }`}
+                  title="ตาราง"
+                >
+                  <LayoutGrid className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="hidden md:inline">ตาราง</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-md sm:rounded-lg font-semibold text-xs sm:text-sm transition-all duration-300 ${
+                    viewMode === 'grid'
+                      ? 'bg-white text-purple-600 shadow-sm sm:shadow-md'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                  }`}
+                  title="รายการ"
+                >
+                  <List className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="hidden md:inline">รายการ</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -140,9 +175,9 @@ export default function DashboardPage() {
         {/* Content Area */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
           {activeTab === 'paths' ? (
-            <LearningPathsTab userPackage={userData?.package || null} />
+            <LearningPathsTab userPackage={userData?.package || null} viewMode={viewMode} />
           ) : (
-            <AIToolsTab userPackage={userData?.package || null} />
+            <AIToolsTab userPackage={userData?.package || null} viewMode={viewMode} />
           )}
         </div>
       </div>
@@ -151,7 +186,7 @@ export default function DashboardPage() {
 }
 
 // Learning Paths Tab Component
-function LearningPathsTab({ userPackage }: { userPackage: string | null }) {
+function LearningPathsTab({ userPackage, viewMode }: { userPackage: string | null; viewMode: 'list' | 'grid' }) {
   const { paths, loading } = useLearningPaths();
   const { userData } = useAuth();
   const searchParams = useSearchParams();
@@ -193,9 +228,11 @@ function LearningPathsTab({ userPackage }: { userPackage: string | null }) {
     <>
       {/* Results count */}
       {searchQuery && (
-        <div className="mb-4 text-sm text-gray-600">
+        <div className="mb-4">
           {filteredPaths.length > 0 ? (
-            <>แสดง {filteredPaths.length} จาก {paths.length} เส้นทางการเรียน</>
+            <div className="text-sm text-gray-600 bg-white rounded-lg px-4 py-2 border border-gray-200 inline-block">
+              แสดง <span className="font-bold text-purple-600">{filteredPaths.length}</span> จาก {paths.length} เส้นทางการเรียน
+            </div>
           ) : (
             <div className="text-center py-12 card">
               <p className="text-gray-600">ไม่พบเส้นทางการเรียนที่ค้นหา "{searchQuery}"</p>
@@ -206,7 +243,11 @@ function LearningPathsTab({ userPackage }: { userPackage: string | null }) {
 
       {/* Paths Grid */}
       {filteredPaths.length > 0 && (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className={`grid gap-6 ${
+          viewMode === 'list'
+            ? 'md:grid-cols-2 lg:grid-cols-3'
+            : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
+        }`}>
           {filteredPaths.map((path) => {
             const hasAccess = canAccessContent(userPackage, path.requiredPackage);
             const sanitizedPathId = path.id.replace(/\./g, '_');
@@ -224,7 +265,9 @@ function LearningPathsTab({ userPackage }: { userPackage: string | null }) {
                 >
                   {/* Icon/Image */}
                   {path.imageUrl ? (
-                    <div className="w-full aspect-[4/3] mb-4 overflow-hidden rounded-lg bg-gray-100">
+                    <div className={`w-full mb-3 overflow-hidden rounded-lg bg-gray-100 ${
+                      viewMode === 'list' ? 'aspect-[4/3]' : 'aspect-square'
+                    }`}>
                       <img
                         src={path.imageUrl}
                         alt={path.title}
@@ -232,18 +275,24 @@ function LearningPathsTab({ userPackage }: { userPackage: string | null }) {
                       />
                     </div>
                   ) : (
-                    <div className="text-5xl mb-4">{path.icon}</div>
+                    <div className={viewMode === 'list' ? 'text-5xl mb-4' : 'text-3xl mb-2'}>{path.icon}</div>
                   )}
 
                   {/* Title */}
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{path.title}</h3>
+                  <h3 className={`font-bold text-gray-900 mb-2 ${
+                    viewMode === 'list' ? 'text-xl' : 'text-sm line-clamp-2'
+                  }`}>{path.title}</h3>
 
-                  {/* Description */}
-                  <p className="text-gray-600 mb-4 line-clamp-2">{path.description}</p>
+                  {/* Description - Only show in list mode */}
+                  {viewMode === 'list' && (
+                    <p className="text-gray-600 mb-4 line-clamp-2">{path.description}</p>
+                  )}
 
                   {/* Level Badge */}
                   <span
-                    className={`inline-block px-3 py-1 rounded-full text-xs font-medium mb-3 ${
+                    className={`inline-block px-3 py-1 rounded-full font-medium mb-3 ${
+                      viewMode === 'list' ? 'text-xs' : 'text-[10px]'
+                    } ${
                       path.level === 'เริ่มต้น'
                         ? 'bg-green-100 text-green-700'
                         : path.level === 'กลาง'
@@ -255,38 +304,44 @@ function LearningPathsTab({ userPackage }: { userPackage: string | null }) {
                   </span>
 
                   {/* Info */}
-                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                  <div className={`flex items-center text-gray-600 mb-3 ${
+                    viewMode === 'list' ? 'gap-4 text-sm' : 'gap-2 text-[10px] flex-col items-start'
+                  }`}>
                     <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
+                      <Clock className={viewMode === 'list' ? 'w-4 h-4' : 'w-3 h-3'} />
                       <span>{path.totalDuration}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Video className="w-4 h-4" />
+                      <Video className={viewMode === 'list' ? 'w-4 h-4' : 'w-3 h-3'} />
                       <span>{path.totalVideos} คลิป</span>
                     </div>
                   </div>
 
-                  {/* Tools Used */}
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {path.toolsUsed.slice(0, 3).map((tool, idx) => (
-                      <span
-                        key={idx}
-                        className="text-xs bg-purple-50 text-purple-600 px-2 py-1 rounded-full"
-                      >
-                        {tool}
-                      </span>
-                    ))}
-                    {path.toolsUsed.length > 3 && (
-                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                        +{path.toolsUsed.length - 3} เพิ่มเติม
-                      </span>
-                    )}
-                  </div>
+                  {/* Tools Used - Only show in list mode */}
+                  {viewMode === 'list' && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {path.toolsUsed.slice(0, 3).map((tool, idx) => (
+                        <span
+                          key={idx}
+                          className="text-xs bg-purple-50 text-purple-600 px-2 py-1 rounded-full"
+                        >
+                          {tool}
+                        </span>
+                      ))}
+                      {path.toolsUsed.length > 3 && (
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                          +{path.toolsUsed.length - 3} เพิ่มเติม
+                        </span>
+                      )}
+                    </div>
+                  )}
 
                   {/* Progress Bar */}
                   {hasAccess && (
                     <div>
-                      <div className="flex justify-between text-xs text-gray-600 mb-1">
+                      <div className={`flex justify-between text-gray-600 mb-1 ${
+                        viewMode === 'list' ? 'text-xs' : 'text-[10px]'
+                      }`}>
                         <span>ความคืบหน้า</span>
                         <span>{Math.round(progress)}%</span>
                       </div>
@@ -312,7 +367,7 @@ function LearningPathsTab({ userPackage }: { userPackage: string | null }) {
 }
 
 // AI Tools Tab Component
-function AIToolsTab({ userPackage }: { userPackage: string | null }) {
+function AIToolsTab({ userPackage, viewMode }: { userPackage: string | null; viewMode: 'list' | 'grid' }) {
   const { tools, loading } = useAITools();
   const { userData } = useAuth();
   const searchParams = useSearchParams();
@@ -354,9 +409,11 @@ function AIToolsTab({ userPackage }: { userPackage: string | null }) {
     <>
       {/* Results count */}
       {searchQuery && (
-        <div className="mb-4 text-sm text-gray-600">
+        <div className="mb-4">
           {filteredTools.length > 0 ? (
-            <>แสดง {filteredTools.length} จาก {tools.length} AI Tools</>
+            <div className="text-sm text-gray-600 bg-white rounded-lg px-4 py-2 border border-gray-200 inline-block">
+              แสดง <span className="font-bold text-purple-600">{filteredTools.length}</span> จาก {tools.length} AI Tools
+            </div>
           ) : (
             <div className="text-center py-12 card">
               <p className="text-gray-600">ไม่พบ AI Tool ที่ค้นหา "{searchQuery}"</p>
@@ -367,7 +424,11 @@ function AIToolsTab({ userPackage }: { userPackage: string | null }) {
 
       {/* Tools Grid */}
       {filteredTools.length > 0 && (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className={`grid gap-6 ${
+          viewMode === 'list'
+            ? 'md:grid-cols-2 lg:grid-cols-3'
+            : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
+        }`}>
           {filteredTools.map((tool) => {
             const hasAccess = canAccessContent(userPackage, tool.requiredPackage);
             const sanitizedToolId = tool.id.replace(/\./g, '_');
@@ -385,7 +446,9 @@ function AIToolsTab({ userPackage }: { userPackage: string | null }) {
                 >
                   {/* Icon/Image */}
                   {tool.imageUrl ? (
-                    <div className="w-full aspect-[4/3] mb-4 overflow-hidden rounded-lg bg-gray-100">
+                    <div className={`w-full mb-3 overflow-hidden rounded-lg bg-gray-100 ${
+                      viewMode === 'list' ? 'aspect-[4/3]' : 'aspect-square'
+                    }`}>
                       <img
                         src={tool.imageUrl}
                         alt={tool.name}
@@ -393,39 +456,57 @@ function AIToolsTab({ userPackage }: { userPackage: string | null }) {
                       />
                     </div>
                   ) : (
-                    <div className="text-5xl mb-4">{tool.icon}</div>
+                    <div className={viewMode === 'list' ? 'text-5xl mb-4' : 'text-3xl mb-2'}>{tool.icon}</div>
                   )}
 
                   {/* Title */}
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{tool.name}</h3>
+                  <h3 className={`font-bold text-gray-900 mb-2 ${
+                    viewMode === 'list' ? 'text-xl' : 'text-sm line-clamp-2'
+                  }`}>{tool.name}</h3>
 
-                  {/* Description */}
-                  <p className="text-gray-600 mb-4 line-clamp-2">{tool.description}</p>
+                  {/* Description - Only show in list mode */}
+                  {viewMode === 'list' && (
+                    <p className="text-gray-600 mb-4 line-clamp-2">{tool.description}</p>
+                  )}
 
                   {/* Video Count Badge */}
                   {totalVideos === 0 ? (
                     <div className="mb-3">
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-yellow-50 border border-yellow-300 rounded-md">
-                        <Video className="w-4 h-4 text-yellow-600" />
-                        <span className="text-xs font-medium text-yellow-700">รออัพเดตคลิป</span>
+                      <div className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-yellow-50 border border-yellow-300 rounded-md ${
+                        viewMode === 'grid' ? 'w-full justify-center' : ''
+                      }`}>
+                        <Video className={viewMode === 'list' ? 'w-4 h-4' : 'w-3 h-3'} />
+                        <span className={`font-medium text-yellow-700 ${
+                          viewMode === 'list' ? 'text-xs' : 'text-[10px]'
+                        }`}>รออัพเดต</span>
                       </div>
                     </div>
                   ) : totalVideos <= 3 ? (
-                    <div className="flex items-center gap-1.5 text-sm mb-3 px-2.5 py-1.5 bg-blue-50 border border-blue-200 rounded-md">
-                      <Video className="w-4 h-4 text-blue-600" />
-                      <span className="text-xs font-medium text-blue-700">{totalVideos} คลิป</span>
+                    <div className={`flex items-center gap-1.5 mb-3 px-2.5 py-1.5 bg-blue-50 border border-blue-200 rounded-md ${
+                      viewMode === 'grid' ? 'w-full justify-center' : ''
+                    }`}>
+                      <Video className={viewMode === 'list' ? 'w-4 h-4' : 'w-3 h-3'} />
+                      <span className={`font-medium text-blue-700 ${
+                        viewMode === 'list' ? 'text-xs' : 'text-[10px]'
+                      }`}>{totalVideos} คลิป</span>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-1.5 text-sm mb-3 px-2.5 py-1.5 bg-green-50 border border-green-200 rounded-md">
-                      <Video className="w-4 h-4 text-green-600" />
-                      <span className="text-xs font-medium text-green-700">{totalVideos} คลิป</span>
+                    <div className={`flex items-center gap-1.5 mb-3 px-2.5 py-1.5 bg-green-50 border border-green-200 rounded-md ${
+                      viewMode === 'grid' ? 'w-full justify-center' : ''
+                    }`}>
+                      <Video className={viewMode === 'list' ? 'w-4 h-4' : 'w-3 h-3'} />
+                      <span className={`font-medium text-green-700 ${
+                        viewMode === 'list' ? 'text-xs' : 'text-[10px]'
+                      }`}>{totalVideos} คลิป</span>
                     </div>
                   )}
 
                   {/* Progress Bar */}
                   {hasAccess && (
                     <div className="mb-3">
-                      <div className="flex justify-between text-xs text-gray-600 mb-1">
+                      <div className={`flex justify-between text-gray-600 mb-1 ${
+                        viewMode === 'list' ? 'text-xs' : 'text-[10px]'
+                      }`}>
                         <span>ความคืบหน้า</span>
                         <span>{progress}%</span>
                       </div>

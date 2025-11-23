@@ -72,28 +72,37 @@ export default function WhatsNewPage() {
         }
       });
 
-      // Load from Learning Paths (check if updated within 30 days)
+      // Load from Learning Paths (check if new steps were added within 30 days)
       const pathsCol = collection(db, 'learningPaths');
       const pathsSnapshot = await getDocs(pathsCol);
 
       pathsSnapshot.docs.forEach((doc) => {
         const path = doc.data();
+        const steps = path.steps || [];
 
-        // Check if path was created or updated within 30 days
-        const pathDate = path.updatedAt || path.createdAt;
-        if (!pathDate) return;
+        // Count new steps (those with createdAt within 30 days)
+        const newSteps = steps.filter((step: any) => {
+          if (!step.createdAt) return false;
+          const stepDate = step.createdAt.toDate();
+          const daysDiff = (new Date().getTime() - stepDate.getTime()) / (1000 * 60 * 60 * 24);
+          return daysDiff <= 30;
+        });
 
-        const updateDate = pathDate.toDate();
-        const daysDiff = (new Date().getTime() - updateDate.getTime()) / (1000 * 60 * 60 * 24);
+        if (newSteps.length > 0) {
+          // Find latest step date
+          const latestStep = newSteps.reduce((latest: any, step: any) => {
+            if (!latest.createdAt) return step;
+            if (!step.createdAt) return latest;
+            return step.createdAt.seconds > latest.createdAt.seconds ? step : latest;
+          });
 
-        if (daysDiff <= 30) {
           sourceMap.set(`path-${doc.id}`, {
             sourceType: 'path',
             sourceName: path.title,
             sourceId: doc.id,
             requiredPackage: path.requiredPackage,
-            newVideosCount: path.steps?.length || 0,
-            latestDate: updateDate,
+            newVideosCount: newSteps.length,
+            latestDate: latestStep.createdAt.toDate(),
             icon: path.icon,
             imageUrl: path.imageUrl,
           });

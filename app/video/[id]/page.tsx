@@ -8,7 +8,7 @@ import { db } from '@/lib/firebase';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Navbar } from '@/components/Navbar';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { CheckCircle, ChevronRight, ChevronLeft, PlayCircle, ExternalLink, Link as LinkIcon } from 'lucide-react';
+import { CheckCircle, ChevronRight, ChevronLeft, PlayCircle, ExternalLink, Link as LinkIcon, X } from 'lucide-react';
 
 interface Video {
   id: string;
@@ -289,13 +289,8 @@ export default function VideoPlayerPage() {
       // ✅ อัพเดท local state ทันที (Optimistic Update)
       setMarked(true);
 
-      // แสดง success modal
+      // แสดง success modal (ไม่มี auto close ให้ผู้ใช้กดปิดเอง)
       setShowSuccessModal(true);
-
-      // Auto close modal after 3 seconds
-      setTimeout(() => {
-        setShowSuccessModal(false);
-      }, 3000);
 
     } catch (error) {
       console.error('❌ Error marking video as completed:', error);
@@ -345,6 +340,15 @@ export default function VideoPlayerPage() {
 
             {/* Modal Content */}
             <div className="relative bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full animate-scaleIn">
+              {/* Close Button - Top Right */}
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors group"
+                aria-label="ปิด"
+              >
+                <X className="w-5 h-5 text-gray-400 group-hover:text-gray-600" />
+              </button>
+
               {/* Celebration Icon */}
               <div className="flex justify-center mb-6">
                 <div className="relative">

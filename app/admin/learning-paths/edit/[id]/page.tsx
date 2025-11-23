@@ -28,6 +28,7 @@ interface Step {
   videoId: string;
   title: string;
   description: string;
+  createdAt?: any; // Timestamp when step was added
 }
 
 export default function EditLearningPathPage() {
@@ -181,6 +182,11 @@ export default function EditLearningPathPage() {
         return tool?.name || s.toolId;
       }))];
 
+      // Get original steps to preserve createdAt
+      const pathRef = doc(db, 'learningPaths', pathId);
+      const pathSnap = await getDoc(pathRef);
+      const originalSteps = pathSnap.exists() ? pathSnap.data().steps || [] : [];
+
       const learningPathData = {
         title,
         description,
@@ -193,18 +199,29 @@ export default function EditLearningPathPage() {
         toolsUsed,
         order: order || 0,
         updatedAt: Timestamp.now(),
-        steps: steps.map(s => ({
-          order: s.order,
-          toolId: s.toolId,
-          videoId: s.videoId,
-          title: s.title,
-          description: s.description
-        }))
+        steps: steps.map((s, index) => {
+          // Find if this step existed before (match by order or content)
+          const existingStep = originalSteps.find((orig: any) =>
+            orig.toolId === s.toolId &&
+            orig.videoId === s.videoId &&
+            orig.title === s.title
+          );
+
+          return {
+            order: s.order,
+            toolId: s.toolId,
+            videoId: s.videoId,
+            title: s.title,
+            description: s.description,
+            // Keep original createdAt if step existed, otherwise set new timestamp
+            createdAt: existingStep?.createdAt || Timestamp.now()
+          };
+        })
       };
 
       console.log('💾 Updating Learning Path:', learningPathData);
 
-      const pathRef = doc(db, 'learningPaths', pathId);
+      // Update the document
       await updateDoc(pathRef, learningPathData);
 
       alert('✅ อัพเดท Learning Path เรียบร้อยแล้ว!');
