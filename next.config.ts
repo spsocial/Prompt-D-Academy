@@ -1,6 +1,8 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // หน้าในเบราว์เซอร์จำไว้แค่ 30 วิ (ค่าเริ่มต้น 5 นาที) — แก้ข้อมูลหลังบ้านแล้วเห็นผลไว
+  experimental: { staleTimes: { dynamic: 0, static: 30 } },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'firebasestorage.googleapis.com' },
