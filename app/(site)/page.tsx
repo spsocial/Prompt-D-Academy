@@ -53,7 +53,7 @@ export default async function Home() {
               <ButtonLink href="/courses" variant="signal" size="lg">เริ่มเรียนฟรี <ArrowRight className="size-4" /></ButtonLink>
               <ButtonLink href={featured[0] ? `/courses/${featured[0].slug}` : '/courses'} variant="outline" size="lg">ดูคอร์สแนะนำ</ButtonLink>
             </Reveal>
-            <Reveal delay={0.32}>
+            {courses.length > 0 && <Reveal delay={0.32}>
               <dl className="mt-12 grid max-w-lg grid-cols-3 divide-x divide-line border-y border-line">
                 {[[courses.length, 'คอร์ส'], [lessonTotal, 'บทเรียน'], [Math.round(minutesTotal / 60) || 1, 'ชั่วโมง']].map(([n, l]) => (
                   <div key={l as string} className="px-4 py-4 first:pl-0">
@@ -62,7 +62,7 @@ export default async function Home() {
                   </div>
                 ))}
               </dl>
-            </Reveal>
+            </Reveal>}
           </div>
           <Reveal delay={0.2} y={40} className="lg:pl-6">
             <HeroTerminal />

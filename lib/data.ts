@@ -33,9 +33,10 @@ const normLesson = (id: string, d: Record<string, unknown>): Lesson => ({
   ...plain<Partial<Lesson>>(d),
 });
 
-async function safe<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
-  if (!firebaseConfigured) return fallback;
-  try { return await fn(); } catch (e) { console.error('[data]', e); return fallback; }
+/** โหมดตัวอย่าง → ข้อมูลเดโม · เชื่อม Firebase แล้วแต่อ่านไม่ได้ → ค่าว่าง (ไม่เอาเดโมไปโชว์บนเว็บจริง) */
+async function safe<T>(fn: () => Promise<T>, demo: T, empty: T): Promise<T> {
+  if (!firebaseConfigured) return demo;
+  try { return await fn(); } catch (e) { console.error('[data]', (e as Error).message); return empty; }
 }
 
 export const isDemo = !firebaseConfigured;
@@ -44,7 +45,7 @@ export const getCourses = cache(async (): Promise<Course[]> =>
   safe(async () => {
     const snap = await getDocs(query(collection(fs(), 'courses'), where('published', '==', true)));
     return snap.docs.map((d) => normCourse(d.id, d.data())).sort((a, b) => a.order - b.order || a.title.localeCompare(b.title, 'th'));
-  }, SEED_COURSES.filter((c) => c.published)),
+  }, SEED_COURSES.filter((c) => c.published), []),
 );
 
 export const getCourse = cache(async (slug: string): Promise<Course | null> =>
@@ -53,14 +54,14 @@ export const getCourse = cache(async (slug: string): Promise<Course | null> =>
     if (!d.exists()) return null;
     const c = normCourse(d.id, d.data());
     return c.published ? c : null;
-  }, SEED_COURSES.find((c) => c.slug === slug && c.published) ?? null),
+  }, SEED_COURSES.find((c) => c.slug === slug && c.published) ?? null, null),
 );
 
 export const getLessons = cache(async (slug: string): Promise<Lesson[]> =>
   safe(async () => {
     const snap = await getDocs(query(collection(fs(), 'courses', slug, 'lessons'), orderBy('order')));
     return snap.docs.map((d) => normLesson(d.id, d.data())).filter((l) => l.published);
-  }, (SEED_LESSONS[slug] ?? []).filter((l) => l.published)),
+  }, (SEED_LESSONS[slug] ?? []).filter((l) => l.published), []),
 );
 
 export const getPromos = cache(async (placement: Promo['placement']): Promise<Promo[]> =>
@@ -68,14 +69,14 @@ export const getPromos = cache(async (placement: Promo['placement']): Promise<Pr
     const snap = await getDocs(query(collection(fs(), 'promos'), where('active', '==', true)));
     return snap.docs.map((d) => ({ id: d.id, ...plain<Omit<Promo, 'id'>>(d.data()) }))
       .filter((p) => p.placement === placement || p.placement === 'all').sort((a, b) => a.order - b.order);
-  }, SEED_PROMOS.filter((p) => p.active && (p.placement === placement || p.placement === 'all'))),
+  }, SEED_PROMOS.filter((p) => p.active && (p.placement === placement || p.placement === 'all')), []),
 );
 
 export const getSettings = cache(async (): Promise<SiteSettings> =>
   safe(async () => {
     const d = await getDoc(doc(fs(), 'settings', 'site'));
     return d.exists() ? plain<SiteSettings>(d.data()) : {};
-  }, SEED_SETTINGS),
+  }, SEED_SETTINGS, {}),
 );
 
 export async function getLatestLessons(n = 6) {
