@@ -1,0 +1,41 @@
+rules_version = '2';
+// Prompt D Academy v3 — วางใน Firebase Console › Firestore › Rules แล้วกด Publish
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isAdmin() { return signedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true; }
+
+    // เนื้อหาเว็บ: ทุกคนอ่านได้ (จำเป็นสำหรับ SEO / ISR) — แก้ไขได้เฉพาะแอดมิน
+    match /courses/{slug} {
+      allow read: if resource == null || resource.data.published == true || isAdmin();
+      allow write: if isAdmin();
+      match /lessons/{id} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+    }
+    match /promos/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /settings/{id} { allow read: if true; allow write: if isAdmin(); }
+
+    // ข้อมูลเว็บเดิม (อ่านได้เฉพาะแอดมิน สำหรับนำเข้า)
+    match /aiTools/{id} { allow read, write: if isAdmin(); }
+    match /learningPaths/{id} { allow read, write: if isAdmin(); }
+
+    // สมาชิก: อ่าน/แก้ของตัวเองได้ แต่ห้ามตั้งสิทธิ์แอดมิน/แพ็กเกจเอง
+    match /users/{uid} {
+      allow read: if (signedIn() && request.auth.uid == uid) || isAdmin();
+      allow create: if signedIn() && request.auth.uid == uid && request.resource.data.get('isAdmin', false) == false;
+      allow update: if isAdmin() || (signedIn() && request.auth.uid == uid
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'package', 'packageExpiry', 'suspiciousActivity']));
+      allow delete: if isAdmin();
+    }
+
+    // คอมเมนต์: อ่านได้ทุกคน, โพสต์ได้เมื่อล็อกอิน, แก้/ลบได้เจ้าของหรือแอดมิน
+    match /comments/{id} {
+      allow read: if true;
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid
+        && request.resource.data.text is string && request.resource.data.text.size() <= 2000 && request.resource.data.hidden == false;
+      allow update, delete: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+    }
+  }
+}
