@@ -18,7 +18,6 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image' },
   alternates: { canonical: '/' },
   robots: { index: true, follow: true, googleBot: { 'max-image-preview': 'large', 'max-video-preview': -1 } },
-  icons: { icon: '/icon.png' },
 };
 
 export const viewport: Viewport = {

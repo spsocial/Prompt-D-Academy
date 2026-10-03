@@ -11,7 +11,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   return (
     <>
       <JsonLd data={[
-        { '@context': 'https://schema.org', '@type': 'EducationalOrganization', name: SITE.name, url: SITE.url, logo: `${SITE.url}/icon.png`, description: SITE.description,
+        { '@context': 'https://schema.org', '@type': 'EducationalOrganization', name: SITE.name, url: SITE.url, logo: `${SITE.url}/logo-512.png`, description: SITE.description,
           sameAs: [settings.youtubeUrl, settings.facebookUrl, settings.tiktokUrl].filter(Boolean) },
         { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE.name, url: SITE.url, inLanguage: 'th',
           potentialAction: { '@type': 'SearchAction', target: `${SITE.url}/courses?q={search_term_string}`, 'query-input': 'required name=search_term_string' } },
