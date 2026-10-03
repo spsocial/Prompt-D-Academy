@@ -2,6 +2,7 @@ import { SiteHeader } from '@/components/site/header';
 import { SiteFooter } from '@/components/site/footer';
 import { AdSenseScript } from '@/components/site/ads';
 import { JsonLd } from '@/components/site/json-ld';
+import { ContactFab } from '@/components/site/contact-fab';
 import { getSettings } from '@/lib/data';
 import { SITE } from '@/lib/config';
 
@@ -19,6 +20,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <SiteHeader announcement={settings.announcement} announcementUrl={settings.announcementUrl} />
       <main id="main">{children}</main>
       <SiteFooter settings={settings} />
+      <ContactFab lineUrl={settings.lineUrl} facebookUrl={settings.facebookUrl} />
     </>
   );
 }
