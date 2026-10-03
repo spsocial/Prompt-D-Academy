@@ -195,15 +195,17 @@ type LegacyTool = { name: string; description?: string; imageUrl?: string; requi
 const durToMin = (d?: string) => { if (!d) return 0; const p = d.split(':').map(Number); return p.length === 3 ? p[0] * 60 + p[1] : p[0] || 0; };
 
 export async function previewLegacy() {
-  if (DEMO) return { tools: [] as { id: string; name: string; videos: number }[] };
+  if (DEMO) return { tools: [] as { id: string; name: string; videos: number; imported: boolean }[] };
   const s = await getDocs(collection(db(), 'aiTools'));
-  return { tools: s.docs.map((d) => ({ id: d.id, name: (d.data() as LegacyTool).name, videos: ((d.data() as LegacyTool).videos ?? []).length })) };
+  const existing = new Set((await getDocs(collection(db(), 'courses'))).docs.map((x) => x.id));
+  return { tools: s.docs.map((d) => ({ id: d.id, name: (d.data() as LegacyTool).name, videos: ((d.data() as LegacyTool).videos ?? []).length, imported: existing.has(slugify(d.id)) })) };
 }
-export async function importLegacy(opts: { publish: boolean; access: 'free' | 'member' }) {
+export async function importLegacy(opts: { publish: boolean; access: 'free' | 'member'; ids?: string[] }) {
   if (DEMO) demoBlock();
   const s = await getDocs(collection(db(), 'aiTools'));
   let n = 0;
   for (const d of s.docs) {
+    if (opts.ids && !opts.ids.includes(d.id)) continue;
     const t = d.data() as LegacyTool;
     const slug = slugify(d.id);
     if ((await getDoc(doc(db(), 'courses', slug))).exists()) continue; // ไม่ทับของที่มีอยู่
@@ -223,9 +225,10 @@ export async function importLegacy(opts: { publish: boolean; access: 'free' | 'm
   await revalidate(['/', '/courses']);
   return n;
 }
-export async function importSeed() {
+export async function importSeed(slugs?: string[]) {
   if (DEMO) demoBlock();
   for (const c of SEED_COURSES) {
+    if (slugs && !slugs.includes(c.slug)) continue;
     if ((await getDoc(doc(db(), 'courses', c.slug))).exists()) continue;
     const { slug, ...data } = c;
     const b = writeBatch(db());
