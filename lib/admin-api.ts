@@ -238,3 +238,32 @@ export async function importSeed(slugs?: string[]) {
   }
   await revalidate(['/', '/courses']);
 }
+
+// ───────── course package (.json) — ไฟล์คอร์สที่ผลิตไว้ล่วงหน้า ─────────
+export type CoursePackage = { course: Partial<Course> & { slug: string; title: string }; lessons: (Partial<Lesson> & { title: string })[] };
+export async function importPackage(pkg: CoursePackage, opts: { publish: boolean; mode: 'new' | 'append' }) {
+  if (DEMO) demoBlock();
+  if (!pkg?.course?.title || !Array.isArray(pkg.lessons)) throw new Error('ไฟล์ไม่ถูกต้อง: ต้องมี course และ lessons');
+  const slug = slugify(pkg.course.slug || pkg.course.title);
+  const ref = doc(db(), 'courses', slug);
+  const exists = (await getDoc(ref)).exists();
+  if (exists && opts.mode === 'new') throw new Error(`มีคอร์ส /${slug} อยู่แล้ว — เลือกโหมด "เพิ่มบทเรียนเข้าคอร์สเดิม" แทน`);
+  const start = exists ? (await listLessons(slug)).length : 0;
+  const b = writeBatch(db());
+  if (!exists) {
+    const { slug: _s, ...c } = pkg.course; void _s;
+    b.set(ref, { subtitle: '', description: '', category: 'ai-basics', level: 'beginner', tags: [], tools: [], access: 'free', featured: false, order: 999,
+      ...c, published: opts.publish, lessonCount: 0, totalMinutes: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+  }
+  pkg.lessons.forEach((l, i) => {
+    const id = doc(collection(db(), 'courses', slug, 'lessons')).id;
+    b.set(doc(db(), 'courses', slug, 'lessons', id), {
+      slug: slugify(l.slug || l.title), title: l.title, summary: l.summary ?? '', video: l.video ?? { type: 'none' }, durationMin: l.durationMin ?? 0,
+      content: l.content ?? '', resources: l.resources ?? [], order: start + i + 1, published: opts.publish, access: l.access ?? 'free', updatedAt: serverTimestamp(),
+    });
+  });
+  await b.commit();
+  await recount(slug);
+  await revalidate(['/', '/courses', `/courses/${slug}`]);
+  return { slug, added: pkg.lessons.length };
+}

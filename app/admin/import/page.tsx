@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { DatabaseZap, Sparkles, Loader2, CheckCircle2 } from 'lucide-react';
-import { importLegacy, importSeed, previewLegacy } from '@/lib/admin-api';
+import { DatabaseZap, Sparkles, Loader2, CheckCircle2, FileJson, UploadCloud } from 'lucide-react';
+import { importLegacy, importSeed, importPackage, previewLegacy, type CoursePackage } from '@/lib/admin-api';
 import { SEED_COURSES } from '@/lib/seed';
 import { Card, PageHeader, Segmented, Toggle, useAction } from '@/components/admin/ui';
 
@@ -14,12 +14,30 @@ export default function Import() {
   const [access, setAccess] = useState<'free' | 'member'>('free');
   const [done, setDone] = useState<string>('');
   const [seedSel, setSeedSel] = useState<Set<string>>(new Set(SEED_COURSES.map((c) => c.slug)));
-  const a = useAction(); const b = useAction();
+  const a = useAction(); const b = useAction(); const c = useAction();
+  const [pkg, setPkg] = useState<CoursePackage | null>(null);
+  const [pkgErr, setPkgErr] = useState('');
+  const [pkgMode, setPkgMode] = useState<'new' | 'append'>('new');
   useEffect(() => { reload(); }, []);
 
   return (
     <>
       <PageHeader title="นำเข้าข้อมูล" sub="ย้ายคอร์สจากเว็บเวอร์ชันเก่า หรือเริ่มด้วยคอร์สตัวอย่าง — ไม่ทับข้อมูลที่มีอยู่แล้ว" />
+      <Card className="mb-6" title={<span className="flex items-center gap-2"><FileJson className="size-5 text-orange" />นำเข้าคอร์สจากไฟล์ (.json)</span>} desc="ไฟล์คอร์สที่ผลิตไว้ล่วงหน้า (เช่นจาก Claude) — ได้คอร์ส + บทเรียน + บทความครบในคลิกเดียว แล้วค่อยวางลิงก์ YouTube ทีละบท">
+        <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-line-strong p-6 text-center text-sm text-muted hover:border-fg/40">
+          <UploadCloud className="size-7" strokeWidth={1.25} />{pkg ? <span className="text-fg">ไฟล์: {pkg.course.title} · {pkg.lessons.length} บทเรียน</span> : 'คลิกเพื่อเลือกไฟล์ .json'}
+          <input type="file" accept=".json,application/json" hidden onChange={async (e) => { const f = e.target.files?.[0]; if (!f) return; setPkgErr(''); try { const j = JSON.parse(await f.text()); if (!j.course || !j.lessons) throw 0; setPkg(j); } catch { setPkg(null); setPkgErr('อ่านไฟล์ไม่ได้ — ต้องเป็นไฟล์ .json ที่มี course และ lessons'); } }} />
+        </label>
+        {pkgErr && <p className="mt-2 text-sm text-red-500">{pkgErr}</p>}
+        {pkg && (
+          <div className="mt-4 space-y-3">
+            <ul className="rounded-xl border border-line text-sm">{pkg.lessons.map((l, i) => <li key={i} className="flex justify-between border-b border-line px-4 py-2 last:border-0"><span>{i + 1}. {l.title}</span><span className="font-mono text-xs text-muted">{l.durationMin ?? 0} นาที</span></li>)}</ul>
+            <div><p className="mb-2 text-sm font-medium text-fg-2">โหมด</p><Segmented value={pkgMode} onChange={setPkgMode} options={[{ value: 'new', label: 'สร้างคอร์สใหม่' }, { value: 'append', label: 'เพิ่มบทเรียนเข้าคอร์สเดิม' }]} /></div>
+            <button disabled={c.busy} onClick={async () => { const r = await c.run(() => importPackage(pkg, { publish: false, mode: pkgMode })); if (r) { setDone(`นำเข้า "${pkg.course.title}" ${r.added} บทแล้ว (ฉบับร่าง) — ไปที่ คอร์ส & บทเรียน เพื่อวางลิงก์คลิปแล้วกดเผยแพร่`); setPkg(null); } }}
+              className="inline-flex h-11 items-center gap-2 rounded-full bg-signal px-6 text-sm font-semibold text-white disabled:opacity-50">{c.busy && <Loader2 className="size-4 animate-spin" />}นำเข้าเป็นฉบับร่าง</button>
+          </div>
+        )}
+      </Card>
       <div className="grid gap-6 lg:grid-cols-2">
         <Card title={<span className="flex items-center gap-2"><DatabaseZap className="size-5 text-orange" />คอร์สจากเว็บเดิม (AI Tools)</span>} desc="แปลงแต่ละ AI Tool เป็น 1 คอร์ส และวิดีโอ Google Drive เป็นบทเรียน · ฐานข้อมูลสมาชิกเดิมไม่ต้องย้าย ใช้ต่อได้ทันที">
           {legacy && legacy.some((t) => !t.imported) && (
