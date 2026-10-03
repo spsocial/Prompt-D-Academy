@@ -1,722 +1,85 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { Navbar } from '@/components/Navbar';
-import { useAuth } from '@/lib/hooks/useAuth';
-import { ProviderBadge } from '@/components/ProviderBadge';
-import { PackageBadge } from '@/components/PackageBadge';
-import { Search, Edit, Trash2, Users, CheckCircle, XCircle, Crown, Package, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
-import { getPackageName } from '@/lib/utils/accessControl';
+import { useEffect, useMemo, useState } from 'react';
+import { Search, ShieldCheck, Download, UserCheck, UserX } from 'lucide-react';
+import { listUsers, updateUser } from '@/lib/admin-api';
+import type { UserDoc } from '@/lib/types';
+import { PageHeader, useAction } from '@/components/admin/ui';
+import { cn } from '@/lib/utils';
 
-interface User {
-  uid: string;
-  email: string;
-  displayName: string;
-  photoURL?: string;
-  provider: 'email' | 'google';
-  isActive: boolean;
-  package: string | null;
-  packageExpiry?: string;
-  isAdmin?: boolean;
-  createdAt: any;
-  progress?: any;
-}
+const fmt = (v: unknown) => (typeof v === 'number' ? new Date(v).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) : '—');
+const PKG: Record<string, string> = { free: 'Free', basic: 'Beginner', allinone: 'All-in-One', pro: 'Pro', pro_standalone: 'Pro Dev' };
 
-export default function UsersPage() {
+export default function Users() {
+  const [items, setItems] = useState<UserDoc[] | null>(null);
+  const [q, setQ] = useState('');
+  const [f, setF] = useState<'all' | 'admin' | 'legacy' | 'inactive'>('all');
+  const { run } = useAction();
+  useEffect(() => { listUsers().then((u) => setItems(u.sort((a, b) => Number(b.createdAt ?? 0) - Number(a.createdAt ?? 0)))); }, []);
 
-  // Force light mode for admin pages
-  useEffect(() => {
-    document.documentElement.classList.remove('dark');
-    return () => {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      }
-    };
-  }, []);
-  const { userData } = useAuth();
-  const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
-  const [filterPackage, setFilterPackage] = useState<string>('all');
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editPackage, setEditPackage] = useState<string>('basic');
-  const [editActive, setEditActive] = useState(true);
-  const [editAdmin, setEditAdmin] = useState(false);
-  const [editExpiry, setEditExpiry] = useState<string>('');
-  const [sortBy, setSortBy] = useState<'createdAt' | 'name' | 'progress'>('createdAt');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const list = useMemo(() => (items ?? []).filter((u) => {
+    if (f === 'admin' && !u.isAdmin) return false;
+    if (f === 'legacy' && !(u.package && u.package !== 'free')) return false;
+    if (f === 'inactive' && u.isActive !== false) return false;
+    const s = q.toLowerCase();
+    return !s || u.email?.toLowerCase().includes(s) || u.displayName?.toLowerCase().includes(s);
+  }), [items, q, f]);
 
-  useEffect(() => {
-    loadUsers();
-  }, []);
+  const patch = (uid: string, p: Partial<UserDoc>, msg: string) =>
+    run(async () => { await updateUser(uid, p); setItems((x) => x?.map((u) => (u.uid === uid ? { ...u, ...p } : u)) ?? x); }, msg);
 
-  useEffect(() => {
-    filterUsers();
-  }, [users, searchTerm, filterStatus, filterPackage, sortBy, sortOrder]);
-
-  const loadUsers = async () => {
-    try {
-      const usersRef = collection(db, 'users');
-      const snapshot = await getDocs(usersRef);
-
-      const usersData = snapshot.docs.map((doc) => ({
-        uid: doc.id,
-        ...doc.data(),
-      })) as User[];
-
-      setUsers(usersData);
-    } catch (error) {
-      console.error('Error loading users:', error);
-    } finally {
-      setLoading(false);
-    }
+  const exportCsv = () => {
+    const rows = [['email', 'name', 'provider', 'package', 'active', 'admin', 'created'], ...list.map((u) => [u.email, u.displayName, u.provider ?? '', u.package ?? '', String(u.isActive !== false), String(!!u.isAdmin), fmt(u.createdAt)])];
+    const csv = '﻿' + rows.map((r) => r.map((c) => `"${String(c ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = `members-${Date.now()}.csv`; a.click();
   };
-
-  const filterUsers = () => {
-    let filtered = users;
-
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (user) =>
-          user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.displayName.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Filter by status
-    if (filterStatus === 'active') {
-      filtered = filtered.filter((user) => user.isActive);
-    } else if (filterStatus === 'inactive') {
-      filtered = filtered.filter((user) => !user.isActive);
-    }
-
-    // Filter by package
-    if (filterPackage !== 'all') {
-      if (filterPackage === 'none') {
-        filtered = filtered.filter((user) => !user.package);
-      } else {
-        filtered = filtered.filter((user) => user.package === filterPackage);
-      }
-    }
-
-    // Sort users
-    filtered.sort((a, b) => {
-      if (sortBy === 'createdAt') {
-        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-      } else if (sortBy === 'progress') {
-        // Sort by total videos watched
-        const videosA = a.progress
-          ? Object.values(a.progress).reduce((acc: number, p: any) => acc + (p.watchedVideos?.length || 0), 0)
-          : 0;
-        const videosB = b.progress
-          ? Object.values(b.progress).reduce((acc: number, p: any) => acc + (p.watchedVideos?.length || 0), 0)
-          : 0;
-        return sortOrder === 'asc' ? videosA - videosB : videosB - videosA;
-      } else {
-        // Sort by name
-        const nameA = a.displayName.toLowerCase();
-        const nameB = b.displayName.toLowerCase();
-        if (sortOrder === 'asc') {
-          return nameA.localeCompare(nameB);
-        } else {
-          return nameB.localeCompare(nameA);
-        }
-      }
-    });
-
-    setFilteredUsers(filtered);
-  };
-
-  const toggleSort = (column: 'createdAt' | 'name' | 'progress') => {
-    if (sortBy === column) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(column);
-      setSortOrder('desc');
-    }
-  };
-
-  const handleEdit = (user: User) => {
-    setSelectedUser(user);
-    setEditPackage(user.package || '');
-    setEditActive(user.isActive);
-    setEditAdmin(user.isAdmin || false);
-    setEditExpiry(
-      user.packageExpiry
-        ? new Date(user.packageExpiry).toISOString().split('T')[0]
-        : ''
-    );
-    setShowEditModal(true);
-  };
-
-  const handleSaveEdit = async () => {
-    if (!selectedUser) return;
-
-    try {
-      const userRef = doc(db, 'users', selectedUser.uid);
-      await updateDoc(userRef, {
-        package: editPackage || null,
-        packageExpiry: editExpiry ? new Date(editExpiry).toISOString() : null,
-        isActive: editActive,
-        isAdmin: editAdmin,
-      });
-
-      alert(`✅ อัพเดต ${selectedUser.displayName} สำเร็จ!`);
-      setShowEditModal(false);
-      setSelectedUser(null);
-      loadUsers(); // Reload
-    } catch (error) {
-      console.error('Error updating user:', error);
-      alert('❌ เกิดข้อผิดพลาดในการอัพเดต');
-    }
-  };
-
-  const handleDeleteUser = async (userId: string, userName: string) => {
-    if (
-      !confirm(
-        `คุณแน่ใจหรือไม่ที่จะลบผู้ใช้ "${userName}"?\n\nการลบจะไม่สามารถกู้คืนได้!`
-      )
-    )
-      return;
-
-    try {
-      await deleteDoc(doc(db, 'users', userId));
-      alert('✅ ลบผู้ใช้เรียบร้อยแล้ว!');
-      loadUsers();
-    } catch (error: any) {
-      console.error('Error deleting user:', error);
-      alert('❌ เกิดข้อผิดพลาด: ' + (error as Error).message);
-    }
-  };
-
-  const getProgressStats = (user: User): { courses: number; videos: number } => {
-    if (!user.progress) return { courses: 0, videos: 0 };
-
-    const courses = Object.keys(user.progress).length;
-    const videos = Object.values(user.progress).reduce(
-      (acc: number, p: any) => acc + (p.watchedVideos?.length || 0),
-      0
-    );
-
-    return { courses, videos };
-  };
-
-  // Package statistics
-  const getPackageStats = () => {
-    const stats = {
-      free: 0,
-      basic: 0,
-      allinone: 0,
-      pro: 0,
-      pro_standalone: 0,
-      none: 0,
-    };
-
-    users.forEach((user) => {
-      if (!user.package) {
-        stats.none++;
-      } else if (user.package in stats) {
-        stats[user.package as keyof typeof stats]++;
-      }
-    });
-
-    return stats;
-  };
-
-  const packageStats = getPackageStats();
-
-  if (!userData?.isAdmin) {
-    return (
-      <ProtectedRoute requireActive={true}>
-        <div className="min-h-screen bg-gray-50">
-          <Navbar />
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="text-center">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">⛔ ไม่มีสิทธิ์เข้าถึง</h1>
-              <Link href="/dashboard" className="text-purple-600 hover:underline">
-                กลับไปหน้าหลัก
-              </Link>
-            </div>
-          </div>
-        </div>
-      </ProtectedRoute>
-    );
-  }
 
   return (
-    <ProtectedRoute requireActive={true}>
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              👥 จัดการผู้ใช้
-            </h1>
-            <p className="text-gray-600">แก้ไขแพ็คเกจ สถานะ และข้อมูลผู้ใช้</p>
-          </div>
-
-          {/* Stats */}
-          <div className="grid md:grid-cols-4 gap-6 mb-8">
-            <div className="card">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-purple-100 rounded-lg">
-                  <Users className="w-6 h-6 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">{users.length}</p>
-                  <p className="text-sm text-gray-600">ผู้ใช้ทั้งหมด</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-green-100 rounded-lg">
-                  <CheckCircle className="w-6 h-6 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {users.filter((u) => u.isActive).length}
-                  </p>
-                  <p className="text-sm text-gray-600">ผู้ใช้ Active</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-yellow-100 rounded-lg">
-                  <Crown className="w-6 h-6 text-yellow-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {users.filter((u) => u.package).length}
-                  </p>
-                  <p className="text-sm text-gray-600">มีแพ็คเกจ</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-red-100 rounded-lg">
-                  <XCircle className="w-6 h-6 text-red-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {users.filter((u) => !u.isActive).length}
-                  </p>
-                  <p className="text-sm text-gray-600">ปิดการใช้งาน</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Package Statistics */}
-          <div className="card mb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Package className="w-5 h-5 text-purple-600" />
-              <h2 className="text-lg font-bold text-gray-900">สถิติแพ็กเกจ</h2>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-              <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-xl font-bold text-gray-900">{packageStats.none}</p>
-                <p className="text-xs text-gray-600 mt-1">ไม่มีแพ็กเกจ</p>
-              </div>
-              <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-xl font-bold text-blue-600">{packageStats.free}</p>
-                <p className="text-xs text-gray-600 mt-1">Free</p>
-              </div>
-              <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
-                <p className="text-xl font-bold text-green-600">{packageStats.basic}</p>
-                <p className="text-xs text-gray-600 mt-1">Beginner</p>
-              </div>
-              <div className="text-center p-3 bg-orange-50 rounded-lg border border-orange-200">
-                <p className="text-xl font-bold text-orange-600">{packageStats.allinone}</p>
-                <p className="text-xs text-gray-600 mt-1">All-in-One</p>
-              </div>
-              <div className="text-center p-3 bg-purple-50 rounded-lg border border-purple-200">
-                <p className="text-xl font-bold text-purple-600">{packageStats.pro}</p>
-                <p className="text-xs text-gray-600 mt-1">Pro Bundle</p>
-              </div>
-              <div className="text-center p-3 bg-indigo-50 rounded-lg border border-indigo-200">
-                <p className="text-xl font-bold text-indigo-600">{packageStats.pro_standalone}</p>
-                <p className="text-xs text-gray-600 mt-1">Pro Only</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Filters */}
-          <div className="card mb-6">
-            <div className="flex flex-wrap gap-4">
-              {/* Search */}
-              <div className="flex-1 min-w-[200px]">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="ค้นหาด้วยชื่อหรืออีเมล..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
-                  />
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                </div>
-              </div>
-
-              {/* Status Filter */}
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value as any)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
-              >
-                <option value="all">สถานะ: ทั้งหมด</option>
-                <option value="active">Active เท่านั้น</option>
-                <option value="inactive">Inactive เท่านั้น</option>
-              </select>
-
-              {/* Package Filter */}
-              <select
-                value={filterPackage}
-                onChange={(e) => setFilterPackage(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
-              >
-                <option value="all">แพ็กเกจ: ทั้งหมด</option>
-                <option value="none">ไม่มีแพ็กเกจ ({packageStats.none})</option>
-                <option value="free">Free ({packageStats.free})</option>
-                <option value="basic">Beginner ({packageStats.basic})</option>
-                <option value="allinone">All-in-One ({packageStats.allinone})</option>
-                <option value="pro">Pro Bundle ({packageStats.pro})</option>
-                <option value="pro_standalone">Pro Only ({packageStats.pro_standalone})</option>
-              </select>
-            </div>
-            <p className="text-sm text-gray-500 mt-3">
-              แสดง {filteredUsers.length} จาก {users.length} ผู้ใช้
-            </p>
-          </div>
-
-          {/* Users Table */}
-          {loading ? (
-            <div className="text-center py-12">
-              <div className="spinner h-12 w-12 mx-auto mb-4" />
-              <p className="text-gray-600">กำลังโหลด...</p>
-            </div>
-          ) : (
-            <div className="card overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">
-                      <button
-                        onClick={() => toggleSort('name')}
-                        className="flex items-center gap-2 hover:text-purple-600 transition-colors"
-                      >
-                        ผู้ใช้
-                        {sortBy === 'name' ? (
-                          sortOrder === 'asc' ? (
-                            <ArrowUp className="w-4 h-4" />
-                          ) : (
-                            <ArrowDown className="w-4 h-4" />
-                          )
-                        ) : (
-                          <ArrowUpDown className="w-4 h-4 text-gray-400" />
-                        )}
-                      </button>
-                    </th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Provider</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Package</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">สถานะ</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">
-                      <button
-                        onClick={() => toggleSort('createdAt')}
-                        className="flex items-center gap-2 hover:text-purple-600 transition-colors"
-                      >
-                        วันที่สมัคร
-                        {sortBy === 'createdAt' ? (
-                          sortOrder === 'asc' ? (
-                            <ArrowUp className="w-4 h-4" />
-                          ) : (
-                            <ArrowDown className="w-4 h-4" />
-                          )
-                        ) : (
-                          <ArrowUpDown className="w-4 h-4 text-gray-400" />
-                        )}
-                      </button>
-                    </th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">
-                      <button
-                        onClick={() => toggleSort('progress')}
-                        className="flex items-center gap-2 hover:text-purple-600 transition-colors"
-                      >
-                        ความคืบหน้า
-                        {sortBy === 'progress' ? (
-                          sortOrder === 'asc' ? (
-                            <ArrowUp className="w-4 h-4" />
-                          ) : (
-                            <ArrowDown className="w-4 h-4" />
-                          )
-                        ) : (
-                          <ArrowUpDown className="w-4 h-4 text-gray-400" />
-                        )}
-                      </button>
-                    </th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">จัดการ</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredUsers.map((user) => {
-                    const stats = getProgressStats(user);
-
-                    return (
-                      <tr key={user.uid} className="border-b border-gray-100 hover:bg-gray-50">
-                        <td className="py-3 px-4">
-                          <div className="flex items-center gap-3">
-                            {user.photoURL ? (
-                              <img
-                                src={user.photoURL}
-                                alt={user.displayName}
-                                className="w-10 h-10 rounded-full border border-gray-200"
-                                referrerPolicy="no-referrer"
-                              />
-                            ) : (
-                              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold">
-                                {user.displayName?.charAt(0).toUpperCase() || 'U'}
-                              </div>
-                            )}
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <p className="font-medium text-gray-900">{user.displayName}</p>
-                                {user.isAdmin && (
-                                  <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
-                                    Admin
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-sm text-gray-600">{user.email}</p>
-                              <p className="text-xs text-gray-400 mt-0.5">
-                                UID: {user.uid.slice(0, 8)}...
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-3 px-4">
-                          <ProviderBadge provider={user.provider} size="sm" />
-                        </td>
-                        <td className="py-3 px-4">
-                          <div>
-                            <PackageBadge packageId={user.package} size="sm" />
-                            {user.packageExpiry && (
-                              <p className="text-xs text-gray-500 mt-1">
-                                หมดอายุ: {new Date(user.packageExpiry).toLocaleDateString('th-TH')}
-                              </p>
-                            )}
-                          </div>
-                        </td>
-                        <td className="py-3 px-4">
-                          <span
-                            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                              user.isActive
-                                ? 'bg-green-100 text-green-700'
-                                : 'bg-red-100 text-red-700'
-                            }`}
-                          >
-                            {user.isActive ? (
-                              <>
-                                <CheckCircle className="w-3 h-3" />
-                                Active
-                              </>
-                            ) : (
-                              <>
-                                <XCircle className="w-3 h-3" />
-                                Inactive
-                              </>
-                            )}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-sm">
-                          {user.createdAt ? (
-                            <>
-                              <p className="text-gray-900 font-medium">
-                                {(() => {
-                                  try {
-                                    const date = user.createdAt.toDate ? user.createdAt.toDate() : new Date(user.createdAt);
-                                    return date.toLocaleDateString('th-TH', {
-                                      year: 'numeric',
-                                      month: 'short',
-                                      day: 'numeric',
-                                    });
-                                  } catch (e) {
-                                    return 'ไม่มีข้อมูล';
-                                  }
-                                })()}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {(() => {
-                                  try {
-                                    const date = user.createdAt.toDate ? user.createdAt.toDate() : new Date(user.createdAt);
-                                    return date.toLocaleTimeString('th-TH', {
-                                      hour: '2-digit',
-                                      minute: '2-digit',
-                                    });
-                                  } catch (e) {
-                                    return '';
-                                  }
-                                })()}
-                              </p>
-                            </>
-                          ) : (
-                            <p className="text-gray-400 text-xs">ไม่มีข้อมูล</p>
-                          )}
-                        </td>
-                        <td className="py-3 px-4 text-sm">
-                          <p className="text-gray-900 font-medium">{stats.courses} คอร์ส</p>
-                          <p className="text-gray-500">{stats.videos} วิดีโอ</p>
-                        </td>
-                        <td className="py-3 px-4">
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => handleEdit(user)}
-                              className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
-                              title="แก้ไข"
-                            >
-                              <Edit className="w-4 h-4 text-blue-600" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteUser(user.uid, user.displayName)}
-                              className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                              title="ลบ"
-                            >
-                              <Trash2 className="w-4 h-4 text-red-600" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-
-              {filteredUsers.length === 0 && (
-                <div className="text-center py-12">
-                  <p className="text-gray-500">ไม่พบผู้ใช้ที่ตรงกับเงื่อนไขการค้นหา</p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Edit Modal */}
-        {showEditModal && selectedUser && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl max-w-md w-full p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">แก้ไขข้อมูลผู้ใช้</h2>
-
-              <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                <p className="font-bold text-gray-900">{selectedUser.displayName}</p>
-                <p className="text-sm text-gray-600">{selectedUser.email}</p>
-              </div>
-
-              <div className="space-y-4 mb-6">
-                {/* Package */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    แพ็คเกจ
-                  </label>
-                  <select
-                    value={editPackage}
-                    onChange={(e) => setEditPackage(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                  >
-                    <option value="">ไม่มีแพ็คเกจ</option>
-                    <option value="free">Free (Freemium)</option>
-                    <option value="basic">Beginner</option>
-                    <option value="allinone">All-in-One</option>
-                    <option value="pro">Pro Developer + All-in-One (Bundle)</option>
-                    <option value="pro_standalone">Pro Developer (Standalone)</option>
-                  </select>
-                </div>
-
-                {/* Package Expiry */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    วันหมดอายุ (ถ้ามี)
-                  </label>
-                  <input
-                    type="date"
-                    value={editExpiry}
-                    onChange={(e) => setEditExpiry(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
-
-                {/* Is Active */}
-                <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    id="editActive"
-                    checked={editActive}
-                    onChange={(e) => setEditActive(e.target.checked)}
-                    className="w-4 h-4 text-purple-600 rounded focus:ring-2 focus:ring-purple-500"
-                  />
-                  <label htmlFor="editActive" className="text-sm font-medium text-gray-700">
-                    เปิดการใช้งาน (Active)
-                  </label>
-                </div>
-
-                {/* Is Admin */}
-                <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    id="editAdmin"
-                    checked={editAdmin}
-                    onChange={(e) => setEditAdmin(e.target.checked)}
-                    className="w-4 h-4 text-purple-600 rounded focus:ring-2 focus:ring-purple-500"
-                  />
-                  <label htmlFor="editAdmin" className="text-sm font-medium text-gray-700">
-                    Admin (สิทธิ์พิเศษ)
-                  </label>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => {
-                    setShowEditModal(false);
-                    setSelectedUser(null);
-                  }}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
-                >
-                  ยกเลิก
-                </button>
-                <button
-                  onClick={handleSaveEdit}
-                  className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                >
-                  บันทึก
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Back to Admin */}
-        <div className="mt-8 text-center pb-8">
-          <Link href="/admin" className="text-purple-600 hover:underline">
-            ← กลับไปหน้า Admin
-          </Link>
-        </div>
+    <>
+      <PageHeader title="สมาชิก" sub={`ฐานข้อมูลลูกค้าทั้งหมด ${items?.length ?? '…'} คน (รวมลูกค้าจากเว็บเดิม)`}
+        actions={<button onClick={exportCsv} className="inline-flex h-10 items-center gap-2 rounded-full border border-line-strong px-4 text-sm"><Download className="size-4" />ส่งออก CSV</button>} />
+      <div className="mb-5 flex flex-wrap items-center gap-3">
+        <label className="flex h-11 w-full max-w-sm items-center gap-2 rounded-xl border border-line-strong bg-surface px-3.5">
+          <Search className="size-4 text-muted" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="ค้นหาอีเมลหรือชื่อ…" className="h-full flex-1 bg-transparent text-[15px] outline-none" />
+        </label>
+        {([['all', 'ทั้งหมด'], ['legacy', 'ลูกค้าแพ็กเกจเดิม'], ['admin', 'แอดมิน'], ['inactive', 'ถูกระงับ']] as const).map(([k, l]) => (
+          <button key={k} onClick={() => setF(k)} className={cn('h-9 rounded-full border px-4 text-sm', f === k ? 'border-fg bg-fg text-bg' : 'border-line-strong text-fg-2')}>{l}</button>
+        ))}
       </div>
-    </ProtectedRoute>
+      <div className="overflow-x-auto rounded-[20px] border border-line bg-surface">
+        <table className="w-full min-w-[760px] text-left text-sm">
+          <thead className="border-b border-line font-mono text-[11px] uppercase tracking-wider text-muted">
+            <tr><th className="px-5 py-3 font-normal">สมาชิก</th><th className="px-3 py-3 font-normal">แพ็กเกจเดิม</th><th className="px-3 py-3 font-normal">สมัครเมื่อ</th><th className="px-3 py-3 font-normal">ความคืบหน้า</th><th className="px-5 py-3 text-right font-normal">จัดการ</th></tr>
+          </thead>
+          <tbody className="divide-y divide-line">
+            {items === null && <tr><td colSpan={5} className="px-5 py-10 text-center text-muted">กำลังโหลด…</td></tr>}
+            {list.map((u) => (
+              <tr key={u.uid} className={cn(u.isActive === false && 'opacity-55')}>
+                <td className="px-5 py-3">
+                  <div className="flex items-center gap-3">
+                    {u.photoURL
+                      // eslint-disable-next-line @next/next/no-img-element
+                      ? <img src={u.photoURL} alt="" className="size-9 rounded-full object-cover" referrerPolicy="no-referrer" />
+                      : <span className="grid size-9 place-items-center rounded-full bg-surface-2 font-semibold">{(u.displayName || u.email || '?').slice(0, 1)}</span>}
+                    <div className="min-w-0"><p className="flex items-center gap-1.5 font-medium">{u.displayName || '—'}{u.isAdmin && <ShieldCheck className="size-3.5 text-orange" />}</p><p className="truncate font-mono text-xs text-muted">{u.email} · {u.provider === 'google' ? 'Google' : 'Email'}</p></div>
+                  </div>
+                </td>
+                <td className="px-3 py-3"><span className="rounded-full bg-surface-2 px-2.5 py-1 font-mono text-xs">{PKG[u.package ?? ''] ?? u.package ?? '—'}</span></td>
+                <td className="px-3 py-3 font-mono text-xs text-muted">{fmt(u.createdAt)}</td>
+                <td className="px-3 py-3 font-mono text-xs text-muted">{Object.values(u.progress ?? {}).reduce((s, p) => s + (p.watchedVideos?.length ?? 0), 0)} บท</td>
+                <td className="px-5 py-3">
+                  <div className="flex justify-end gap-1">
+                    <button onClick={() => patch(u.uid, { isAdmin: !u.isAdmin }, u.isAdmin ? 'ถอดสิทธิ์แอดมินแล้ว' : 'ตั้งเป็นแอดมินแล้ว')} className="h-8 rounded-lg px-2.5 text-xs text-fg-2 hover:bg-surface-2">{u.isAdmin ? 'ถอดแอดมิน' : 'ตั้งเป็นแอดมิน'}</button>
+                    <button onClick={() => patch(u.uid, { isActive: u.isActive === false, needsApproval: false }, u.isActive === false ? 'เปิดใช้งานแล้ว' : 'ระงับบัญชีแล้ว')} className="grid size-8 place-items-center rounded-lg text-fg-2 hover:bg-surface-2" title={u.isActive === false ? 'เปิดใช้งาน' : 'ระงับบัญชี'}>
+                      {u.isActive === false ? <UserCheck className="size-4" /> : <UserX className="size-4" />}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
