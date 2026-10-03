@@ -22,7 +22,7 @@ export function AuthShell({ eyebrow, title, children }: { eyebrow: string; title
         <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 p-10">
           <p className="font-display text-3xl font-bold leading-snug">&ldquo;เรียนจบบทแรก<br />ก็ทำคลิปขายของได้เลย&rdquo;</p>
-          <p className="mt-3 font-mono text-xs text-muted">— ผู้เรียน Prompt D Academy</p>
+          <p className="mt-3 font-mono text-xs text-muted">— ผู้เรียน Prompt D Class</p>
         </div>
       </div>
     </Container>

@@ -5,7 +5,7 @@ import { Container } from '@/components/ui/primitives';
 import { PageHero } from '@/components/site/page-hero';
 import { FacebookIcon, LineIcon, TikTokIcon, YouTubeIcon } from '@/components/ui/brand-icons';
 
-export const metadata: Metadata = { title: 'ติดต่อเรา', description: 'ติดต่อทีม Prompt D Academy สอบถาม ร่วมงาน หรือแนะนำหัวข้อที่อยากเรียน', alternates: { canonical: '/contact' } };
+export const metadata: Metadata = { title: 'ติดต่อเรา', description: 'ติดต่อทีม Prompt D Class สอบถาม ร่วมงาน หรือแนะนำหัวข้อที่อยากเรียน', alternates: { canonical: '/contact' } };
 
 export default async function Contact() {
   const s = await getSettings();

@@ -7,7 +7,7 @@ import { PageHero } from '@/components/site/page-hero';
 
 export const metadata: Metadata = {
   title: 'เกี่ยวกับเรา',
-  description: 'Prompt D Academy สอน AI ฟรีเป็นภาษาไทย โดยคนที่ใช้ AI ทำงานจริงทุกวัน ทั้งทำคลิป ทำเพลง สร้างโปรแกรม และขายของออนไลน์',
+  description: 'Prompt D Class สอน AI ฟรีเป็นภาษาไทย โดยคนที่ใช้ AI ทำงานจริงทุกวัน ทั้งทำคลิป ทำเพลง สร้างโปรแกรม และขายของออนไลน์',
   alternates: { canonical: '/about' },
 };
 
@@ -16,7 +16,7 @@ export default async function About() {
   const lessons = courses.reduce((s, c) => s + c.lessonCount, 0);
   return (
     <>
-      <PageHero eyebrow="เกี่ยวกับ Prompt D Academy" title={<>สอน AI แบบที่<br /><span className="text-spectrum">เราใช้ทำงานจริง</span></>}
+      <PageHero eyebrow="เกี่ยวกับ Prompt D Class" title={<>สอน AI แบบที่<br /><span className="text-spectrum">เราใช้ทำงานจริง</span></>}
         lead="เราไม่ได้สอนทฤษฎี เราสอนสิ่งที่ใช้ทำเงินจริงทุกวัน ตั้งแต่ทำคลิปโฆษณา ทำ MV ทำหนังสั้น ไปจนถึงสร้างโปรแกรมขายเอง — แล้วเปิดให้เรียนฟรีทั้งหมด" />
       <Container className="grid gap-16 py-20 lg:grid-cols-[1fr_1.1fr]">
         <Reveal>

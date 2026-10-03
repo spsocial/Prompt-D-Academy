@@ -1,7 +1,7 @@
 import type { Level } from './types';
 
 export const SITE = {
-  name: 'Prompt D Academy',
+  name: 'Prompt D Class',
   short: 'Prompt D',
   tagline: 'เรียน AI ให้ใช้เป็นจริง ฟรี',
   description:

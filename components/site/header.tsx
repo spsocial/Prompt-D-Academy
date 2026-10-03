@@ -17,7 +17,7 @@ export function Logo({ className }: { className?: string }) {
       <PDMark className="size-9 transition-transform duration-500 ease-out-expo group-hover:rotate-[-8deg]" />
       <span className="leading-none">
         <span className="block font-display text-[17px] font-bold tracking-tight">Prompt D</span>
-        <span className="block font-mono text-[9.5px] uppercase tracking-[0.32em] text-muted">Academy</span>
+        <span className="block font-mono text-[9.5px] uppercase tracking-[0.32em] text-muted">Class</span>
       </span>
     </Link>
   );

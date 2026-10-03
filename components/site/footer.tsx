@@ -57,7 +57,7 @@ export function SiteFooter({ settings }: { settings: SiteSettings }) {
           </div>
         </div>
         <div className="relative flex flex-col items-start justify-between gap-4 border-t border-line py-6 pb-28 text-[13px] text-muted sm:flex-row sm:items-center lg:pb-40">
-          <p>© {new Date().getFullYear()} {SITE.name} · สอน AI ฟรีเพื่อคนไทย</p>
+          <p>© {new Date().getFullYear()} {SITE.name} · <span className="font-medium text-fg-2">PromptDClass.com</span> · สอน AI ฟรีเพื่อคนไทย</p>
           <div className="flex items-center gap-1">
             {socials.map(({ href, label, Icon }) => (
               <a key={label} href={href} target="_blank" rel="noopener" aria-label={label} className="grid size-9 place-items-center rounded-full text-fg-2 transition hover:bg-surface-2 hover:text-fg"><Icon className="size-[17px]" /></a>

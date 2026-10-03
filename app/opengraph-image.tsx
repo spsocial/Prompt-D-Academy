@@ -15,7 +15,7 @@ export default async function OG() {
         backgroundImage: 'radial-gradient(60% 80% at 0% 0%, rgba(76,132,255,.45), transparent 60%), radial-gradient(60% 80% at 100% 100%, rgba(255,122,51,.45), transparent 60%)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 18, fontSize: 30 }}>
           <div style={{ width: 54, height: 54, borderRadius: 16, border: '3px solid #9468ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>PD</div>
-          Prompt D Academy
+          Prompt D Class
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ fontSize: 96, fontWeight: 700, lineHeight: 1.1 }}>เรียน AI ให้ใช้เป็นจริง</div>
