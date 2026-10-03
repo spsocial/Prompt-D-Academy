@@ -25,7 +25,13 @@ export async function POST(req: Request) {
   }
   const { paths } = (await req.json().catch(() => ({}))) as { paths?: string[] };
   const list = (paths ?? []).filter((p) => typeof p === 'string' && p.startsWith('/')).slice(0, 50);
-  list.forEach((p) => revalidatePath(p));
+  // ลิงก์ภาษาไทย: ล้างทั้งแบบดิบและแบบ encode + ล้างทุกหน้าคอร์ส/บทเรียนตาม pattern (กันพลาด)
+  list.forEach((p) => { revalidatePath(p); try { revalidatePath(encodeURI(decodeURI(p))); } catch {} });
+  if (list.some((p) => p.startsWith('/courses'))) {
+    revalidatePath('/courses/[slug]', 'page');
+    revalidatePath('/courses/[slug]/[lesson]', 'page');
+    revalidatePath('/dashboard');
+  }
   revalidatePath('/sitemap.xml');
   return NextResponse.json({ ok: true, revalidated: list });
 }
