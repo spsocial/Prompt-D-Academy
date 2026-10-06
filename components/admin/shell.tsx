@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { LayoutDashboard, BookOpen, Users, MessagesSquare, Megaphone, Settings, DatabaseZap, ExternalLink, Menu, X, ShieldAlert, LogOut, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
+import { markNoTrack } from '@/lib/track';
 import { cn } from '@/lib/utils';
 import { PDMark } from '@/components/ui/brand-icons';
 import { ThemeToggle } from '@/components/site/header';
@@ -27,6 +28,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(false), [path]);
+  useEffect(() => { if (isAdmin) markNoTrack(); }, [isAdmin]); // เครื่องแอดมินไม่นับยอดชม
   useEffect(() => { if (ready && !user && !demo) router.replace('/login?next=/admin'); }, [ready, user, demo, router]);
 
   if (!ready) return <div className="grid min-h-dvh place-items-center"><span className="size-8 animate-spin rounded-full border-2 border-line-strong border-t-orange" /></div>;

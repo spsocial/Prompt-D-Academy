@@ -16,8 +16,13 @@ export function firstTime(key: string) {
   return true;
 }
 
+/** แอดมินไม่นับ — จำไว้ในเครื่องเมื่อเคยล็อกอินเป็นแอดมิน */
+const NO_TRACK = 'pd:noTrack';
+export function markNoTrack() { try { localStorage.setItem(NO_TRACK, '1'); } catch { /* ignore */ } }
+const skipped = () => { try { return localStorage.getItem(NO_TRACK) === '1'; } catch { return false; } };
+
 function bump(slug: string, data: Record<string, unknown>) {
-  if (!firebaseConfigured || !slug) return;
+  if (!firebaseConfigured || !slug || skipped()) return;
   setDoc(doc(db(), 'stats', slug), data, { merge: true }).catch(() => {});
 }
 
