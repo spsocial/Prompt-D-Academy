@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { ArrowUpRight, Clock, PlayCircle, Lock } from 'lucide-react';
-import { LEVELS, fmtMinutes } from '@/lib/config';
+import { ArrowUpRight, Clock, PlayCircle, Lock, Users } from 'lucide-react';
+import { LEVELS, MIN_PUBLIC_VIEWS, fmtCount, fmtMinutes } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import type { Course } from '@/lib/types';
 import { CourseCover } from './course-cover';
@@ -14,6 +14,7 @@ export function CourseCard({ course, index, className }: { course: Course; index
           <span className="rounded-full border border-line-strong px-2 py-0.5 text-fg-2">{LEVELS[course.level]?.label}</span>
           <span className="flex items-center gap-1"><PlayCircle className="size-3.5" strokeWidth={1.75} />{course.lessonCount} บท</span>
           <span className="flex items-center gap-1"><Clock className="size-3.5" strokeWidth={1.75} />{fmtMinutes(course.totalMinutes)}</span>
+          {(course.views ?? 0) >= MIN_PUBLIC_VIEWS && <span className="flex items-center gap-1" title="คนเข้าเรียนคอร์สนี้"><Users className="size-3.5" strokeWidth={1.75} />{fmtCount(course.views!)}</span>}
           <span className="ml-auto">{course.access === 'free' ? <span className="rounded-full bg-orange/12 px-2 py-0.5 font-semibold text-orange">ฟรี</span> : <span className="flex items-center gap-1"><Lock className="size-3" />สมาชิก</span>}</span>
         </div>
         <h3 className="mt-3.5 font-display text-[1.28rem] font-bold leading-snug tracking-tight">{course.title}</h3>

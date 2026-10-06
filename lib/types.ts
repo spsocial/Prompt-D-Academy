@@ -30,6 +30,8 @@ export interface Course {
   seoDescription?: string;
   createdAt?: number;
   updatedAt?: number;
+  /** จำนวนคนเข้าคอร์ส (จาก stats/{slug}.views) — เติมตอนอ่านฝั่งเซิร์ฟเวอร์ */
+  views?: number;
 }
 
 export interface Lesson {
@@ -99,4 +101,14 @@ export interface UserDoc {
   lastLogin?: unknown;
   bio?: string;
   progress?: Record<string, { completed: number; lastWatchedVideo: string; completionPercent: number; watchedVideos: string[] }>;
+}
+
+/** stats/{courseSlug} — ตัวนับแบบไม่ระบุตัวตน (lib/track.ts) */
+export interface LessonStats { views?: number; plays?: number; sec?: number; [decile: `d${number}`]: number | undefined }
+export interface CourseStats {
+  slug: string;
+  views?: number;
+  lessonViews?: number;
+  days?: Record<string, number>;
+  lessons?: Record<string, LessonStats>;
 }

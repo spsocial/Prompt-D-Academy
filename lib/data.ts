@@ -41,10 +41,19 @@ async function safe<T>(fn: () => Promise<T>, demo: T, empty: T): Promise<T> {
 
 export const isDemo = !firebaseConfigured;
 
+/** ยอดคนเข้าคอร์ส { slug: views } — อ่านไม่ได้ (ยังไม่ตั้ง rules) ก็คืนค่าว่าง ไม่ทำให้หน้าพัง */
+export const getViewMap = cache(async (): Promise<Record<string, number>> => {
+  if (!firebaseConfigured) return {};
+  try {
+    const snap = await getDocs(collection(fs(), 'stats'));
+    return Object.fromEntries(snap.docs.map((d) => [d.id, Number(d.data().views) || 0]));
+  } catch { return {}; }
+});
+
 export const getCourses = cache(async (): Promise<Course[]> =>
   safe(async () => {
-    const snap = await getDocs(query(collection(fs(), 'courses'), where('published', '==', true)));
-    return snap.docs.map((d) => normCourse(d.id, d.data())).sort((a, b) => a.order - b.order || a.title.localeCompare(b.title, 'th'));
+    const [snap, views] = await Promise.all([getDocs(query(collection(fs(), 'courses'), where('published', '==', true))), getViewMap()]);
+    return snap.docs.map((d) => ({ ...normCourse(d.id, d.data()), views: views[d.id] ?? 0 })).sort((a, b) => a.order - b.order || a.title.localeCompare(b.title, 'th'));
   }, SEED_COURSES.filter((c) => c.published), []),
 );
 
@@ -52,7 +61,7 @@ export const getCourse = cache(async (slug: string): Promise<Course | null> =>
   safe(async () => {
     const d = await getDoc(doc(fs(), 'courses', slug));
     if (!d.exists()) return null;
-    const c = normCourse(d.id, d.data());
+    const c = { ...normCourse(d.id, d.data()), views: (await getViewMap())[d.id] ?? 0 };
     return c.published ? c : null;
   }, SEED_COURSES.find((c) => c.slug === slug && c.published) ?? null, null),
 );

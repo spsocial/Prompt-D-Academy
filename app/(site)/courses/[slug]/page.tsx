@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Clock, PlayCircle, BarChart3, Lock, ChevronRight, Infinity as InfinityIcon, MessagesSquare, FileText, Wrench } from 'lucide-react';
+import { Clock, PlayCircle, BarChart3, Lock, ChevronRight, Infinity as InfinityIcon, MessagesSquare, FileText, Wrench, Users } from 'lucide-react';
 import { getCourse, getCourses, getLessons, getSettings } from '@/lib/data';
-import { LEVELS, SITE, categoryLabel, fmtMinutes } from '@/lib/config';
+import { LEVELS, MIN_PUBLIC_VIEWS, SITE, categoryLabel, fmtCount, fmtMinutes } from '@/lib/config';
 import { cleanHtml } from '@/lib/sanitize';
 import { excerpt, pad2 } from '@/lib/utils';
 import { Container, Eyebrow } from '@/components/ui/primitives';
@@ -12,6 +12,7 @@ import { CourseCover } from '@/components/site/course-cover';
 import { CourseCard } from '@/components/site/course-card';
 import { CourseCTA, LessonCheck } from '@/components/site/course-progress';
 import { JsonLd } from '@/components/site/json-ld';
+import { TrackView } from '@/components/site/track-view';
 import { AdSlot } from '@/components/site/ads';
 
 export const revalidate = 600;
@@ -57,6 +58,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
         ] },
       ]} />
 
+      <TrackView slug={course.slug} />
       {/* ───── header ───── */}
       <section className="relative overflow-hidden border-b border-line">
         <div className="grid-lines absolute inset-0" aria-hidden />
@@ -73,6 +75,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
               <div className="flex items-center gap-2"><BarChart3 className="size-4 text-muted" strokeWidth={1.75} /><dt className="sr-only">ระดับ</dt><dd>{LEVELS[course.level]?.label}</dd></div>
               <div className="flex items-center gap-2"><PlayCircle className="size-4 text-muted" strokeWidth={1.75} /><dt className="sr-only">บทเรียน</dt><dd>{lessons.length || course.lessonCount} บทเรียน</dd></div>
               <div className="flex items-center gap-2"><Clock className="size-4 text-muted" strokeWidth={1.75} /><dt className="sr-only">ความยาว</dt><dd>{fmtMinutes(totalMin)}</dd></div>
+              {(course.views ?? 0) >= MIN_PUBLIC_VIEWS && <div className="flex items-center gap-2"><Users className="size-4 text-muted" strokeWidth={1.75} /><dt className="sr-only">ผู้เรียน</dt><dd>{fmtCount(course.views!)} คนเข้าเรียน</dd></div>}
               {course.tools.length > 0 && <div className="flex items-center gap-2"><Wrench className="size-4 text-muted" strokeWidth={1.75} /><dt className="sr-only">เครื่องมือ</dt><dd>{course.tools.join(' · ')}</dd></div>}
             </dl>
             <div className="mt-9"><CourseCTA course={course} lessons={lessons.map((l) => ({ id: l.id, slug: l.slug }))} /></div>

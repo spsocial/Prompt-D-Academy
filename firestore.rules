@@ -14,6 +14,20 @@ service cloud.firestore {
         allow write: if isAdmin();
       }
     }
+    // สถิติผู้ชม (นับแบบไม่ระบุตัวตนจาก lib/track.ts): ทุกคนอ่านได้ / เพิ่มยอดได้เฉพาะช่องที่กำหนด
+    // views/lessonViews เพิ่มได้ทีละ 1 และห้ามลด — ต้องเป็นคอร์สที่มีอยู่จริง
+    match /stats/{slug} {
+      function okKeys() { return request.resource.data.keys().hasOnly(['views', 'lessonViews', 'days', 'lessons']); }
+      allow read: if true;
+      allow create: if okKeys() && exists(/databases/$(database)/documents/courses/$(slug))
+        && request.resource.data.get('views', 0) <= 1 && request.resource.data.get('lessonViews', 0) <= 1;
+      allow update: if okKeys()
+        && request.resource.data.get('views', 0) >= resource.data.get('views', 0)
+        && request.resource.data.get('views', 0) <= resource.data.get('views', 0) + 1
+        && request.resource.data.get('lessonViews', 0) >= resource.data.get('lessonViews', 0)
+        && request.resource.data.get('lessonViews', 0) <= resource.data.get('lessonViews', 0) + 1;
+      allow delete: if isAdmin();
+    }
     match /promos/{id} { allow read: if true; allow write: if isAdmin(); }
     match /settings/{id} { allow read: if true; allow write: if isAdmin(); }
 

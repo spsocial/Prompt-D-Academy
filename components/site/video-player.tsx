@@ -1,12 +1,39 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { Play, Lock, Clapperboard } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import type { VideoSource } from '@/lib/types';
+import { trackDecile, trackPlay, trackWatchSeconds } from '@/lib/track';
 
-export function VideoPlayer({ video, title, locked }: { video: VideoSource; title: string; locked?: boolean }) {
+type Track = { slug: string; lessonId: string };
+
+/** <video> ที่นับยอดกดเล่น + ดูถึงกี่ % (ทีละ 10%) + เวลาดูรวม */
+function TrackedVideo({ url, track }: { url: string; track?: Track }) {
+  const acc = useRef(0), last = useRef<number | null>(null);
+  const flush = () => { if (track && acc.current >= 1) { trackWatchSeconds(track.slug, track.lessonId, acc.current); acc.current = 0; } };
+  return (
+    <video className="absolute inset-0 size-full" src={url} controls preload="metadata" playsInline controlsList="nodownload"
+      onPlay={() => { if (track) trackPlay(track.slug, track.lessonId); }}
+      onTimeUpdate={(e) => {
+        const v = e.currentTarget;
+        if (!track || !v.duration) return;
+        const t = v.currentTime;
+        if (last.current !== null && t > last.current && t - last.current < 2) acc.current += t - last.current; // ไม่นับตอนกรอข้าม
+        last.current = t;
+        const n = Math.min(10, Math.floor((t / v.duration) * 10 + 0.03));
+        for (let k = 1; k <= n; k++) trackDecile(track.slug, track.lessonId, k);
+        if (acc.current >= 30) flush();
+      }}
+      onSeeking={(e) => { last.current = e.currentTarget.currentTime; }}
+      onPause={flush}
+      onEnded={() => { if (track) trackDecile(track.slug, track.lessonId, 10); flush(); }}
+    />
+  );
+}
+
+export function VideoPlayer({ video, title, locked, track }: { video: VideoSource; title: string; locked?: boolean; track?: Track }) {
   const { user, ready } = useAuth();
   const [play, setPlay] = useState(false);
   const frame = 'relative aspect-video w-full overflow-hidden rounded-[22px] border border-line bg-black shadow-[0_40px_100px_-40px_rgba(0,0,0,.8)]';
@@ -34,7 +61,7 @@ export function VideoPlayer({ video, title, locked }: { video: VideoSource; titl
         {play ? (
           <iframe className="absolute inset-0 size-full" src={`https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&rel=0&modestbranding=1`} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
         ) : (
-          <button onClick={() => setPlay(true)} className="group absolute inset-0" aria-label={`เล่นวิดีโอ ${title}`}>
+          <button onClick={() => { setPlay(true); if (track) trackPlay(track.slug, track.lessonId); }} className="group absolute inset-0" aria-label={`เล่นวิดีโอ ${title}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={`https://i.ytimg.com/vi/${video.id}/maxresdefault.jpg`} onError={(e) => { (e.target as HTMLImageElement).src = `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`; }} alt="" className="absolute inset-0 size-full object-cover opacity-85 transition duration-700 group-hover:scale-[1.02] group-hover:opacity-100" />
             <span className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
@@ -50,7 +77,7 @@ export function VideoPlayer({ video, title, locked }: { video: VideoSource; titl
     return <div className={frame}><iframe className="absolute inset-0 size-full" src={`https://drive.google.com/file/d/${video.id}/preview`} title={title} allow="autoplay; fullscreen" allowFullScreen /></div>;
   }
   if (video.type === 'file' && video.url) {
-    return <div className={frame}><video className="absolute inset-0 size-full" src={video.url} controls preload="metadata" playsInline controlsList="nodownload" /></div>;
+    return <div className={frame}><TrackedVideo url={video.url} track={track} /></div>;
   }
   return (
     <div className={`${frame} grid place-items-center bg-[#0c0e13]`}>

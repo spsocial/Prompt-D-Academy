@@ -8,7 +8,7 @@ import { auth, db, storage } from './firebase/client';
 import { firebaseConfigured } from './firebase/config';
 import { SEED_COURSES, SEED_LESSONS, SEED_PROMOS, SEED_SETTINGS } from './seed';
 import { parseVideoLink, slugify } from './utils';
-import type { CommentDoc, Course, Lesson, Promo, SiteSettings, UserDoc } from './types';
+import type { CommentDoc, Course, CourseStats, Lesson, Promo, SiteSettings, UserDoc } from './types';
 
 export const DEMO = !firebaseConfigured;
 const demoBlock = () => { throw new Error('โหมดตัวอย่าง: เชื่อม Firebase ก่อนจึงจะบันทึกได้'); };
@@ -178,6 +178,22 @@ export async function getStats() {
   ]);
   const lessons = (await listCourses()).reduce((s, x) => s + (x.lessonCount || 0), 0);
   return { users, courses, lessons, comments, newUsers7d };
+}
+
+/** ตัวนับยอดชมทุกคอร์ส (stats/{slug}) */
+export async function listCourseStats(): Promise<CourseStats[]> {
+  if (DEMO) {
+    const day = (n: number) => new Date(Date.now() + 7 * 3600e3 - n * 864e5).toISOString().slice(0, 10);
+    return SEED_COURSES.map((c, i) => {
+      const days = Object.fromEntries(Array.from({ length: 90 }, (_, k) => [day(k), Math.round((12 - i) * (0.6 + ((k * 7 + i * 3) % 10) / 12))]));
+      const views = Object.values(days).reduce((a, b) => a + b, 0);
+      return {
+      slug: c.slug, views, lessonViews: Math.round(views * 1.8), days,
+      lessons: Object.fromEntries((SEED_LESSONS[c.slug] ?? []).map((l, j) => [l.id, { views: 200 - j * 30, plays: 150 - j * 25, sec: 9000, ...Object.fromEntries(Array.from({ length: 10 }, (_, k) => [`d${k + 1}`, Math.round((150 - j * 25) * (k < 2 ? 0.9 - k * 0.15 : 0.72 - k * 0.04))])) }])),
+    }; });
+  }
+  const s = await getDocs(collection(db(), 'stats'));
+  return s.docs.map((d) => ({ ...(d.data() as Omit<CourseStats, 'slug'>), slug: d.id }));
 }
 
 // ───────── uploads ─────────

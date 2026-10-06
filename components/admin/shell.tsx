@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { LayoutDashboard, BookOpen, Users, MessagesSquare, Megaphone, Settings, DatabaseZap, ExternalLink, Menu, X, ShieldAlert, LogOut } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Users, MessagesSquare, Megaphone, Settings, DatabaseZap, ExternalLink, Menu, X, ShieldAlert, LogOut, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 import { PDMark } from '@/components/ui/brand-icons';
@@ -13,6 +13,7 @@ import { ToastProvider } from './ui';
 const NAV = [
   { href: '/admin', label: 'ภาพรวม', icon: LayoutDashboard, exact: true },
   { href: '/admin/courses', label: 'คอร์ส & บทเรียน', icon: BookOpen },
+  { href: '/admin/stats', label: 'สถิติผู้ชม', icon: BarChart3 },
   { href: '/admin/users', label: 'สมาชิก', icon: Users },
   { href: '/admin/comments', label: 'คอมเมนต์', icon: MessagesSquare },
   { href: '/admin/promos', label: 'โปรโมทสินค้า', icon: Megaphone },

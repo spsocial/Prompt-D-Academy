@@ -35,3 +35,7 @@ export const fmtMinutes = (m: number) => {
   const r = Math.round(m % 60);
   return h ? `${h} ชม. ${r ? `${r} นาที` : ''}`.trim() : `${r} นาที`;
 };
+
+/** โชว์ยอดคนเรียนบนหน้าเว็บเมื่อถึงขั้นต่ำนี้ (ตัวเลขน้อยๆ ดูไม่น่าเชื่อถือ) */
+export const MIN_PUBLIC_VIEWS = 30;
+export const fmtCount = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1).replace(/\.0$/, '')}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1).replace(/\.0$/, '')}K` : String(n));

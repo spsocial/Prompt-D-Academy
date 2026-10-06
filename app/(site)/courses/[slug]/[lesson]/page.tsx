@@ -8,6 +8,7 @@ import { cleanHtml } from '@/lib/sanitize';
 import { excerpt, pad2, videoThumb } from '@/lib/utils';
 import { Container } from '@/components/ui/primitives';
 import { VideoPlayer } from '@/components/site/video-player';
+import { TrackView } from '@/components/site/track-view';
 import { Comments } from '@/components/site/comments';
 import { Curriculum, MarkComplete, PrevNext } from '@/components/site/lesson-actions';
 import { PromoCard } from '@/components/site/promo';
@@ -75,7 +76,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
           <Link href={base} className="group inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-wider text-muted hover:text-fg">
             <ChevronLeft className="size-3.5 transition group-hover:-translate-x-0.5" />{course.title}
           </Link>
-          <div className="mt-4"><VideoPlayer video={lesson.video} title={lesson.title} locked={lesson.access === 'member'} /></div>
+          <div className="mt-4"><TrackView slug={course.slug} lessonId={lesson.id} /><VideoPlayer video={lesson.video} title={lesson.title} locked={lesson.access === 'member'} track={{ slug: course.slug, lessonId: lesson.id }} /></div>
 
           <header className="mt-8">
             <p className="font-mono text-xs text-orange">บทที่ {pad2(idx + 1)} / {pad2(lessons.length)}</p>

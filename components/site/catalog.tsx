@@ -18,6 +18,7 @@ export function Catalog({ courses }: { courses: Course[] }) {
   const [q, setQ] = useState(sp.get('q') ?? '');
   const cat = sp.get('cat') ?? '';
   const level = (sp.get('level') ?? '') as Level | '';
+  const sort = sp.get('sort') ?? '';
 
   useEffect(() => { if (sp.get('focus')) inputRef.current?.focus(); }, [sp]);
 
@@ -37,14 +38,15 @@ export function Catalog({ courses }: { courses: Course[] }) {
 
   const list = useMemo(() => {
     const terms = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
-    return courses.filter((c) => {
+    const filtered = courses.filter((c) => {
       if (cat && c.category !== cat) return false;
       if (level && c.level !== level) return false;
       if (!terms.length) return true;
       const hay = [c.title, c.subtitle, stripHtml(c.description), ...c.tags, ...c.tools].join(' ').toLowerCase();
       return terms.every((t) => hay.includes(t));
     });
-  }, [courses, q, cat, level]);
+    return sort === 'popular' ? [...filtered].sort((a, b) => (b.views ?? 0) - (a.views ?? 0)) : filtered;
+  }, [courses, q, cat, level, sort]);
 
   return (
     <>
@@ -68,6 +70,10 @@ export function Catalog({ courses }: { courses: Course[] }) {
             <select value={level} onChange={(e) => setParam('level', e.target.value)} className="h-10 rounded-full border border-line-strong bg-surface px-4 text-sm text-fg-2 outline-none" aria-label="ระดับ">
               <option value="">ทุกระดับ</option>
               {(Object.keys(LEVELS) as Level[]).map((l) => <option key={l} value={l}>{LEVELS[l].label}</option>)}
+            </select>
+            <select value={sort} onChange={(e) => setParam('sort', e.target.value)} className="h-10 rounded-full border border-line-strong bg-surface px-4 text-sm text-fg-2 outline-none" aria-label="เรียงตาม">
+              <option value="">แนะนำ</option>
+              <option value="popular">ยอดนิยม</option>
             </select>
           </div>
         </Container>
