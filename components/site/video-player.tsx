@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Play, Lock, Clapperboard } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import type { VideoSource } from '@/lib/types';
@@ -35,6 +36,7 @@ function TrackedVideo({ url, track }: { url: string; track?: Track }) {
 
 export function VideoPlayer({ video, title, locked, track }: { video: VideoSource; title: string; locked?: boolean; track?: Track }) {
   const { user, ready } = useAuth();
+  const path = usePathname();
   const [play, setPlay] = useState(false);
   const frame = 'relative aspect-video w-full overflow-hidden rounded-[22px] border border-line bg-black shadow-[0_40px_100px_-40px_rgba(0,0,0,.8)]';
 
@@ -44,11 +46,11 @@ export function VideoPlayer({ video, title, locked, track }: { video: VideoSourc
         <div className="absolute inset-0 opacity-70" style={{ background: 'radial-gradient(60% 80% at 50% 0%, color-mix(in oklab, var(--violet) 40%, transparent), transparent 70%)' }} />
         <div className="relative px-6 text-center text-white">
           <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-white/10 backdrop-blur"><Lock className="size-6" /></span>
-          <p className="mt-4 font-display text-2xl font-bold">บทนี้สำหรับสมาชิก</p>
+          <p className="mt-4 font-display text-2xl font-bold">เข้าสู่ระบบเพื่อดูคลิปบทเรียน</p>
           <p className="mt-1.5 text-white/70">สมัครสมาชิกฟรี ใช้เวลาไม่ถึง 30 วินาที</p>
           <div className="mt-6 flex justify-center gap-2">
-            <Link href="/register" className="rounded-full bg-[var(--orange)] px-6 py-3 font-semibold">สมัครฟรี</Link>
-            <Link href="/login" className="rounded-full border border-white/25 px-6 py-3">เข้าสู่ระบบ</Link>
+            <Link href={`/register?next=${encodeURIComponent(path)}`} className="rounded-full bg-[var(--orange)] px-6 py-3 font-semibold">สมัครฟรี</Link>
+            <Link href={`/login?next=${encodeURIComponent(path)}`} className="rounded-full border border-white/25 px-6 py-3">เข้าสู่ระบบ</Link>
           </div>
         </div>
       </div>

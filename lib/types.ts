@@ -72,6 +72,8 @@ export interface SiteSettings {
   adSlotLesson?: string;
   adSlotSidebar?: string;
   adSlotList?: string;
+  /** ต้องล็อกอินก่อนดูบทเรียน (ไม่ตั้ง = เปิดใช้) */
+  requireLogin?: boolean;
 }
 
 export interface CommentDoc {

@@ -9,6 +9,7 @@ import { excerpt, pad2, videoThumb } from '@/lib/utils';
 import { Container } from '@/components/ui/primitives';
 import { VideoPlayer } from '@/components/site/video-player';
 import { TrackView } from '@/components/site/track-view';
+import { LoginGate } from '@/components/site/login-gate';
 import { Comments } from '@/components/site/comments';
 import { Curriculum, MarkComplete, PrevNext } from '@/components/site/lesson-actions';
 import { PromoCard } from '@/components/site/promo';
@@ -53,6 +54,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   const slim = lessons.map(({ id, slug, title, durationMin, access }) => ({ id, slug, title, durationMin, access }));
   const url = `${SITE.url}${base}/${lesson.slug}`;
   const html = cleanHtml(lesson.content);
+  const gate = settings.requireLogin !== false || lesson.access === 'member';
 
   return (
     <>
@@ -76,7 +78,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
           <Link href={base} className="group inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-wider text-muted hover:text-fg">
             <ChevronLeft className="size-3.5 transition group-hover:-translate-x-0.5" />{course.title}
           </Link>
-          <div className="mt-4"><TrackView slug={course.slug} lessonId={lesson.id} /><VideoPlayer video={lesson.video} title={lesson.title} locked={lesson.access === 'member'} track={{ slug: course.slug, lessonId: lesson.id }} /></div>
+          <div className="mt-4"><TrackView slug={course.slug} lessonId={lesson.id} /><VideoPlayer video={lesson.video} title={lesson.title} locked={gate} track={{ slug: course.slug, lessonId: lesson.id }} /></div>
 
           <header className="mt-8">
             <p className="font-mono text-xs text-orange">บทที่ {pad2(idx + 1)} / {pad2(lessons.length)}</p>
@@ -89,6 +91,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
 
           <div className="rule-spectrum mt-8 opacity-60" />
 
+          <LoginGate locked={gate}>
           {html && <div className="prose prose-academy prose-lg mt-8 max-w-none" dangerouslySetInnerHTML={{ __html: html }} />}
 
           {lesson.resources.length > 0 && (
@@ -103,6 +106,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
               </ul>
             </div>
           )}
+          </LoginGate>
 
           <AdSlot client={settings.adsenseClient} slot={settings.adSlotLesson} className="mt-10" />
           <PrevNext base={base} prev={prev && slim[idx - 1]} next={next && slim[idx + 1]} />
