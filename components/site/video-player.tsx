@@ -40,7 +40,8 @@ export function VideoPlayer({ video, title, locked, track }: { video: VideoSourc
   const [play, setPlay] = useState(false);
   const frame = 'relative aspect-video w-full overflow-hidden rounded-[22px] border border-line bg-black shadow-[0_40px_100px_-40px_rgba(0,0,0,.8)]';
 
-  if (locked && ready && !user) {
+  if (locked && !ready) return <div className={frame} />; // รอเช็คล็อกอินก่อน ไม่ให้คลิปโผล่แวบ
+  if (locked && !user) {
     return (
       <div className={`${frame} grid place-items-center`}>
         <div className="absolute inset-0 opacity-70" style={{ background: 'radial-gradient(60% 80% at 50% 0%, color-mix(in oklab, var(--violet) 40%, transparent), transparent 70%)' }} />
