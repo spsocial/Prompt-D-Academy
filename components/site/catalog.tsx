@@ -51,13 +51,14 @@ export function Catalog({ courses }: { courses: Course[] }) {
   return (
     <>
       <div className="sticky top-[68px] z-30 border-y border-line bg-bg/80 backdrop-blur-xl">
-        <Container className="flex flex-col gap-3 py-3 lg:flex-row lg:items-center">
+        <Container className="flex flex-col gap-3 py-3 lg:flex-row lg:flex-wrap lg:items-center">
           <label className="relative flex h-12 flex-1 items-center rounded-full border border-line-strong bg-surface px-4 transition focus-within:border-fg/50 lg:max-w-sm">
             <Search className="size-[18px] text-muted" strokeWidth={1.75} />
             <input ref={inputRef} value={q} onChange={(e) => setQ(e.target.value)} placeholder="ค้นหาคอร์ส เครื่องมือ หรือสิ่งที่อยากทำ…" className="h-full flex-1 bg-transparent px-3 text-[15px] outline-none placeholder:text-muted" aria-label="ค้นหาคอร์ส" />
             {q && <button onClick={() => setQ('')} aria-label="ล้าง" className="grid size-7 place-items-center rounded-full hover:bg-surface-2"><X className="size-4" /></button>}
           </label>
-          <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 lg:mx-0 lg:px-0 lg:pb-0 [scrollbar-width:none]">
+          {/* mobile: one swipeable row with faded edges; desktop: own row, wraps so no chip gets clipped */}
+          <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 [mask-image:linear-gradient(90deg,transparent,#000_20px,#000_calc(100%-32px),transparent)] [scrollbar-width:none] lg:order-last lg:mx-0 lg:basis-full lg:flex-wrap lg:overflow-visible lg:px-0 lg:pb-0 lg:[mask-image:none]">
             {[{ key: '', label: 'ทั้งหมด' }, ...CATEGORIES].map((c) => (
               <button key={c.key || 'all'} onClick={() => setParam('cat', c.key)}
                 className={cn('h-10 shrink-0 rounded-full border px-4 text-sm transition', cat === c.key ? 'border-fg bg-fg text-bg' : 'border-line-strong text-fg-2 hover:border-fg/40 hover:text-fg')}>
