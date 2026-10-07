@@ -168,7 +168,7 @@ export default async function Home() {
               </div>
               <Sparkles className="mb-3 hidden size-8 text-orange sm:block" strokeWidth={1.5} />
             </Reveal>
-            <div className="mt-10 grid gap-x-10 md:grid-cols-2">
+            <div className="mt-10 grid gap-x-10 md:grid-cols-2 [&>*]:min-w-0">
               {latest.map((l, i) => (
                 <Reveal key={`${l.course.slug}-${l.id}`} delay={(i % 2) * 0.06}>
                   <Link href={`/courses/${l.course.slug}/${l.slug}`} className="group flex items-start gap-5 border-b border-line py-5">
