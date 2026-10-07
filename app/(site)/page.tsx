@@ -86,14 +86,19 @@ export default async function Home() {
       </section>
 
       {/* ───────────────── PROMO VIDEO ───────────────── */}
-      <section className="pt-24 lg:pt-32" aria-label="คลิปแนะนำเว็บ">
-        <Container className="max-w-5xl">
-          <Reveal className="text-center">
+      <section className="pt-20 lg:pt-28" aria-label="คลิปแนะนำเว็บ">
+        <Container className="grid items-center gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
+          <Reveal className="text-center lg:text-left">
             <Eyebrow>คลิปแนะนำ</Eyebrow>
             <h2 className="mt-3 font-display text-[clamp(2rem,4.4vw,3.4rem)] font-bold leading-[1.08] tracking-tight">เรียนที่นี่ <span className="text-spectrum">ยังไง?</span></h2>
-            <p className="mx-auto mt-4 max-w-xl text-[16px] leading-relaxed text-muted">คลิปสอนทำตามได้ทีละขั้น พร้อมคำสั่งให้ก๊อป ฟรีทุกคอร์ส และมีบทเรียนใหม่เพิ่มตลอด</p>
+            <p className="mx-auto mt-4 max-w-md text-[16px] leading-relaxed text-muted lg:mx-0">คลิปสอนทำตามได้ทีละขั้น พร้อมคำสั่งให้ก๊อป ฟรีทุกคอร์ส และมีบทเรียนใหม่เพิ่มตลอด — สอนโดยมี Claude เป็นครู</p>
+            <ul className="mx-auto mt-6 grid max-w-md gap-2 text-left text-[15px] text-fg-2 lg:mx-0">
+              {['เรียนฟรีทุกคอร์ส ไม่ต้องใช้บัตรเครดิต', 'คลิปสอน + คำสั่งก๊อปไปใช้ได้ทันที', 'บทเรียนใหม่อัปเดตตลอด'].map((t) => (
+                <li key={t} className="flex items-center gap-2.5"><span className="size-1.5 rounded-full bg-orange" />{t}</li>
+              ))}
+            </ul>
           </Reveal>
-          <Reveal delay={0.1} className="mt-10"><PromoVideo /></Reveal>
+          <Reveal delay={0.1}><PromoVideo /></Reveal>
         </Container>
       </section>
 
