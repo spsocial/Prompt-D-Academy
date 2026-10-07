@@ -8,6 +8,7 @@ import { Reveal } from '@/components/ui/reveal';
 import { CourseCard } from '@/components/site/course-card';
 import { HeroTerminal } from '@/components/site/hero-terminal';
 import { PromoBanner } from '@/components/site/promo';
+import { PromoVideo } from '@/components/site/promo-video';
 import { LineIcon } from '@/components/ui/brand-icons';
 
 export const revalidate = 600;
@@ -82,6 +83,18 @@ export default async function Home() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* ───────────────── PROMO VIDEO ───────────────── */}
+      <section className="pt-24 lg:pt-32" aria-label="คลิปแนะนำเว็บ">
+        <Container className="max-w-5xl">
+          <Reveal className="text-center">
+            <Eyebrow>คลิปแนะนำ</Eyebrow>
+            <h2 className="mt-3 font-display text-[clamp(2rem,4.4vw,3.4rem)] font-bold leading-[1.08] tracking-tight">เรียนที่นี่ <span className="text-spectrum">ยังไง?</span></h2>
+            <p className="mx-auto mt-4 max-w-xl text-[16px] leading-relaxed text-muted">คลิปสอนทำตามได้ทีละขั้น พร้อมคำสั่งให้ก๊อป ฟรีทุกคอร์ส และมีบทเรียนใหม่เพิ่มตลอด</p>
+          </Reveal>
+          <Reveal delay={0.1} className="mt-10"><PromoVideo /></Reveal>
+        </Container>
       </section>
 
       {/* ───────────────── FEATURED ───────────────── */}

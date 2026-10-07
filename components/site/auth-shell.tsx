@@ -1,8 +1,7 @@
-import Image from 'next/image';
 import { Container } from '@/components/ui/primitives';
+import { PromoVideoVertical } from '@/components/site/promo-video';
 
-const COVERS = ['claude-code-video', 'kling-short-film', 'thai-voice-ai', 'nano-banana-studio', 'ai-music-mv', 'vibe-coding-101'];
-
+// Login / register: form on the left, the vertical promo clip on the right (below the form on phones).
 export function AuthShell({ eyebrow, title, children }: { eyebrow: string; title: React.ReactNode; children: React.ReactNode }) {
   return (
     <Container className="grid min-h-[calc(100dvh-68px)] items-center gap-14 py-12 lg:grid-cols-2">
@@ -11,18 +10,12 @@ export function AuthShell({ eyebrow, title, children }: { eyebrow: string; title
         <h1 className="mt-3 font-display text-[2.6rem] font-extrabold leading-[1.08] tracking-tight">{title}</h1>
         <div className="mt-9">{children}</div>
       </div>
-      <div className="relative hidden h-[640px] overflow-hidden rounded-[32px] border border-line lg:block" aria-hidden>
-        <div className="absolute inset-0 grid -rotate-6 scale-125 grid-cols-2 gap-4 p-4">
-          {[...COVERS, ...COVERS].map((c, i) => (
-            <div key={i} className="relative aspect-[16/10] overflow-hidden rounded-2xl" style={{ transform: `translateY(${(i % 2) * 60}px)` }}>
-              <Image src={`/covers/${c}.webp`} alt="" fill sizes="340px" className="object-cover" />
-            </div>
-          ))}
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 p-10">
-          <p className="font-display text-3xl font-bold leading-snug">&ldquo;เรียนจบบทแรก<br />ก็ทำคลิปขายของได้เลย&rdquo;</p>
-          <p className="mt-3 font-mono text-xs text-muted">— ผู้เรียน Prompt D Class</p>
+      <div className="relative mx-auto w-full max-w-[340px] lg:flex lg:h-[680px] lg:max-w-none lg:items-center lg:justify-center lg:overflow-hidden lg:rounded-[32px] lg:border lg:border-line lg:bg-surface/40">
+        <div className="glow-orb -left-24 top-10 hidden size-[360px] bg-blue lg:block" aria-hidden />
+        <div className="glow-orb -right-24 bottom-0 hidden size-[340px] bg-orange lg:block" aria-hidden />
+        <div className="relative">
+          <p className="mb-3 text-center font-mono text-[11px] uppercase tracking-[0.22em] text-muted">เรียนที่นี่ยังไง? · 37 วิ</p>
+          <PromoVideoVertical className="aspect-[9/16] w-full rounded-[26px] border border-line-strong bg-surface shadow-2xl lg:h-[590px] lg:w-auto" />
         </div>
       </div>
     </Container>
