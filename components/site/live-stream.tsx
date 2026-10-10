@@ -30,10 +30,17 @@ export function LiveStream({ live, children }: { live: LiveClass; children: Reac
   }, [allowed, on, vid, live.slug]);
 
   if (allowed && on && vid) {
+    const host = typeof window !== 'undefined' ? window.location.hostname : 'www.promptdclass.com';
     return (
-      <div className="mt-4 overflow-hidden rounded-[22px] border border-line bg-black">
-        <iframe className="aspect-video w-full" src={`https://www.youtube.com/embed/${vid}?autoplay=1&rel=0`} title={live.title}
-          allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen />
+      <div className="mt-4 space-y-3">
+        <div className="overflow-hidden rounded-[22px] border border-line bg-black">
+          <iframe className="aspect-video w-full" src={`https://www.youtube.com/embed/${vid}?autoplay=1&rel=0`} title={live.title}
+            allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen />
+        </div>
+        {/* แชทสดของ YouTube — พิมพ์ถามได้ในหน้าเว็บ (ต้องล็อกอิน YouTube) */}
+        <div className="overflow-hidden rounded-[22px] border border-line bg-surface">
+          <iframe className="h-[420px] w-full" src={`https://www.youtube.com/live_chat?v=${vid}&embed_domain=${host}`} title="แชทสด" />
+        </div>
       </div>
     );
   }
