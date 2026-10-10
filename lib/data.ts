@@ -95,7 +95,7 @@ export async function getLatestLessons(n = 6) {
 }
 
 const normLive = (slug: string, d: Record<string, unknown>): LiveClass => ({
-  slug, title: '', subtitle: '', description: '', startAt: 0, durationMin: 60, capacity: 100, count: 0, topics: [], platform: 'Google Meet', published: false,
+  slug, title: '', subtitle: '', description: '', startAt: 0, durationMin: 60, capacity: 100, count: 0, ytCount: 0, streamOpen: false, topics: [], platform: 'Google Meet', published: false,
   ...plain<Partial<LiveClass>>(d),
 });
 

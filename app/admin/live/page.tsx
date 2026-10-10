@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Download, ExternalLink, Loader2, Plus, Save, Users } from 'lucide-react';
-import { deleteLive, getLiveRoom, listLives, listRegistrations, saveLive } from '@/lib/admin-api';
+import { deleteLive, getLiveRoom, getLiveStream, listLives, listRegistrations, saveLive } from '@/lib/admin-api';
 import type { LiveClass, LiveRegistration } from '@/lib/types';
 import { fmtLiveDate, fmtLiveTime } from '@/lib/live';
 import { Card, ConfirmButton, Field, ImageDrop, PageHeader, Toggle, inputCls, useAction } from '@/components/admin/ui';
@@ -12,16 +12,16 @@ import { RichEditor } from '@/components/admin/rich-editor';
 const toLocalInput = (ms: number) => (ms ? new Date(ms - new Date(ms).getTimezoneOffset() * 60_000).toISOString().slice(0, 16) : '');
 const blank = (): LiveClass => ({ slug: '', title: '', subtitle: '', description: '', startAt: 0, durationMin: 60, capacity: 100, topics: [], platform: 'Google Meet', published: false });
 
-function Registrants({ slug }: { slug: string }) {
+function Registrants({ slug, kind = 'registrations', label }: { slug: string; kind?: 'registrations' | 'viewers'; label: string }) {
   const [rows, setRows] = useState<LiveRegistration[] | null>(null);
-  useEffect(() => { listRegistrations(slug).then(setRows).catch(() => setRows([])); }, [slug]);
+  useEffect(() => { listRegistrations(slug, kind).then(setRows).catch(() => setRows([])); }, [slug, kind]);
   const csv = () => {
     const lines = [['ลำดับ', 'ชื่อ', 'อีเมล', 'เวลาลงทะเบียน'], ...(rows ?? []).map((r, i) => [i + 1, r.name, r.email, r.createdAt ? new Date(r.createdAt).toLocaleString('th-TH') : ''])];
     const blob = new Blob(['﻿' + lines.map((l) => l.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')], { type: 'text/csv;charset=utf-8' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `ลงทะเบียน_${slug}.csv`; a.click();
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${kind === 'viewers' ? 'YouTube' : 'Meet'}_${slug}.csv`; a.click();
   };
   return (
-    <Card title={<span className="flex items-center gap-2"><Users className="size-4" />คนที่ลงทะเบียน {rows ? `(${rows.length})` : ''}</span>}>
+    <Card title={<span className="flex items-center gap-2"><Users className="size-4" />{label} {rows ? `(${rows.length})` : ''}</span>}>
       {!rows ? <Loader2 className="size-5 animate-spin text-muted" /> : !rows.length ? <p className="text-sm text-muted">ยังไม่มีคนลงทะเบียน</p> : (
         <>
           <button onClick={csv} className="mb-4 inline-flex h-9 items-center gap-2 rounded-full border border-line-strong px-4 text-sm"><Download className="size-4" />ดาวน์โหลด CSV</button>
@@ -43,15 +43,16 @@ function Registrants({ slug }: { slug: string }) {
 function LiveEditor({ initial, onSaved, onDeleted }: { initial: LiveClass; onSaved: (l: LiveClass) => void; onDeleted: () => void }) {
   const [l, setL] = useState(initial);
   const [meet, setMeet] = useState('');
+  const [yt, setYt] = useState('');
   const [topics, setTopics] = useState(initial.topics.join('\n'));
   const { busy, run } = useAction();
   const set = <K extends keyof LiveClass>(k: K, v: LiveClass[K]) => setL((x) => ({ ...x, [k]: v }));
-  useEffect(() => { if (initial.slug) getLiveRoom(initial.slug).then(setMeet).catch(() => {}); }, [initial.slug]);
+  useEffect(() => { if (initial.slug) { getLiveRoom(initial.slug).then(setMeet).catch(() => {}); getLiveStream(initial.slug).then(setYt).catch(() => {}); } }, [initial.slug]);
 
   async function save() {
     const data = { ...l, topics: topics.split('\n').map((t) => t.trim()).filter(Boolean) };
     if (!data.title || !data.startAt) throw new Error('ใส่ชื่อคลาสและวันเวลาเริ่มก่อน');
-    const slug = await saveLive(data, meet);
+    const slug = await saveLive(data, meet, yt);
     const nl = { ...data, slug }; setL(nl); onSaved(nl);
     return slug;
   }
@@ -78,10 +79,12 @@ function LiveEditor({ initial, onSaved, onDeleted }: { initial: LiveClass; onSav
             </div>
             <Field label="สอนอะไรบ้าง (บรรทัดละข้อ)"><textarea className={`${inputCls} h-auto py-2.5`} rows={6} value={topics} onChange={(e) => setTopics(e.target.value)} /></Field>
             <Toggle checked={l.published} onChange={(v) => set('published', v)} label="เผยแพร่ (เปิดให้ลงทะเบียน)" desc="เปิดแล้วจะมีแถบแจ้งเตือนทุกหน้าของเว็บ" />
+            <Toggle checked={!!l.streamOpen} onChange={(v) => set('streamOpen', v)} label="เปิดรับดูสดผ่าน YouTube (ไม่จำกัดที่นั่ง)" desc="คนที่ลงไม่ทันที่นั่ง Meet ลงทะเบียนดูผ่าน YouTube ได้ ไลฟ์ฝังในหน้าคลาส" />
+            <Field label="ลิงก์ YouTube Live" hint="ใส่ตอนเริ่มไลฟ์จาก Meet (กิจกรรม → ถ่ายทอดสด) · คนที่ลงทะเบียนเท่านั้นที่เห็น"><input className={inputCls} value={yt} onChange={(e) => setYt(e.target.value)} placeholder="https://www.youtube.com/live/xxxxxxxxxxx" /></Field>
           </div>
           <div className="space-y-4">
             <Field label="ภาพปก (16:9)"><ImageDrop value={l.cover} onChange={(v) => set('cover', v)} folder="lives" aspect="aspect-[16/9]" /></Field>
-            {initial.slug && <p className="text-sm text-muted">ลงทะเบียนแล้ว {initial.count ?? 0} / {l.capacity} คน</p>}
+            {initial.slug && <p className="text-sm text-muted">Meet {initial.count ?? 0} / {l.capacity} คน · YouTube {initial.ytCount ?? 0} คน</p>}
           </div>
         </div>
         <div className="mt-6"><Field label="รายละเอียดเพิ่มเติม"><RichEditor value={l.description} onChange={(v) => set('description', v)} folder="lives" placeholder="รายละเอียดคลาส สิ่งที่ต้องเตรียม ฯลฯ" /></Field></div>
@@ -92,7 +95,8 @@ function LiveEditor({ initial, onSaved, onDeleted }: { initial: LiveClass; onSav
           {initial.slug && <ConfirmButton onConfirm={async () => { const ok = await run(async () => { await deleteLive(initial.slug); return true; }, 'ลบแล้ว'); if (ok) onDeleted(); }} />}
         </div>
       </Card>
-      {initial.slug && <Registrants slug={initial.slug} />}
+      {initial.slug && <Registrants slug={initial.slug} label="ที่นั่ง Google Meet" />}
+      {initial.slug && <Registrants slug={initial.slug} kind="viewers" label="ดูผ่าน YouTube" />}
     </div>
   );
 }

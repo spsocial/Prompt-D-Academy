@@ -45,11 +45,32 @@ service cloud.firestore {
           && getAfter(/databases/$(database)/documents/lives/$(slug)).data.get('count', 0) == get(/databases/$(database)/documents/lives/$(slug)).data.get('count', 0) + 1;
         allow delete: if isAdmin();
       }
+      // ดูสดผ่าน YouTube (ไม่จำกัดที่นั่ง): สร้าง viewers/{uid} ของตัวเอง + เพิ่ม ytCount ทีละ 1 ใน batch เดียวกัน
+      allow update: if signedIn() && resource.data.published == true && resource.data.get('streamOpen', false) == true
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ytCount'])
+        && request.resource.data.ytCount == resource.data.get('ytCount', 0) + 1
+        && !exists(/databases/$(database)/documents/lives/$(slug)/viewers/$(request.auth.uid))
+        && existsAfter(/databases/$(database)/documents/lives/$(slug)/viewers/$(request.auth.uid));
+      match /viewers/{uid} {
+        allow read: if (signedIn() && request.auth.uid == uid) || isAdmin();
+        allow create: if signedIn() && request.auth.uid == uid && request.resource.data.uid == uid
+          && getAfter(/databases/$(database)/documents/lives/$(slug)).data.get('ytCount', 0) == get(/databases/$(database)/documents/lives/$(slug)).data.get('ytCount', 0) + 1;
+        allow delete: if isAdmin();
+      }
     }
-    // ลิงก์ห้องเรียน: เห็นได้เฉพาะคนที่ลงทะเบียน และหลังเวลาเปิดห้อง (openAt = 15 นาทีก่อนเริ่ม)
+    // ไลฟ์ YouTube: เห็นได้เฉพาะคนที่ลงทะเบียน (Meet หรือ YouTube) หลังเวลาเปิดห้อง
+    match /liveStreams/{slug} {
+      allow read: if isAdmin() || (signedIn() && request.time >= resource.data.openAt
+        && (exists(/databases/$(database)/documents/lives/$(slug)/registrations/$(request.auth.uid))
+          || exists(/databases/$(database)/documents/lives/$(slug)/viewers/$(request.auth.uid))));
+      allow write: if isAdmin();
+    }
+    // ลิงก์ห้องเรียน: คนจองที่นั่งเห็นหลัง openAt (15 นาทีก่อนเริ่ม) · คนดูผ่าน YouTube เห็นหลัง openAllAt (เริ่มแล้ว 10 นาที) เผื่อห้องยังว่าง
     match /liveSecrets/{slug} {
       allow read: if isAdmin() || (signedIn() && request.time >= resource.data.openAt
-        && exists(/databases/$(database)/documents/lives/$(slug)/registrations/$(request.auth.uid)));
+        && exists(/databases/$(database)/documents/lives/$(slug)/registrations/$(request.auth.uid)))
+        || (signedIn() && request.time >= resource.data.get('openAllAt', resource.data.openAt)
+        && exists(/databases/$(database)/documents/lives/$(slug)/viewers/$(request.auth.uid)));
       allow write: if isAdmin();
     }
     match /promos/{id} { allow read: if true; allow write: if isAdmin(); }

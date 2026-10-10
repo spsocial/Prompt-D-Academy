@@ -7,7 +7,7 @@ import { db } from './firebase/client';
 export async function liveSeats(slug: string) {
   const d = await getDoc(doc(db(), 'lives', slug));
   const v = d.data() ?? {};
-  return { count: Number(v.count) || 0, capacity: Number(v.capacity) || 0 };
+  return { count: Number(v.count) || 0, capacity: Number(v.capacity) || 0, ytCount: Number(v.ytCount) || 0 };
 }
 
 export async function isRegistered(slug: string, uid: string) {
@@ -27,5 +27,23 @@ export async function liveRoomUrl(slug: string): Promise<string | null> {
   try {
     const d = await getDoc(doc(db(), 'liveSecrets', slug));
     return (d.data()?.meetUrl as string) || null;
+  } catch { return null; }
+}
+
+/** สมัครดูสดผ่าน YouTube (ไม่จำกัดที่นั่ง): ใบลงทะเบียนใน viewers/{uid} + เพิ่ม ytCount 1 */
+export async function isViewer(slug: string, uid: string) {
+  return (await getDoc(doc(db(), 'lives', slug, 'viewers', uid))).exists();
+}
+export async function registerViewer(slug: string, user: User, name: string) {
+  const b = writeBatch(db());
+  b.set(doc(db(), 'lives', slug, 'viewers', user.uid), { uid: user.uid, name, email: user.email ?? '', createdAt: serverTimestamp() });
+  b.update(doc(db(), 'lives', slug), { ytCount: increment(1) });
+  await b.commit();
+}
+/** วิดีโอไลฟ์ YouTube — อ่านได้เฉพาะคนลงทะเบียน (Meet หรือ YouTube) หลังเวลาเปิดห้อง */
+export async function liveStreamId(slug: string): Promise<string | null> {
+  try {
+    const d = await getDoc(doc(db(), 'liveStreams', slug));
+    return (d.data()?.youtubeId as string) || null;
   } catch { return null; }
 }

@@ -131,6 +131,10 @@ export interface LiveClass {
   topics: string[];
   platform: string;
   published: boolean;
+  /** เปิดรับ "ดูสดผ่าน YouTube" (ไม่จำกัดที่นั่ง) */
+  streamOpen?: boolean;
+  /** จำนวนคนลงทะเบียนดูผ่าน YouTube (เพิ่มทีละ 1 — บังคับใน firestore.rules) */
+  ytCount?: number;
   createdAt?: number;
   updatedAt?: number;
 }

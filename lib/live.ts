@@ -3,6 +3,8 @@ import type { LiveClass } from './types';
 
 /** ลิงก์ห้องเรียนเปิดให้คนที่ลงทะเบียนเห็นก่อนเริ่มกี่นาที (ต้องตรงกับ openAt ใน liveSecrets) */
 export const OPEN_BEFORE_MIN = 15;
+/** ที่นั่ง Meet ที่ยังว่าง เปิดให้คนดูผ่าน YouTube ลองเข้าได้หลังเริ่มสอนกี่นาที (ต้องตรงกับ openAllAt ใน liveSecrets) */
+export const SPARE_AFTER_MIN = 10;
 const TZ = 'Asia/Bangkok';
 
 export type LivePhase = 'upcoming' | 'open' | 'live' | 'ended';
@@ -32,4 +34,12 @@ export function calendarUrl(l: LiveClass, pageUrl: string) {
     location: pageUrl,
   });
   return `https://calendar.google.com/calendar/render?${p.toString()}`;
+}
+
+/** ดึง video id จากลิงก์ YouTube (youtube.com/live/ID, watch?v=ID, youtu.be/ID) หรือ id ตรงๆ */
+export function youtubeId(input: string) {
+  const s = input.trim();
+  const m = s.match(/(?:youtube\.com\/(?:live\/|watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  if (m) return m[1];
+  return /^[A-Za-z0-9_-]{11}$/.test(s) ? s : '';
 }

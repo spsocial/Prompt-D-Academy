@@ -9,6 +9,7 @@ import { excerpt } from '@/lib/utils';
 import { fmtLiveDate, fmtLiveTime, liveEnd } from '@/lib/live';
 import { Container } from '@/components/ui/primitives';
 import { LivePanel } from '@/components/site/live-panel';
+import { LiveStream } from '@/components/site/live-stream';
 import { JsonLd } from '@/components/site/json-ld';
 
 export const revalidate = 300;
@@ -42,7 +43,7 @@ export default async function LivePage({ params }: { params: Promise<{ slug: str
     { icon: CalendarDays, text: fmtLiveDate(live.startAt) },
     { icon: Clock, text: `${fmtLiveTime(live.startAt)} – ${fmtLiveTime(liveEnd(live))} น.` },
     { icon: Video, text: `สอนสดผ่าน ${live.platform}` },
-    { icon: Users, text: `จำกัด ${live.capacity} ที่นั่ง` },
+    { icon: Users, text: live.streamOpen ? `${live.platform} ${live.capacity} ที่ + YouTube ไม่จำกัด` : `จำกัด ${live.capacity} ที่นั่ง` },
     { icon: Gift, text: 'เรียนฟรี' },
   ];
 
@@ -61,10 +62,12 @@ export default async function LivePage({ params }: { params: Promise<{ slug: str
           <Link href="/live" className="group inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-wider text-muted hover:text-fg">
             <ChevronLeft className="size-3.5 transition group-hover:-translate-x-0.5" />คลาสสอนสด
           </Link>
-          {live.cover && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={live.cover} alt={live.title} className="mt-4 aspect-video w-full rounded-[22px] border border-line object-cover" />
-          )}
+          <LiveStream live={live}>
+            {live.cover && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={live.cover} alt={live.title} className="aspect-video w-full rounded-[22px] border border-line object-cover" />
+            )}
+          </LiveStream>
           <p className="mt-8 inline-flex items-center gap-2 rounded-full bg-red-500/10 px-3 py-1 font-mono text-xs font-semibold text-red-500">
             <span className="size-1.5 rounded-full bg-red-500" />LIVE · คลาสสอนสดฟรี
           </p>
@@ -97,6 +100,7 @@ export default async function LivePage({ params }: { params: Promise<{ slug: str
             <h2 className="font-semibold">ก่อนเข้าเรียน</h2>
             <ul className="mt-3 space-y-2 text-[15px] text-fg-2">
               <li>• ลงทะเบียนด้วยบัญชีเว็บนี้ แล้วกลับมาที่หน้านี้ก่อนเวลาเริ่ม ลิงก์ห้องเรียนจะขึ้นให้อัตโนมัติ</li>
+              {live.streamOpen && <li>• ที่นั่ง {live.platform} {live.capacity} คนแรกได้ลิงก์ห้องก่อน 15 นาที · คนที่ลงทะเบียนดูผ่าน YouTube ดูไลฟ์ในหน้านี้ได้ทันที และถ้าห้องยังว่าง ลองเข้าได้หลังเริ่ม 10 นาที</li>}
               <li>• เข้าผ่านคอมฯ (Chrome) หรือแอป {live.platform} บนมือถือก็ได้</li>
               <li>• เข้าห้องแล้วปิดไมค์ไว้ก่อน มีคำถามพิมพ์ในแชทได้เลย</li>
             </ul>
