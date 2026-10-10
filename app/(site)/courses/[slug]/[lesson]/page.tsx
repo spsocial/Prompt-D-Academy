@@ -15,6 +15,7 @@ import { Curriculum, MarkComplete, PrevNext } from '@/components/site/lesson-act
 import { PromoCard } from '@/components/site/promo';
 import { AdSlot } from '@/components/site/ads';
 import { JsonLd } from '@/components/site/json-ld';
+import { LessonContent } from '@/components/site/lesson-content';
 
 export const revalidate = 600;
 
@@ -92,7 +93,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
           <div className="rule-spectrum mt-8 opacity-60" />
 
           <LoginGate locked={gate}>
-          {html && <div className="prose prose-academy prose-lg mt-8 max-w-none" dangerouslySetInnerHTML={{ __html: html }} />}
+          {html && <LessonContent html={html} />}
 
           {lesson.resources.length > 0 && (
             <div className="mt-10 rounded-2xl border border-line bg-surface p-5">
