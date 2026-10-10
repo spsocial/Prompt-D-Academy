@@ -6,7 +6,7 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore, collection, doc, getDoc, getDocs, query, where, orderBy } from 'firebase/firestore/lite';
 import { firebaseConfig, firebaseConfigured } from './firebase/config';
 import { SEED_COURSES, SEED_LESSONS, SEED_PROMOS, SEED_SETTINGS } from './seed';
-import type { Course, Lesson, Promo, SiteSettings } from './types';
+import type { Course, Lesson, LiveClass, Promo, SiteSettings } from './types';
 
 const APP_NAME = 'server-lite';
 const fs = () => getFirestore(getApps().some((a) => a.name === APP_NAME) ? getApp(APP_NAME) : initializeApp(firebaseConfig, APP_NAME));
@@ -92,4 +92,32 @@ export async function getLatestLessons(n = 6) {
   const courses = await getCourses();
   const all = await Promise.all(courses.map(async (c) => (await getLessons(c.slug)).map((l) => ({ ...l, course: c }))));
   return all.flat().sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0) || a.order - b.order).slice(0, n);
+}
+
+const normLive = (slug: string, d: Record<string, unknown>): LiveClass => ({
+  slug, title: '', subtitle: '', description: '', startAt: 0, durationMin: 60, capacity: 100, count: 0, topics: [], platform: 'Google Meet', published: false,
+  ...plain<Partial<LiveClass>>(d),
+});
+
+/** คลาสสดที่เผยแพร่แล้ว (เรียงตามเวลาเริ่ม) */
+export const getLives = cache(async (): Promise<LiveClass[]> =>
+  safe(async () => {
+    const snap = await getDocs(query(collection(fs(), 'lives'), where('published', '==', true)));
+    return snap.docs.map((d) => normLive(d.id, d.data())).sort((a, b) => a.startAt - b.startAt);
+  }, [], []),
+);
+
+export const getLive = cache(async (slug: string): Promise<LiveClass | null> =>
+  safe(async () => {
+    const d = await getDoc(doc(fs(), 'lives', slug));
+    if (!d.exists()) return null;
+    const l = normLive(d.id, d.data());
+    return l.published ? l : null;
+  }, null, null),
+);
+
+/** คลาสที่ยังไม่จบ ที่ใกล้ที่สุด (ใช้กับแถบแจ้งเตือนทั้งเว็บ) */
+export async function getNextLive(): Promise<LiveClass | null> {
+  const now = Date.now();
+  return (await getLives()).find((l) => l.startAt + l.durationMin * 60_000 > now) ?? null;
 }

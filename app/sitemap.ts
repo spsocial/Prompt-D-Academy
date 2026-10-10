@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { getCourses, getLessons } from '@/lib/data';
+import { getCourses, getLessons, getLives } from '@/lib/data';
 import { SITE } from '@/lib/config';
 
 export const revalidate = 3600;
@@ -20,5 +20,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ...ls.map((l) => ({ url: `${SITE.url}/courses/${encodeURIComponent(c.slug)}/${encodeURIComponent(l.slug)}`, lastModified: new Date(l.updatedAt || c.updatedAt || now), changeFrequency: 'monthly' as const, priority: 0.7 })),
     ];
   }));
-  return [...statics, ...rows.flat()];
+  const lives = (await getLives()).map((l) => ({ url: `${SITE.url}/live/${encodeURIComponent(l.slug)}`, lastModified: new Date(l.updatedAt || now), changeFrequency: 'daily' as const, priority: 0.8 }));
+  return [...statics, { url: `${SITE.url}/live`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.7 }, ...lives, ...rows.flat()];
 }

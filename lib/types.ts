@@ -114,3 +114,24 @@ export interface CourseStats {
   days?: Record<string, number>;
   lessons?: Record<string, LessonStats>;
 }
+
+/** lives/{slug} — คลาสสอนสด (ลงทะเบียนผ่านเว็บ, ลิงก์ห้องเรียนเก็บแยกใน liveSecrets/{slug}) */
+export interface LiveClass {
+  slug: string;
+  title: string;
+  subtitle: string;
+  description: string; // HTML
+  cover?: string;
+  /** เวลาเริ่ม (epoch ms) */
+  startAt: number;
+  durationMin: number;
+  capacity: number;
+  /** จำนวนคนลงทะเบียน (เพิ่มทีละ 1 ตอนลงทะเบียน — บังคับใน firestore.rules) */
+  count?: number;
+  topics: string[];
+  platform: string;
+  published: boolean;
+  createdAt?: number;
+  updatedAt?: number;
+}
+export interface LiveRegistration { uid: string; name: string; email: string; createdAt?: number }

@@ -92,6 +92,7 @@ function UserMenu() {
 
 const NAV = [
   { href: '/courses', label: 'คอร์สทั้งหมด' },
+  { href: '/live', label: 'คลาสสด' },
   { href: '/about', label: 'เกี่ยวกับเรา' },
 ];
 
@@ -180,6 +181,7 @@ export function SiteHeader({ announcement, announcementUrl }: { announcement?: s
               <div className="space-y-1 px-5 py-4">
                 <Link href="/courses" className="block rounded-xl px-3 py-3 font-display text-xl font-semibold">คอร์สทั้งหมด</Link>
                 {CATEGORIES.map((c) => <Link key={c.key} href={`/courses?cat=${c.key}`} className="block rounded-xl px-3 py-2 text-fg-2">{c.label}</Link>)}
+                <Link href="/live" className="block rounded-xl px-3 py-3 font-display text-xl font-semibold">คลาสสด</Link>
                 <Link href="/about" className="block rounded-xl px-3 py-3 font-display text-xl font-semibold">เกี่ยวกับเรา</Link>
                 <div className="mt-3 grid grid-cols-2 gap-2 border-t border-line pt-4">
                   {user ? (

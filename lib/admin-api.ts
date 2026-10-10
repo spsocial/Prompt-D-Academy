@@ -1,14 +1,15 @@
 'use client';
 // All admin reads/writes (client SDK — firestore.rules only lets isAdmin users write).
 import {
-  collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, writeBatch, query, orderBy, limit, serverTimestamp, getCountFromServer, where,
+  collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, writeBatch, query, orderBy, limit, serverTimestamp, getCountFromServer, where, Timestamp,
 } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { auth, db, storage } from './firebase/client';
 import { firebaseConfigured } from './firebase/config';
 import { SEED_COURSES, SEED_LESSONS, SEED_PROMOS, SEED_SETTINGS } from './seed';
 import { parseVideoLink, slugify } from './utils';
-import type { CommentDoc, Course, CourseStats, Lesson, Promo, SiteSettings, UserDoc } from './types';
+import type { CommentDoc, Course, CourseStats, Lesson, LiveClass, LiveRegistration, Promo, SiteSettings, UserDoc } from './types';
+import { OPEN_BEFORE_MIN } from './live';
 
 export const DEMO = !firebaseConfigured;
 const demoBlock = () => { throw new Error('โหมดตัวอย่าง: เชื่อม Firebase ก่อนจึงจะบันทึกได้'); };
@@ -282,4 +283,45 @@ export async function importPackage(pkg: CoursePackage, opts: { publish: boolean
   await recount(slug);
   await revalidate(['/', '/courses', `/courses/${slug}`]);
   return { slug, added: pkg.lessons.length };
+}
+
+// ───────── live classes ─────────
+export async function listLives(): Promise<LiveClass[]> {
+  if (DEMO) return [];
+  const s = await getDocs(collection(db(), 'lives'));
+  return s.docs.map((d) => ({ ...(d.data() as LiveClass), slug: d.id, createdAt: ms(d.data().createdAt), updatedAt: ms(d.data().updatedAt) }))
+    .sort((a, b) => b.startAt - a.startAt);
+}
+export async function getLiveRoom(slug: string): Promise<string> {
+  if (DEMO || !slug) return '';
+  const d = await getDoc(doc(db(), 'liveSecrets', slug));
+  return (d.data()?.meetUrl as string) || '';
+}
+/** บันทึกคลาส + ลิงก์ห้องเรียน (เก็บแยก ให้อ่านได้เฉพาะคนลงทะเบียนหลังเวลาเปิดห้อง) */
+export async function saveLive(l: LiveClass, meetUrl: string) {
+  if (DEMO) demoBlock();
+  const slug = slugify(l.slug || l.title);
+  const { slug: _s, createdAt: _c, updatedAt: _u, count: _n, ...data } = l;
+  void _s; void _c; void _u; void _n;
+  const ref = doc(db(), 'lives', slug);
+  const exists = (await getDoc(ref)).exists();
+  await setDoc(ref, { ...data, updatedAt: serverTimestamp(), ...(exists ? {} : { createdAt: serverTimestamp(), count: 0 }) }, { merge: true });
+  await setDoc(doc(db(), 'liveSecrets', slug), { meetUrl: meetUrl.trim(), openAt: Timestamp.fromMillis(l.startAt - OPEN_BEFORE_MIN * 60_000) });
+  await revalidate(['/', '/live', `/live/${slug}`]);
+  return slug;
+}
+export async function deleteLive(slug: string) {
+  if (DEMO) demoBlock();
+  const regs = await getDocs(collection(db(), 'lives', slug, 'registrations'));
+  const b = writeBatch(db());
+  regs.docs.forEach((r) => b.delete(r.ref));
+  b.delete(doc(db(), 'lives', slug)); b.delete(doc(db(), 'liveSecrets', slug));
+  await b.commit();
+  await revalidate(['/', '/live']);
+}
+export async function listRegistrations(slug: string): Promise<LiveRegistration[]> {
+  if (DEMO) return [];
+  const s = await getDocs(collection(db(), 'lives', slug, 'registrations'));
+  return s.docs.map((d) => ({ ...(d.data() as LiveRegistration), uid: d.id, createdAt: ms(d.data().createdAt) }))
+    .sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
 }

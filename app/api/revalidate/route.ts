@@ -32,6 +32,10 @@ export async function POST(req: Request) {
     revalidatePath('/courses/[slug]/[lesson]', 'page');
     revalidatePath('/dashboard');
   }
+  if (list.some((p) => p.startsWith('/live') || p === '/')) {
+    revalidatePath('/live/[slug]', 'page');
+    revalidatePath('/', 'layout'); // แถบแจ้งเตือนคลาสสดอยู่ใน layout ทุกหน้า
+  }
   revalidatePath('/sitemap.xml');
   return NextResponse.json({ ok: true, revalidated: list });
 }

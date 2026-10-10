@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { LayoutDashboard, BookOpen, Users, MessagesSquare, Megaphone, Settings, DatabaseZap, ExternalLink, Menu, X, ShieldAlert, LogOut, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Users, MessagesSquare, Megaphone, Settings, DatabaseZap, ExternalLink, Menu, X, ShieldAlert, LogOut, BarChart3, Radio } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { markNoTrack } from '@/lib/track';
 import { cn } from '@/lib/utils';
@@ -17,6 +17,7 @@ const NAV = [
   { href: '/admin/stats', label: 'สถิติผู้ชม', icon: BarChart3 },
   { href: '/admin/users', label: 'สมาชิก', icon: Users },
   { href: '/admin/comments', label: 'คอมเมนต์', icon: MessagesSquare },
+  { href: '/admin/live', label: 'คลาสสด', icon: Radio },
   { href: '/admin/promos', label: 'โปรโมทสินค้า', icon: Megaphone },
   { href: '/admin/settings', label: 'ตั้งค่าเว็บไซต์', icon: Settings },
   { href: '/admin/import', label: 'นำเข้าข้อมูล', icon: DatabaseZap },

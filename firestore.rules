@@ -28,6 +28,30 @@ service cloud.firestore {
         && request.resource.data.get('lessonViews', 0) <= resource.data.get('lessonViews', 0) + 1;
       allow delete: if isAdmin();
     }
+    // คลาสสอนสด: ทุกคนอ่านได้ (เผยแพร่แล้ว) / แอดมินแก้ได้
+    // สมาชิกลงทะเบียนได้ครั้งเดียว: สร้าง registrations/{uid} ของตัวเอง + เพิ่ม count ทีละ 1 ใน batch เดียวกัน และต้องไม่เกิน capacity
+    match /lives/{slug} {
+      function regPath() { return /databases/$(database)/documents/lives/$(slug)/registrations/$(request.auth.uid); }
+      allow read: if resource == null || resource.data.published == true || isAdmin();
+      allow write: if isAdmin();
+      allow update: if signedIn() && resource.data.published == true
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['count'])
+        && request.resource.data.count == resource.data.get('count', 0) + 1
+        && resource.data.get('count', 0) < resource.data.capacity
+        && !exists(regPath()) && existsAfter(regPath());
+      match /registrations/{uid} {
+        allow read: if (signedIn() && request.auth.uid == uid) || isAdmin();
+        allow create: if signedIn() && request.auth.uid == uid && request.resource.data.uid == uid
+          && getAfter(/databases/$(database)/documents/lives/$(slug)).data.get('count', 0) == get(/databases/$(database)/documents/lives/$(slug)).data.get('count', 0) + 1;
+        allow delete: if isAdmin();
+      }
+    }
+    // ลิงก์ห้องเรียน: เห็นได้เฉพาะคนที่ลงทะเบียน และหลังเวลาเปิดห้อง (openAt = 15 นาทีก่อนเริ่ม)
+    match /liveSecrets/{slug} {
+      allow read: if isAdmin() || (signedIn() && request.time >= resource.data.openAt
+        && exists(/databases/$(database)/documents/lives/$(slug)/registrations/$(request.auth.uid)));
+      allow write: if isAdmin();
+    }
     match /promos/{id} { allow read: if true; allow write: if isAdmin(); }
     match /settings/{id} { allow read: if true; allow write: if isAdmin(); }
 
