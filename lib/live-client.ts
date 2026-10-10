@@ -7,7 +7,7 @@ import { db } from './firebase/client';
 export async function liveSeats(slug: string) {
   const d = await getDoc(doc(db(), 'lives', slug));
   const v = d.data() ?? {};
-  return { count: Number(v.count) || 0, capacity: Number(v.capacity) || 0, ytCount: Number(v.ytCount) || 0 };
+  return { count: Number(v.count) || 0, capacity: Number(v.capacity) || 0, ytCount: Number(v.ytCount) || 0, streamOpen: v.streamOpen === true };
 }
 
 export async function isRegistered(slug: string, uid: string) {

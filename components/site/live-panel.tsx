@@ -46,7 +46,8 @@ export function LivePanel({ live, pageUrl }: { live: LiveClass; pageUrl: string 
   const path = usePathname();
   const now = useNow();
   const phase = livePhase(live, now);
-  const [seats, setSeats] = useState({ count: live.count ?? 0, capacity: live.capacity, ytCount: live.ytCount ?? 0 });
+  // หน้าเว็บถูก cache ได้ → ตัวเลขที่นั่งและสถานะเปิดรับ YouTube อ่านสดจากฐานข้อมูลเสมอ
+  const [seats, setSeats] = useState({ count: live.count ?? 0, capacity: live.capacity, ytCount: live.ytCount ?? 0, streamOpen: !!live.streamOpen });
   const [reg, setReg] = useState<boolean | null>(null);
   const [viewer, setViewer] = useState<boolean | null>(null);
   const [room, setRoom] = useState<string | null>(null);
@@ -121,7 +122,7 @@ export function LivePanel({ live, pageUrl }: { live: LiveClass; pageUrl: string 
               <div className="h-full rounded-full bg-spectrum" style={{ width: `${Math.min(100, (seats.count / Math.max(1, seats.capacity)) * 100)}%` }} />
             </div>
           </div>
-          {live.streamOpen && (
+          {seats.streamOpen && (
             <p className="flex items-center gap-1.5 text-sm text-fg-2"><MonitorPlay className="size-4 text-red-500" />ดูสดผ่าน YouTube {seats.ytCount} คน · ไม่จำกัดที่นั่ง</p>
           )}
         </div>
@@ -173,7 +174,7 @@ export function LivePanel({ live, pageUrl }: { live: LiveClass; pageUrl: string 
           <button onClick={onRegister} disabled={busy} className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-orange font-semibold text-white disabled:opacity-70">
             {busy && <Loader2 className="size-4 animate-spin" />}จองที่นั่ง {live.platform} ฟรี
           </button>
-        ) : live.streamOpen ? (
+        ) : seats.streamOpen ? (
           <>
             <p className="rounded-xl border border-line px-4 py-3 text-sm text-fg-2">ที่นั่ง {live.platform} ({seats.capacity} คนแรก) เต็มแล้ว แต่ยังดูสดได้ผ่าน YouTube <b>ไม่จำกัดที่นั่ง</b> ถามในแชทได้ และถ้าห้องมีที่ว่าง ลองเข้าได้หลังเริ่ม {SPARE_AFTER_MIN} นาที</p>
             <button onClick={onViewer} disabled={busy} className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-red-600 font-semibold text-white disabled:opacity-70">

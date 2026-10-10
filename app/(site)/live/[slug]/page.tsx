@@ -12,7 +12,7 @@ import { LivePanel } from '@/components/site/live-panel';
 import { LiveStream } from '@/components/site/live-stream';
 import { JsonLd } from '@/components/site/json-ld';
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 export async function generateStaticParams() {
   return (await getLives()).map((l) => ({ slug: l.slug }));

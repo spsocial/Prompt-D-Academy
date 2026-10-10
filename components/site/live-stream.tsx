@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth';
-import { isRegistered, isViewer, liveStreamId } from '@/lib/live-client';
+import { isRegistered, isViewer, liveSeats, liveStreamId } from '@/lib/live-client';
 import { livePhase } from '@/lib/live';
 import type { LiveClass } from '@/lib/types';
 import { useNow } from './live-panel';
@@ -14,7 +14,9 @@ export function LiveStream({ live, children }: { live: LiveClass; children: Reac
   const phase = livePhase(live, now);
   const [allowed, setAllowed] = useState(false);
   const [vid, setVid] = useState<string | null>(null);
-  const on = live.streamOpen && (phase === 'open' || phase === 'live');
+  const [open, setOpen] = useState(!!live.streamOpen);
+  useEffect(() => { liveSeats(live.slug).then((s) => setOpen(s.streamOpen)).catch(() => {}); }, [live.slug]);
+  const on = open && (phase === 'open' || phase === 'live');
 
   useEffect(() => {
     if (!ready || !user || !on) return;
@@ -44,7 +46,7 @@ export function LiveStream({ live, children }: { live: LiveClass; children: Reac
       </div>
     );
   }
-  if (allowed && on && live.streamOpen) {
+  if (allowed && on) {
     return (
       <div className="relative mt-4">
         {children}

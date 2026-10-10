@@ -6,7 +6,7 @@ import { fmtLiveShort, liveEnd } from '@/lib/live';
 import { Container } from '@/components/ui/primitives';
 import type { LiveClass } from '@/lib/types';
 
-export const revalidate = 300;
+export const revalidate = 60;
 export const metadata: Metadata = {
   title: 'คลาสสอนสดฟรี',
   description: 'คลาสสอนสดฟรีผ่าน Google Meet ลงทะเบียนล่วงหน้าบนเว็บ แล้วเข้าห้องเรียนได้จากหน้านี้',
