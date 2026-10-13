@@ -144,4 +144,6 @@ export interface LiveClass {
   createdAt?: number;
   updatedAt?: number;
 }
+/** liveStats/{slug}/seen/{uid} — สถิติย้อนหลังรายคน */
+export interface LiveSeen { uid: string; name: string; lastAt?: number; opens?: number; plays?: number; downloads?: number; reads?: number }
 export interface LiveRegistration { uid: string; name: string; email: string; createdAt?: number }

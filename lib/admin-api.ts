@@ -8,7 +8,7 @@ import { auth, db, storage } from './firebase/client';
 import { firebaseConfigured } from './firebase/config';
 import { SEED_COURSES, SEED_LESSONS, SEED_PROMOS, SEED_SETTINGS } from './seed';
 import { parseVideoLink, slugify } from './utils';
-import type { CommentDoc, Course, CourseStats, Lesson, LiveClass, LiveMaterial, LiveRegistration, Promo, SiteSettings, UserDoc } from './types';
+import type { CommentDoc, Course, CourseStats, Lesson, LiveClass, LiveMaterial, LiveRegistration, LiveSeen, Promo, SiteSettings, UserDoc } from './types';
 import { OPEN_BEFORE_MIN, SPARE_AFTER_MIN, youtubeId } from './live';
 
 export const DEMO = !firebaseConfigured;
@@ -331,6 +331,11 @@ export async function saveLiveReplay(slug: string, replayUrl: string, materials:
   const id = youtubeId(replayUrl);
   if (replayUrl.trim() && !id) throw new Error('ลิงก์คลิปย้อนหลัง YouTube ไม่ถูกต้อง');
   await setDoc(doc(db(), 'liveStreams', slug), { replayId: id, materials }, { merge: true });
+}
+export async function listLiveSeen(slug: string): Promise<LiveSeen[]> {
+  if (DEMO || !slug) return [];
+  const s = await getDocs(collection(db(), 'liveStats', slug, 'seen'));
+  return s.docs.map((d) => ({ ...(d.data() as LiveSeen), uid: d.id, lastAt: ms(d.data().lastAt) })).sort((a, b) => (b.lastAt ?? 0) - (a.lastAt ?? 0));
 }
 export async function deleteLive(slug: string) {
   if (DEMO) demoBlock();

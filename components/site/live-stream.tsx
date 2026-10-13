@@ -7,6 +7,7 @@ import { isRegistered, isViewer, liveReplay, liveSeats, liveStreamId } from '@/l
 import { livePhase } from '@/lib/live';
 import type { LiveClass, LiveMaterial } from '@/lib/types';
 import { useNow } from './live-panel';
+import { trackLive } from '@/lib/track';
 
 /** ไลฟ์ YouTube ฝังในหน้าคลาส — แสดงเฉพาะคนที่ลงทะเบียน (Meet หรือ YouTube) ตั้งแต่เปิดห้องจนจบคลาส; นอกนั้นแสดงภาพปก */
 export function LiveStream({ live, children }: { live: LiveClass; children: React.ReactNode }) {
@@ -33,7 +34,7 @@ export function LiveStream({ live, children }: { live: LiveClass; children: Reac
     return () => clearInterval(t);
   }, [allowed, on, vid, live.slug]);
 
-  if (ended) return <LiveReplay live={live} allowed={allowed} signedIn={!!user}>{children}</LiveReplay>;
+  if (ended) return <LiveReplay live={live} allowed={allowed} signedIn={!!user} uid={user?.uid ?? ''} name={user?.displayName || user?.email || ''}>{children}</LiveReplay>;
   if (allowed && on && vid) {
     const host = typeof window !== 'undefined' ? window.location.hostname : 'www.promptdclass.com';
     return (
@@ -61,10 +62,28 @@ export function LiveStream({ live, children }: { live: LiveClass; children: Reac
 }
 
 /** หลังจบคลาส: คลิปย้อนหลัง + ไฟล์แจก — เฉพาะคนที่ลงทะเบียน (Meet หรือ YouTube) */
-function LiveReplay({ live, allowed, signedIn, children }: { live: LiveClass; allowed: boolean; signedIn: boolean; children: React.ReactNode }) {
+function LiveReplay({ live, allowed, signedIn, uid, name, children }: { live: LiveClass; allowed: boolean; signedIn: boolean; uid: string; name: string; children: React.ReactNode }) {
   const [data, setData] = useState<{ replayId: string | null; materials: LiveMaterial[] } | null>(null);
   const [peek, setPeek] = useState<number | null>(null);
+  const ev = (e: 'open' | 'play' | 'download' | 'read') => trackLive(live.slug, uid, name, e);
   useEffect(() => { if (allowed) liveReplay(live.slug).then(setData); }, [allowed, live.slug]);
+  const hasContent = !!data && (!!data.replayId || data.materials.length > 0);
+  useEffect(() => { if (allowed && hasContent) trackLive(live.slug, uid, name, 'open'); }, [allowed, hasContent, live.slug, uid, name]);
+  // YouTube iframe API (postMessage): สถานะ 1 = กำลังเล่น → นับคนกดเล่น
+  useEffect(() => {
+    if (!allowed || !data?.replayId) return;
+    const on = (m: MessageEvent) => {
+      if (!/youtube(-nocookie)?\.com$/.test(new URL(m.origin).hostname)) return;
+      try {
+        const d = typeof m.data === 'string' ? JSON.parse(m.data) : m.data;
+        if ((d?.event === 'onStateChange' && d.info === 1) || (d?.event === 'infoDelivery' && d.info?.playerState === 1)) trackLive(live.slug, uid, name, 'play');
+      } catch { /* not ours */ }
+    };
+    window.addEventListener('message', on);
+    return () => window.removeEventListener('message', on);
+  }, [allowed, data?.replayId, live.slug, uid, name]);
+  const listen = (e: React.SyntheticEvent<HTMLIFrameElement>) =>
+    e.currentTarget.contentWindow?.postMessage(JSON.stringify({ event: 'listening', id: 1, channel: 'widget' }), '*');
 
   if (!allowed || !data || (!data.replayId && !data.materials.length)) {
     return (
@@ -87,7 +106,7 @@ function LiveReplay({ live, allowed, signedIn, children }: { live: LiveClass; al
     <div className="mt-4 space-y-4">
       {data.replayId ? (
         <div className="overflow-hidden rounded-[22px] border border-line bg-black">
-          <iframe className="aspect-video w-full" src={`https://www.youtube-nocookie.com/embed/${data.replayId}?rel=0`} title={`ย้อนหลัง · ${live.title}`}
+          <iframe className="aspect-video w-full" src={`https://www.youtube-nocookie.com/embed/${data.replayId}?rel=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`} title={`ย้อนหลัง · ${live.title}`} onLoad={listen}
             allow="encrypted-media; picture-in-picture; fullscreen" allowFullScreen />
         </div>
       ) : children}
@@ -101,8 +120,8 @@ function LiveReplay({ live, allowed, signedIn, children }: { live: LiveClass; al
                 <div className="flex flex-wrap items-center gap-3">
                   <FileText className="size-5 shrink-0 text-orange" />
                   <span className="min-w-0 flex-1 break-all font-medium">{m.name}</span>
-                  <button onClick={() => setPeek(peek === i ? null : i)} className="h-9 rounded-full border border-line-strong px-4 text-sm">{peek === i ? 'ซ่อน' : 'ดูเนื้อหา'}</button>
-                  <button onClick={() => save(m)} className="inline-flex h-9 items-center gap-2 rounded-full bg-fg px-4 text-sm font-medium text-bg"><Download className="size-4" />ดาวน์โหลด</button>
+                  <button onClick={() => { if (peek !== i) ev('read'); setPeek(peek === i ? null : i); }} className="h-9 rounded-full border border-line-strong px-4 text-sm">{peek === i ? 'ซ่อน' : 'ดูเนื้อหา'}</button>
+                  <button onClick={() => { ev('download'); save(m); }} className="inline-flex h-9 items-center gap-2 rounded-full bg-fg px-4 text-sm font-medium text-bg"><Download className="size-4" />ดาวน์โหลด</button>
                 </div>
                 {peek === i && <pre className="mt-3 max-h-[480px] overflow-auto whitespace-pre-wrap rounded-lg bg-black/40 p-4 text-xs leading-relaxed">{m.content}</pre>}
               </li>

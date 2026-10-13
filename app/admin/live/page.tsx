@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Download, ExternalLink, FileText, Loader2, Plus, Save, Users, X } from 'lucide-react';
-import { deleteLive, getLiveReplay, getLiveRoom, getLiveStream, listLives, listRegistrations, saveLive, saveLiveReplay } from '@/lib/admin-api';
-import type { LiveClass, LiveMaterial, LiveRegistration } from '@/lib/types';
+import { BarChart3, Download, ExternalLink, FileText, Loader2, Plus, Save, Users, X } from 'lucide-react';
+import { deleteLive, getLiveReplay, getLiveRoom, getLiveStream, listLiveSeen, listLives, listRegistrations, saveLive, saveLiveReplay } from '@/lib/admin-api';
+import type { LiveClass, LiveMaterial, LiveRegistration, LiveSeen } from '@/lib/types';
 import { fmtLiveDate, fmtLiveTime } from '@/lib/live';
 import { Card, ConfirmButton, Field, ImageDrop, PageHeader, Toggle, inputCls, useAction } from '@/components/admin/ui';
 import { RichEditor } from '@/components/admin/rich-editor';
@@ -34,6 +34,42 @@ function Registrants({ slug, kind = 'registrations', label }: { slug: string; ki
               ))}</tbody>
             </table>
           </div>
+        </>
+      )}
+    </Card>
+  );
+}
+
+/** สถิติย้อนหลังรายคน — ใครเปิดหน้า / กดเล่น / อ่าน / โหลดไฟล์ */
+function ReplayStats({ slug, total }: { slug: string; total: number }) {
+  const [rows, setRows] = useState<LiveSeen[] | null>(null);
+  useEffect(() => { listLiveSeen(slug).then(setRows).catch(() => setRows([])); }, [slug]);
+  const n = (k: keyof LiveSeen) => (rows ?? []).filter((r) => Number(r[k]) > 0).length;
+  const stat = (label: string, v: number) => (
+    <div className="rounded-xl border border-line bg-surface-2 p-4">
+      <div className="text-2xl font-semibold">{v}<span className="text-sm font-normal text-muted"> คน</span></div>
+      <div className="text-sm text-muted">{label}{total ? ` · ${Math.round((v / total) * 100)}%` : ''}</div>
+    </div>
+  );
+  return (
+    <Card title={<span className="flex items-center gap-2"><BarChart3 className="size-4" />สถิติย้อนหลัง {rows ? `(${rows.length} คน)` : ''}</span>}>
+      {!rows ? <Loader2 className="size-5 animate-spin text-muted" /> : (
+        <>
+          <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {stat('เปิดหน้าย้อนหลัง', n('opens'))}{stat('กดเล่นคลิป', n('plays'))}{stat('เปิดอ่านไฟล์', n('reads'))}{stat('ดาวน์โหลดไฟล์', n('downloads'))}
+          </div>
+          <p className="mb-3 text-sm text-muted">% เทียบกับผู้ลงทะเบียนทั้งหมด {total} คน · เครื่องแอดมินไม่นับ · ดูยอดวิว/เวลาดูละเอียดที่ YouTube Studio</p>
+          {!!rows.length && (
+            <div className="max-h-96 overflow-auto rounded-xl border border-line">
+              <table className="w-full text-sm">
+                <thead className="sticky top-0 bg-surface-2 text-left text-muted"><tr><th className="px-3 py-2">ชื่อ</th><th className="px-3 py-2">เปิดหน้า</th><th className="px-3 py-2">เล่นคลิป</th><th className="px-3 py-2">อ่าน</th><th className="px-3 py-2">โหลด</th><th className="px-3 py-2">ล่าสุด</th></tr></thead>
+                <tbody>{rows.map((r) => (
+                  <tr key={r.uid} className="border-t border-line"><td className="px-3 py-2">{r.name || r.uid.slice(0, 6)}</td><td className="px-3 py-2">{r.opens ?? 0}</td><td className="px-3 py-2">{r.plays ?? 0}</td><td className="px-3 py-2">{r.reads ?? 0}</td><td className="px-3 py-2">{r.downloads ?? 0}</td>
+                    <td className="px-3 py-2 text-muted">{r.lastAt ? new Date(r.lastAt).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }) : ''}</td></tr>
+                ))}</tbody>
+              </table>
+            </div>
+          )}
         </>
       )}
     </Card>
@@ -135,6 +171,7 @@ function LiveEditor({ initial, onSaved, onDeleted }: { initial: LiveClass; onSav
         </div>
       </Card>
       {initial.slug && <ReplayEditor slug={initial.slug} />}
+      {initial.slug && <ReplayStats slug={initial.slug} total={(initial.count ?? 0) + (initial.ytCount ?? 0)} />}
       {initial.slug && <Registrants slug={initial.slug} label="ที่นั่ง Google Meet" />}
       {initial.slug && <Registrants slug={initial.slug} kind="viewers" label="ดูผ่าน YouTube" />}
     </div>

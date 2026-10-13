@@ -1,7 +1,7 @@
 'use client';
 // Anonymous view/watch counters → stats/{courseSlug}. Fire-and-forget; never blocks the page.
 // Shape: { views, lessonViews, days: { 'YYYY-MM-DD': n }, lessons: { [id]: { views, plays, sec, d1..d10 } } }
-import { doc, setDoc, increment } from 'firebase/firestore';
+import { doc, setDoc, increment, serverTimestamp } from 'firebase/firestore';
 import { db } from './firebase/client';
 import { firebaseConfigured } from './firebase/config';
 
@@ -51,4 +51,14 @@ export function trackWatchSeconds(slug: string, lessonId: string, sec: number) {
   const s = Math.round(sec);
   if (s < 1 || s > 3600) return;
   bump(slug, { lessons: { [lessonId]: { sec: increment(s) } } });
+}
+
+/** คลาสสด: นับรายคน (เฉพาะคนลงทะเบียน — rules ตรวจ) → liveStats/{slug}/seen/{uid}
+ *  open = เปิดหน้าย้อนหลัง · play = กดเล่นคลิปย้อนหลัง · download/read = ไฟล์แจก */
+export type LiveEvent = 'open' | 'play' | 'download' | 'read';
+const LIVE_FIELD: Record<LiveEvent, string> = { open: 'opens', play: 'plays', download: 'downloads', read: 'reads' };
+export function trackLive(slug: string, uid: string, name: string, ev: LiveEvent) {
+  if (!firebaseConfigured || !slug || !uid || skipped()) return;
+  if ((ev === 'open' || ev === 'play') && !firstTime(`pdv:live:${ev}:${slug}`)) return;
+  setDoc(doc(db(), 'liveStats', slug, 'seen', uid), { uid, name, lastAt: serverTimestamp(), [LIVE_FIELD[ev]]: increment(1) }, { merge: true }).catch(() => {});
 }
