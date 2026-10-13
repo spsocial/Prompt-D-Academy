@@ -115,6 +115,12 @@ export interface CourseStats {
   lessons?: Record<string, LessonStats>;
 }
 
+/** ไฟล์แจกในคลาสสด (ข้อความล้วน เช่น .md) — เก็บใน liveStreams/{slug} อ่านได้เฉพาะคนลงทะเบียน */
+export interface LiveMaterial {
+  name: string;
+  content: string;
+}
+
 /** lives/{slug} — คลาสสอนสด (ลงทะเบียนผ่านเว็บ, ลิงก์ห้องเรียนเก็บแยกใน liveSecrets/{slug}) */
 export interface LiveClass {
   slug: string;

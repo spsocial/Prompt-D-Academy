@@ -8,7 +8,7 @@ import { auth, db, storage } from './firebase/client';
 import { firebaseConfigured } from './firebase/config';
 import { SEED_COURSES, SEED_LESSONS, SEED_PROMOS, SEED_SETTINGS } from './seed';
 import { parseVideoLink, slugify } from './utils';
-import type { CommentDoc, Course, CourseStats, Lesson, LiveClass, LiveRegistration, Promo, SiteSettings, UserDoc } from './types';
+import type { CommentDoc, Course, CourseStats, Lesson, LiveClass, LiveMaterial, LiveRegistration, Promo, SiteSettings, UserDoc } from './types';
 import { OPEN_BEFORE_MIN, SPARE_AFTER_MIN, youtubeId } from './live';
 
 export const DEMO = !firebaseConfigured;
@@ -316,9 +316,21 @@ export async function saveLive(l: LiveClass, meetUrl: string, youtubeUrl = '') {
   await setDoc(doc(db(), 'liveSecrets', slug), { meetUrl: meetUrl.trim(), openAt, openAllAt: Timestamp.fromMillis(l.startAt + SPARE_AFTER_MIN * 60_000) });
   const yt = youtubeId(youtubeUrl);
   if (youtubeUrl.trim() && !yt) throw new Error('ลิงก์ YouTube ไม่ถูกต้อง');
-  await setDoc(doc(db(), 'liveStreams', slug), { youtubeId: yt, openAt });
+  await setDoc(doc(db(), 'liveStreams', slug), { youtubeId: yt, openAt }, { merge: true });
   await revalidate(['/', '/live', `/live/${slug}`]);
   return slug;
+}
+/** คลิปย้อนหลัง + ไฟล์แจก — อยู่ใน liveStreams/{slug} (rules: อ่านได้เฉพาะคนลงทะเบียน Meet/YouTube) */
+export async function getLiveReplay(slug: string): Promise<{ url: string; materials: LiveMaterial[] }> {
+  if (DEMO || !slug) return { url: '', materials: [] };
+  const v = (await getDoc(doc(db(), 'liveStreams', slug))).data() ?? {};
+  return { url: v.replayId ? `https://youtu.be/${v.replayId}` : '', materials: (v.materials as LiveMaterial[]) ?? [] };
+}
+export async function saveLiveReplay(slug: string, replayUrl: string, materials: LiveMaterial[]) {
+  if (DEMO) demoBlock();
+  const id = youtubeId(replayUrl);
+  if (replayUrl.trim() && !id) throw new Error('ลิงก์คลิปย้อนหลัง YouTube ไม่ถูกต้อง');
+  await setDoc(doc(db(), 'liveStreams', slug), { replayId: id, materials }, { merge: true });
 }
 export async function deleteLive(slug: string) {
   if (DEMO) demoBlock();

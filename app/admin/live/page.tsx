@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Download, ExternalLink, Loader2, Plus, Save, Users } from 'lucide-react';
-import { deleteLive, getLiveRoom, getLiveStream, listLives, listRegistrations, saveLive } from '@/lib/admin-api';
-import type { LiveClass, LiveRegistration } from '@/lib/types';
+import { Download, ExternalLink, FileText, Loader2, Plus, Save, Users, X } from 'lucide-react';
+import { deleteLive, getLiveReplay, getLiveRoom, getLiveStream, listLives, listRegistrations, saveLive, saveLiveReplay } from '@/lib/admin-api';
+import type { LiveClass, LiveMaterial, LiveRegistration } from '@/lib/types';
 import { fmtLiveDate, fmtLiveTime } from '@/lib/live';
 import { Card, ConfirmButton, Field, ImageDrop, PageHeader, Toggle, inputCls, useAction } from '@/components/admin/ui';
 import { RichEditor } from '@/components/admin/rich-editor';
@@ -36,6 +36,45 @@ function Registrants({ slug, kind = 'registrations', label }: { slug: string; ki
           </div>
         </>
       )}
+    </Card>
+  );
+}
+
+/** คลิปย้อนหลัง + ไฟล์แจก (เห็นเฉพาะคนลงทะเบียน หลังจบคลาส) */
+function ReplayEditor({ slug }: { slug: string }) {
+  const [url, setUrl] = useState('');
+  const [mats, setMats] = useState<LiveMaterial[]>([]);
+  const { busy, run } = useAction();
+  useEffect(() => { getLiveReplay(slug).then((r) => { setUrl(r.url); setMats(r.materials); }).catch(() => {}); }, [slug]);
+  const add = async (files: FileList | null) => {
+    const list = await Promise.all([...(files ?? [])].map(async (f) => ({ name: f.name, content: await f.text() })));
+    setMats((m) => [...m.filter((x) => !list.some((y) => y.name === x.name)), ...list]);
+  };
+  return (
+    <Card title="คลิปย้อนหลัง & ไฟล์แจก (เฉพาะคนลงทะเบียน)">
+      <div className="grid gap-4">
+        <Field label="ลิงก์คลิปย้อนหลัง YouTube" hint="ตั้งวิดีโอเป็น Unlisted แล้ววางลิงก์ · ขึ้นในหน้าคลาสหลังจบคลาส ให้เฉพาะคนที่ลงทะเบียน (Meet หรือ YouTube)">
+          <input className={inputCls} value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://youtu.be/xxxxxxxxxxx" />
+        </Field>
+        <Field label="ไฟล์แจก (.md / .txt)" hint="ไฟล์ข้อความ รวมกันไม่เกินราว 800KB">
+          <div className="space-y-2">
+            {mats.map((m) => (
+              <div key={m.name} className="flex items-center gap-2 rounded-xl border border-line px-3 py-2 text-sm">
+                <FileText className="size-4 text-orange" /><span className="flex-1 break-all">{m.name}</span>
+                <span className="text-muted">{(new Blob([m.content]).size / 1024).toFixed(1)} KB</span>
+                <button onClick={() => setMats((x) => x.filter((y) => y.name !== m.name))} aria-label="เอาออก"><X className="size-4" /></button>
+              </div>
+            ))}
+            <input type="file" accept=".md,.txt,text/markdown,text/plain" multiple onChange={(e) => { add(e.target.files); e.target.value = ''; }} className="text-sm" />
+          </div>
+        </Field>
+        <div>
+          <button onClick={() => run(async () => { await saveLiveReplay(slug, url, mats); return true; }, 'บันทึกย้อนหลังแล้ว')} disabled={busy}
+            className="inline-flex h-10 items-center gap-2 rounded-full bg-fg px-5 text-sm font-medium text-bg">
+            {busy ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}บันทึกย้อนหลัง
+          </button>
+        </div>
+      </div>
     </Card>
   );
 }
@@ -95,6 +134,7 @@ function LiveEditor({ initial, onSaved, onDeleted }: { initial: LiveClass; onSav
           {initial.slug && <ConfirmButton onConfirm={async () => { const ok = await run(async () => { await deleteLive(initial.slug); return true; }, 'ลบแล้ว'); if (ok) onDeleted(); }} />}
         </div>
       </Card>
+      {initial.slug && <ReplayEditor slug={initial.slug} />}
       {initial.slug && <Registrants slug={initial.slug} label="ที่นั่ง Google Meet" />}
       {initial.slug && <Registrants slug={initial.slug} kind="viewers" label="ดูผ่าน YouTube" />}
     </div>

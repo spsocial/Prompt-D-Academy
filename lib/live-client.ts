@@ -3,6 +3,7 @@
 import { doc, getDoc, increment, serverTimestamp, writeBatch } from 'firebase/firestore';
 import type { User } from 'firebase/auth';
 import { db } from './firebase/client';
+import type { LiveMaterial } from './types';
 
 export async function liveSeats(slug: string) {
   const d = await getDoc(doc(db(), 'lives', slug));
@@ -46,4 +47,11 @@ export async function liveStreamId(slug: string): Promise<string | null> {
     const d = await getDoc(doc(db(), 'liveStreams', slug));
     return (d.data()?.youtubeId as string) || null;
   } catch { return null; }
+}
+/** คลิปย้อนหลัง + ไฟล์แจก — อ่านได้เฉพาะคนลงทะเบียน (rules ปฏิเสธคนอื่น → คืนค่าว่าง) */
+export async function liveReplay(slug: string): Promise<{ replayId: string | null; materials: LiveMaterial[] }> {
+  try {
+    const v = (await getDoc(doc(db(), 'liveStreams', slug))).data() ?? {};
+    return { replayId: (v.replayId as string) || null, materials: (v.materials as LiveMaterial[]) ?? [] };
+  } catch { return { replayId: null, materials: [] }; }
 }
