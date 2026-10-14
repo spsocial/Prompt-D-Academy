@@ -347,6 +347,26 @@ export async function deleteLive(slug: string) {
   await b.commit();
   await revalidate(['/', '/live']);
 }
+/** ให้สิทธิ์ดูย้อนหลังแบบแมนนวล — หาบัญชีจากอีเมล แล้วใส่ใบลงทะเบียนใน viewers/{uid} (ไม่นับเพิ่มใน ytCount) */
+export async function grantReplay(slug: string, email: string): Promise<LiveRegistration> {
+  if (DEMO) demoBlock();
+  const e = email.trim();
+  if (!e) throw new Error('ใส่อีเมลก่อน');
+  let s = await getDocs(query(collection(db(), 'users'), where('email', '==', e), limit(1)));
+  if (s.empty && e !== e.toLowerCase()) s = await getDocs(query(collection(db(), 'users'), where('email', '==', e.toLowerCase()), limit(1)));
+  if (s.empty) throw new Error('ไม่พบบัญชีอีเมลนี้ — ให้เขาสมัครสมาชิกที่เว็บก่อน');
+  const u = s.docs[0];
+  const uid = u.id;
+  const [reg, view] = await Promise.all([getDoc(doc(db(), 'lives', slug, 'registrations', uid)), getDoc(doc(db(), 'lives', slug, 'viewers', uid))]);
+  if (reg.exists() || view.exists()) throw new Error('บัญชีนี้มีสิทธิ์ดูอยู่แล้ว');
+  const row = { uid, name: (u.data().displayName as string) || e, email: (u.data().email as string) || e, grantedBy: 'admin' as const };
+  await setDoc(doc(db(), 'lives', slug, 'viewers', uid), { ...row, createdAt: serverTimestamp() });
+  return { ...row, createdAt: Date.now() };
+}
+export async function revokeReplay(slug: string, uid: string) {
+  if (DEMO) demoBlock();
+  await deleteDoc(doc(db(), 'lives', slug, 'viewers', uid));
+}
 export async function listRegistrations(slug: string, kind: 'registrations' | 'viewers' = 'registrations'): Promise<LiveRegistration[]> {
   if (DEMO) return [];
   const s = await getDocs(collection(db(), 'lives', slug, kind));

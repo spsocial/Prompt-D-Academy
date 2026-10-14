@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { BarChart3, Download, ExternalLink, FileText, Loader2, Plus, Save, Users, X } from 'lucide-react';
-import { deleteLive, getLiveReplay, getLiveRoom, getLiveStream, listLiveSeen, listLives, listRegistrations, saveLive, saveLiveReplay } from '@/lib/admin-api';
+import { BarChart3, Download, ExternalLink, FileText, Loader2, Plus, Save, UserPlus, Users, X } from 'lucide-react';
+import { deleteLive, getLiveReplay, getLiveRoom, getLiveStream, grantReplay, listLiveSeen, listLives, listRegistrations, revokeReplay, saveLive, saveLiveReplay } from '@/lib/admin-api';
 import type { LiveClass, LiveMaterial, LiveRegistration, LiveSeen } from '@/lib/types';
 import { fmtLiveDate, fmtLiveTime } from '@/lib/live';
 import { Card, ConfirmButton, Field, ImageDrop, PageHeader, Toggle, inputCls, useAction } from '@/components/admin/ui';
@@ -29,13 +29,34 @@ function Registrants({ slug, kind = 'registrations', label }: { slug: string; ki
             <table className="w-full text-sm">
               <thead className="sticky top-0 bg-surface-2 text-left text-muted"><tr><th className="px-3 py-2">#</th><th className="px-3 py-2">ชื่อ</th><th className="px-3 py-2">อีเมล</th><th className="px-3 py-2">เวลา</th></tr></thead>
               <tbody>{rows.map((r, i) => (
-                <tr key={r.uid} className="border-t border-line"><td className="px-3 py-2 text-muted">{i + 1}</td><td className="px-3 py-2">{r.name}</td><td className="px-3 py-2">{r.email}</td>
-                  <td className="px-3 py-2 text-muted">{r.createdAt ? new Date(r.createdAt).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }) : ''}</td></tr>
+                <tr key={r.uid} className="border-t border-line"><td className="px-3 py-2 text-muted">{i + 1}</td>
+                  <td className="px-3 py-2">{r.name}{r.grantedBy === 'admin' && <span className="ml-2 rounded-full bg-surface-2 px-2 py-0.5 text-xs text-orange">แอดมินเพิ่มให้</span>}</td><td className="px-3 py-2">{r.email}</td>
+                  <td className="px-3 py-2 text-muted">{r.createdAt ? new Date(r.createdAt).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }) : ''}
+                    {r.grantedBy === 'admin' && <button onClick={async () => { if (!confirm(`ถอนสิทธิ์ดูย้อนหลังของ ${r.email}?`)) return; await revokeReplay(slug, r.uid); setRows((x) => (x ?? []).filter((y) => y.uid !== r.uid)); }}
+                      className="ml-2 align-middle text-muted hover:text-fg" aria-label="ถอนสิทธิ์"><X className="inline size-4" /></button>}</td></tr>
               ))}</tbody>
             </table>
           </div>
         </>
       )}
+    </Card>
+  );
+}
+
+/** ให้สิทธิ์ดูย้อนหลังแบบแมนนวล (คนที่ไม่ได้ลงทะเบียนก่อนวันเรียน) — ต้องมีบัญชีในเว็บแล้ว */
+function GrantReplay({ slug, onGranted }: { slug: string; onGranted: () => void }) {
+  const [email, setEmail] = useState('');
+  const { busy, run } = useAction();
+  const go = () => run(async () => { await grantReplay(slug, email); setEmail(''); onGranted(); return true; }, 'เพิ่มสิทธิ์ดูย้อนหลังแล้ว');
+  return (
+    <Card title={<span className="flex items-center gap-2"><UserPlus className="size-4" />เพิ่มสิทธิ์ดูย้อนหลัง</span>}>
+      <p className="mb-3 text-sm text-muted">ใส่อีเมลที่เขาใช้สมัครสมาชิกเว็บ (สมัครด้วย Google ก็ได้) · เขาจะดูคลิปย้อนหลังและโหลดไฟล์แจกในหน้าคลาสได้ทันที · ขึ้นในรายชื่อ "ดูผ่าน YouTube" พร้อมป้าย แอดมินเพิ่มให้</p>
+      <div className="flex flex-wrap gap-2">
+        <input className={inputCls + ' max-w-sm'} type="email" value={email} onChange={(e) => setEmail(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') go(); }} placeholder="name@gmail.com" />
+        <button onClick={go} disabled={busy || !email.trim()} className="inline-flex h-10 items-center gap-2 rounded-full bg-fg px-5 text-sm font-medium text-bg disabled:opacity-50">
+          {busy ? <Loader2 className="size-4 animate-spin" /> : <UserPlus className="size-4" />}เพิ่มสิทธิ์
+        </button>
+      </div>
     </Card>
   );
 }
@@ -120,6 +141,7 @@ function LiveEditor({ initial, onSaved, onDeleted }: { initial: LiveClass; onSav
   const [meet, setMeet] = useState('');
   const [yt, setYt] = useState('');
   const [topics, setTopics] = useState(initial.topics.join('\n'));
+  const [viewersKey, setViewersKey] = useState(0);
   const { busy, run } = useAction();
   const set = <K extends keyof LiveClass>(k: K, v: LiveClass[K]) => setL((x) => ({ ...x, [k]: v }));
   useEffect(() => { if (initial.slug) { getLiveRoom(initial.slug).then(setMeet).catch(() => {}); getLiveStream(initial.slug).then(setYt).catch(() => {}); } }, [initial.slug]);
@@ -173,7 +195,8 @@ function LiveEditor({ initial, onSaved, onDeleted }: { initial: LiveClass; onSav
       {initial.slug && <ReplayEditor slug={initial.slug} />}
       {initial.slug && <ReplayStats slug={initial.slug} total={(initial.count ?? 0) + (initial.ytCount ?? 0)} />}
       {initial.slug && <Registrants slug={initial.slug} label="ที่นั่ง Google Meet" />}
-      {initial.slug && <Registrants slug={initial.slug} kind="viewers" label="ดูผ่าน YouTube" />}
+      {initial.slug && <GrantReplay slug={initial.slug} onGranted={() => setViewersKey((k) => k + 1)} />}
+      {initial.slug && <Registrants key={viewersKey} slug={initial.slug} kind="viewers" label="ดูผ่าน YouTube" />}
     </div>
   );
 }

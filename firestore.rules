@@ -54,7 +54,8 @@ service cloud.firestore {
       match /viewers/{uid} {
         allow read: if (signedIn() && request.auth.uid == uid) || isAdmin();
         allow create: if signedIn() && request.auth.uid == uid && request.resource.data.uid == uid
-          && getAfter(/databases/$(database)/documents/lives/$(slug)).data.get('ytCount', 0) == get(/databases/$(database)/documents/lives/$(slug)).data.get('ytCount', 0) + 1;
+          && getAfter(/databases/$(database)/documents/lives/$(slug)).data.get('ytCount', 0) == get(/databases/$(database)/documents/lives/$(slug)).data.get('ytCount', 0) + 1
+          || isAdmin(); // แอดมินให้สิทธิ์ดูย้อนหลังแบบแมนนวล (หลังบ้าน /admin/live)
         allow delete: if isAdmin();
       }
     }
