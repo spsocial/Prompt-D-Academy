@@ -1,8 +1,6 @@
 'use client';
 // All admin reads/writes (client SDK — firestore.rules only lets isAdmin users write).
-import {
-  collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, writeBatch, query, orderBy, limit, serverTimestamp, getCountFromServer, where, Timestamp,
-} from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, writeBatch, query, orderBy, limit, serverTimestamp, getCountFromServer, where, Timestamp, deleteField } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { auth, db, storage } from './firebase/client';
 import { firebaseConfigured } from './firebase/config';
@@ -321,16 +319,20 @@ export async function saveLive(l: LiveClass, meetUrl: string, youtubeUrl = '') {
   return slug;
 }
 /** คลิปย้อนหลัง + ไฟล์แจก — อยู่ใน liveStreams/{slug} (rules: อ่านได้เฉพาะคนลงทะเบียน Meet/YouTube) */
-export async function getLiveReplay(slug: string): Promise<{ url: string; materials: LiveMaterial[] }> {
-  if (DEMO || !slug) return { url: '', materials: [] };
+export async function getLiveReplay(slug: string): Promise<{ url: string; materials: LiveMaterial[]; isPublic: boolean }> {
+  if (DEMO || !slug) return { url: '', materials: [], isPublic: false };
   const v = (await getDoc(doc(db(), 'liveStreams', slug))).data() ?? {};
-  return { url: v.replayId ? `https://youtu.be/${v.replayId}` : '', materials: (v.materials as LiveMaterial[]) ?? [] };
+  const pub = !!(await getDoc(doc(db(), 'lives', slug))).data()?.publicReplay;
+  return { url: v.replayId ? `https://youtu.be/${v.replayId}` : '', materials: (v.materials as LiveMaterial[]) ?? [], isPublic: pub };
 }
-export async function saveLiveReplay(slug: string, replayUrl: string, materials: LiveMaterial[]) {
+/** isPublic = คัดลอกย้อนหลัง + ไฟล์แจกไปไว้ใน lives/{slug}.publicReplay (เอกสารที่ทุกคนอ่านได้อยู่แล้ว) → ทุกคนดูได้ ไม่ต้องลงทะเบียน */
+export async function saveLiveReplay(slug: string, replayUrl: string, materials: LiveMaterial[], isPublic = false) {
   if (DEMO) demoBlock();
   const id = youtubeId(replayUrl);
   if (replayUrl.trim() && !id) throw new Error('ลิงก์คลิปย้อนหลัง YouTube ไม่ถูกต้อง');
   await setDoc(doc(db(), 'liveStreams', slug), { replayId: id, materials }, { merge: true });
+  await updateDoc(doc(db(), 'lives', slug), { publicReplay: isPublic ? { replayId: id, materials } : deleteField() });
+  await revalidate(['/', '/live', `/live/${slug}`]);
 }
 export async function listLiveSeen(slug: string): Promise<LiveSeen[]> {
   if (DEMO || !slug) return [];

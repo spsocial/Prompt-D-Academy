@@ -101,14 +101,15 @@ function ReplayStats({ slug, total }: { slug: string; total: number }) {
 function ReplayEditor({ slug }: { slug: string }) {
   const [url, setUrl] = useState('');
   const [mats, setMats] = useState<LiveMaterial[]>([]);
+  const [pub, setPub] = useState(false);
   const { busy, run } = useAction();
-  useEffect(() => { getLiveReplay(slug).then((r) => { setUrl(r.url); setMats(r.materials); }).catch(() => {}); }, [slug]);
+  useEffect(() => { getLiveReplay(slug).then((r) => { setUrl(r.url); setMats(r.materials); setPub(r.isPublic); }).catch(() => {}); }, [slug]);
   const add = async (files: FileList | null) => {
     const list = await Promise.all([...(files ?? [])].map(async (f) => ({ name: f.name, content: await f.text() })));
     setMats((m) => [...m.filter((x) => !list.some((y) => y.name === x.name)), ...list]);
   };
   return (
-    <Card title="คลิปย้อนหลัง & ไฟล์แจก (เฉพาะคนลงทะเบียน)">
+    <Card title={pub ? "คลิปย้อนหลัง & ไฟล์แจก (สาธารณะ · ทุกคนดูได้)" : "คลิปย้อนหลัง & ไฟล์แจก (เฉพาะคนลงทะเบียน)"}>
       <div className="grid gap-4">
         <Field label="ลิงก์คลิปย้อนหลัง YouTube" hint="ตั้งวิดีโอเป็น Unlisted แล้ววางลิงก์ · ขึ้นในหน้าคลาสหลังจบคลาส ให้เฉพาะคนที่ลงทะเบียน (Meet หรือ YouTube)">
           <input className={inputCls} value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://youtu.be/xxxxxxxxxxx" />
@@ -125,8 +126,12 @@ function ReplayEditor({ slug }: { slug: string }) {
             <input type="file" accept=".md,.txt,text/markdown,text/plain" multiple onChange={(e) => { add(e.target.files); e.target.value = ''; }} className="text-sm" />
           </div>
         </Field>
+        <label className="flex items-start gap-3 rounded-xl border border-line px-4 py-3 text-sm">
+          <input type="checkbox" className="mt-1" checked={pub} onChange={(e) => setPub(e.target.checked)} />
+          <span><b>เปิดสาธารณะ</b> · ทุกคนดูคลิปย้อนหลังและโหลดไฟล์แจกได้ในหน้าคลาส ไม่ต้องลงทะเบียนหรือล็อกอิน<br /><span className="text-muted">ติ๊กออก = กลับไปเป็นเฉพาะคนลงทะเบียน</span></span>
+        </label>
         <div>
-          <button onClick={() => run(async () => { await saveLiveReplay(slug, url, mats); return true; }, 'บันทึกย้อนหลังแล้ว')} disabled={busy}
+          <button onClick={() => run(async () => { await saveLiveReplay(slug, url, mats, pub); return true; }, 'บันทึกย้อนหลังแล้ว')} disabled={busy}
             className="inline-flex h-10 items-center gap-2 rounded-full bg-fg px-5 text-sm font-medium text-bg">
             {busy ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}บันทึกย้อนหลัง
           </button>

@@ -141,6 +141,8 @@ export interface LiveClass {
   streamOpen?: boolean;
   /** จำนวนคนลงทะเบียนดูผ่าน YouTube (เพิ่มทีละ 1 — บังคับใน firestore.rules) */
   ytCount?: number;
+  /** เปิดย้อนหลัง + ไฟล์แจกให้ทุกคน (ไม่ต้องลงทะเบียน/ล็อกอิน) — admin ตั้งในหน้า /admin/live */
+  publicReplay?: { replayId: string | null; materials: LiveMaterial[] } | null;
   createdAt?: number;
   updatedAt?: number;
 }
