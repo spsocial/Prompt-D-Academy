@@ -109,7 +109,7 @@ function LiveReplay({ live, allowed: registered, signedIn, uid, name, children }
     <div className="mt-4 space-y-4">
       {data.replayId ? (
         <div className="overflow-hidden rounded-[22px] border border-line bg-black">
-          <iframe className="aspect-video w-full" src={`https://www.youtube-nocookie.com/embed/${data.replayId}?rel=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`} title={`ย้อนหลัง · ${live.title}`} onLoad={listen}
+          <iframe className="aspect-video w-full" src={`https://www.youtube-nocookie.com/embed/${data.replayId}?rel=0&enablejsapi=1&origin=${encodeURIComponent(typeof window === 'undefined' ? 'https://www.promptdclass.com' : window.location.origin)}`} title={`ย้อนหลัง · ${live.title}`} onLoad={listen}
             allow="encrypted-media; picture-in-picture; fullscreen" allowFullScreen />
         </div>
       ) : children}
